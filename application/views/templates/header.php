@@ -28,16 +28,19 @@
             <a class="nav-link" href="<?php echo base_url(); ?>users/student">S</a>
           </li>
         </ul>
+
         <ul class="nav navbar-nav navbar-right">
-          <?php if ($this->session->flashdata('user_loggedin')) : ?>
+          <?php if ($this->session->userdata('logged_in')) : ?>
             <li class="nav-item">
-              <?php if (strcmp($this->session->role, 'teacher') == 0) : ?>
-                <a class="nav-link" href="<?php echo base_url(); ?>users/teacher"><?php echo $this->session->username; ?></a>
-              <?php elseif (strcmp($this->session->role, 'student') == 0) : ?>
-                <a class="nav-link" href="<?php echo base_url(); ?>users/student"><?php echo $this->session->username; ?></a>
-              <?php endif; ?>
+              <a class="nav-link" href="<?php echo base_url(); ?>
+              <?php if ($this->session->role === 'teacher') : ?>
+                <?php echo 'users/teacher'; ?>
+              <?php else : ?>
+                <?php echo 'users/student'; ?>
+              <?php endif; ?>"><?php echo $this->session->username; ?>
+              </a>
             </li>
-            <li class="nav-item">
+            <li class=" nav-item">
               <a class="nav-link" href="<?php echo base_url(); ?>users/logout">Logout</a>
             </li>
           <?php else : ?>

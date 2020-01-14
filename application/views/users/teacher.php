@@ -1,10 +1,8 @@
 <?php if (strcmp($this->session->role, 'student') == 0) : ?>
-  <?php redirect('users/login'); ?>
+  <?php redirect('home'); ?>
 <?php endif; ?>
 
 <h2>Welcome back <?php echo $this->session->username . '!'; ?></h2>
-
-
 
 <?php
 for ($i = 0; $i < sizeof($course_list); $i++) {

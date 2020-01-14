@@ -22,7 +22,7 @@ class Users extends CI_Controller
       //set message
       $this->session->set_flashdata('user_registered', 'You are now registered and can log in');
 
-      redirect('home');
+      redirect('users/login');
     }
   }
 
@@ -61,7 +61,7 @@ class Users extends CI_Controller
       } else {
         $user_data['username'] = $username;
         $user_data['logged_in'] = true;
-
+        print_r($user_data);
         $this->session->set_userdata($user_data);
         $this->session->set_flashdata('user_loggedin', 'You are now logged in');
         redirect('home');
