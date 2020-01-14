@@ -80,4 +80,30 @@ class Users extends CI_Controller
 
     redirect('users/login');
   }
+  //teacher's user page
+  public function teacher()
+  {
+    $data['title'] = 'Teacher\'s page';
+
+    $course_list = $this->user_model->get_courses_for_teachers($this->session->id);
+    $data['course_list'] = $course_list;
+    // print_r($data['course_list']);
+
+    $this->load->view('templates/header');
+    $this->load->view('users/teacher', $data);
+    $this->load->view('templates/footer');
+  }
+  //student's user page
+  public function student()
+  {
+    $data['title'] = 'Student\'s page';
+
+    $course_list = $this->user_model->get_courses_for_students($this->session->id);
+    $data['course_list'] = $course_list;
+    // print_r($data['course_list']);
+
+    $this->load->view('templates/header');
+    $this->load->view('users/student', $data);
+    $this->load->view('templates/footer');
+  }
 }

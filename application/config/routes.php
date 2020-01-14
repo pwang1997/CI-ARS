@@ -2,8 +2,13 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 
-$route['users/teacher'] = 'users/teacher';
+$route['courses/create'] = 'courses/create';
+$route['courses/edit'] = 'courses/edit';
+$route['courses/teacher'] = 'courses/teacher';
+$route['courses/student'] = 'courses/student';
+
 $route['users/student'] = 'users/student';
+$route['users/teacher'] = 'users/teacher';
 $route['users/login'] = 'users/login';
 $route['users/register'] = 'users/register';
 
