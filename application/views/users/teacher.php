@@ -15,10 +15,10 @@ for ($i = 0; $i < sizeof($course_list); $i++) {
       <div class="col-md-1"></div>
     <?php } elseif ($i % 3 == 2) {
     ?>
-      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['id'], $course_list[$i]['classroom_id']); ?>
+      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id']); ?>
     </div>
   <?php } else { ?>
-    <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['id'], $course_list[$i]['classroom_id']); ?>
+    <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id']); ?>
     <div class="col-md-1"></div>
 <?php }
 }
