@@ -84,7 +84,7 @@
 					<tbody>
 						<?php foreach($labs as $lab): ?>
 							<tr class="table-light">
-								<th scope="row"><a href="../../../quizs/teacher/<?php echo $lab['lab_index'];?>"><?php echo $lab['lab_index']; ?></a></th>
+								<th scope="row"><a href="../../../questions/teacher/<?php echo $lab['lab_index'];?>"><?php echo $lab['lab_index']; ?></a></th>
 								<th><?php echo $lab['username']; ?></th>
 								<th><button type="button" class="btn btn-primary" id="<?php echo "btn_" . $student['username']; ?>">Remove</button></th>
 								<th><button type="button" class="btn btn-primary" id="<?php echo "btn_" . $student['username'] . "2"; ?>">Modify</button></th>

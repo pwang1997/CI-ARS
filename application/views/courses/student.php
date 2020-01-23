@@ -30,7 +30,7 @@
                     <tbody>
                         <?php foreach ($labs as $lab) : ?>
                             <tr class="table-light">
-                                <th scope="row"><a href="../../../quizs/student/<?php echo $lab['id']; ?>"><?php echo $lab['id']; ?></a></th>
+                                <th scope="row"><a href="../../../questions/student/<?php echo $lab['id']; ?>"><?php echo $lab['id']; ?></a></th>
                                 <th><?php echo $lab['assistant_id']?></th>
                                 <th><button type="button" class="btn btn-primary ">Remove</button></th>
                                 <th><button type="button" class="btn btn-primary ">Modify</button></th>

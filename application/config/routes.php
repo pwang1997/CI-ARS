@@ -1,6 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$route['questions/student/:num'] = 'questions/student';
+$route['questions/create/:num'] = 'questions/create';
+$route['questions/teacher/:num'] = 'questions/teacher';
 
 $route['courses/student/:num/:num'] = 'courses/student';
 $route['courses/create'] = 'courses/create';
