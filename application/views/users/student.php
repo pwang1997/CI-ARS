@@ -5,7 +5,7 @@
 <?php endif; ?>
 
 <h2>Welcome back <?php echo $this->session->username . '!'; ?></h2>
-<?php print_r($course_list); ?>
+<?php //print_r($course_list); ?>
 <?php
 for ($i = 0; $i < sizeof($course_list); $i++) {
   if ($i % 3 == 0) {
