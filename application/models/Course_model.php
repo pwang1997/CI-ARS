@@ -45,10 +45,14 @@ class Course_model extends CI_Model
 
   public function get_enrolledStudents_for_teacher($classroom_id)
   {
-    $this->db->join('users', 'users.id = labs.student_id');
-    return $this->db->get_where('labs', array('classroom_id' => $classroom_id))->result_array();
+    $this->db->join('users', 'users.id = enrolledStudents.student_id');
+    return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id))->result_array();
   }
 
+  public function get_labs($classroom_id) {
+    $this->db->join('enrolledStudents', 'enrolledStudents.id = labs.enrolledStudent_id');
+    return $this->db->get_where('labs', array('enrolledStudents.classroom_id' => $classroom_id))->result_array();
+  }
 
   /**
    * add student to the enrolledStudent table
@@ -61,12 +65,31 @@ class Course_model extends CI_Model
     $student_id = $this->check_username_exists($sname);
     
     //if the student is already enrolled, return false
-    $is_enrolled = $this->db->get_where('labs', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->num_rows();
+    $is_enrolled = $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->num_rows();
 
     if ($student_id !== FALSE && $is_enrolled == FALSE) {
       $data = array(
          			'classroom_id' => $classroom_id,
         			'student_id' => $student_id
+      );
+      $this->db->insert('enrolledStudents', $data);
+      return  $this->db->affected_rows() > 0;
+    } else {
+      return false;
+    }
+  }
+
+  public function add_lab_from_classroom() {
+    $ta_username = $this->input->post('ta_username');
+    $student_username = $this->input->post('student_username');
+    $classroom_id = $this->input->post('classroom_id');
+    $ta_id = $this->check_username_exists($ta_username);
+    $enrolled_id = $this->get_enrolledStudentID($classroom_id, $student_username);
+
+    if($ta_id !== False && $enrolled_id !== FALSE) {
+      $data = array(
+        'assistant_id' => $ta_id,
+        'enrolledStudent_id' => $enrolled_id
       );
       $this->db->insert('labs', $data);
       return  $this->db->affected_rows() > 0;
@@ -80,7 +103,7 @@ class Course_model extends CI_Model
     $username = $this->input->post('username');
     $student_id = $this->check_username_exists($username);
     $classroom_id = $this->input->post('classroom_id');
-    return $this->db->delete('labs', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
+    return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
 
   }
 
@@ -92,5 +115,17 @@ class Course_model extends CI_Model
     } else {
       return $this->db->get_where('users', array('username' => $username))->result_array()[0]['id'];
     }
+  }
+
+  public function get_enrolledStudentID($classroom_id, $student_username) {
+    $student_id = $this->check_username_exists($student_username);
+    $query = $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
+    
+    if (empty($query->row_array())) {
+      return false;
+    } else {
+      return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->result_array()[0]['id'];
+    }
+
   }
 }
