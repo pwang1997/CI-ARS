@@ -126,6 +126,14 @@ class Course_model extends CI_Model
     } else {
       return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->result_array()[0]['id'];
     }
+  }
 
+
+  public function get_labs_for_user($course_id, $classroom_id) {
+    $user_id = $this->session->id;
+
+    return $this->db->select('*')
+    ->where(array('student_id'=>$user_id, 'classroom_id' => $classroom_id))
+    ->join('labs', 'labs.enrolledStudent_id = enrolledStudents.id')->get('enrolledStudents')->result_array();
   }
 }

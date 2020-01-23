@@ -65,4 +65,19 @@ class Courses extends CI_Controller
     
     echo json_encode($msg);
   }
+
+  public function student() {
+    $data['title'] = 'Student\'s Course Page';
+
+    $course_id = $this->uri->segment(3);
+    $classroom_id = $this->uri->segment(4);
+
+    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
+    $data['labs'] = $this->course_model->get_labs_for_user($course_id, $classroom_id);
+
+    $this->load->view('templates/header');
+    $this->load->view('courses/student', $data);
+    $this->load->view('templates/footer');
+
+  }
 }
