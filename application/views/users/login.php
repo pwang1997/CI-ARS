@@ -1,3 +1,5 @@
+<script type = 'text/javascript' src = "<?php echo base_url(); 
+   ?>js/test.js"></script>
 <?php echo form_open('users/login'); ?>
 <div class="mx-auto" style="width: 400px;">
 

@@ -44,23 +44,21 @@ class User_model extends CI_Model
 
   public function get_courses_for_teachers($teacher_id)
   {
-    $this->db->select('courses.id, course_name, course_code');
-    $this->db->from('courses');
+    $this->db->select('courses.id as course_id,  classrooms.id as classroom_id, course_name, course_code');
     $this->db->join('classrooms', 'courses.id = classrooms.course_id');
-    $this->db->where('taught_by', $teacher_id);
-    $result = $this->db->get();
-    return $result->result_array();
+    $where = array('taught_by'=>$teacher_id);
+    return $this->db->get_where('courses', $where)->result_array();
   }
 
   public function get_courses_for_students($student_id)
   {
     $this->db->select('course_name, username, classrooms.id');
-    $this->db->from('courses');
     $this->db->join('classrooms', 'courses.id = classrooms.course_id');
     $this->db->join('users', 'classrooms.taught_by = users.id');
-    $this->db->where('student_id', $student_id);
-    $this->db->where('users.role', 'teacher');
-    $result = $this->db->get();
-    return $result->result_array();
+    $where = array(
+      'student_id' => $student_id,
+      'users.role' => 'teacher'
+    );
+    return $this->db->get_where('courses', $where)->result_array();
   }
 }

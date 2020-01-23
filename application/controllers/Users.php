@@ -106,4 +106,17 @@ class Users extends CI_Controller
     $this->load->view('users/student', $data);
     $this->load->view('templates/footer');
   }
+
+  public function get_course_for_teacher() {
+    $course_id = $this->uri->segment(3);
+    $classroom_id = $this->uri->segment(4);
+
+    $course_data = $this->user_model->get_course_data($course_id, $classroom_id);
+    $data['course_data'] = $course_data;
+    // print_r($data['course_list']);
+
+    $this->load->view('templates/header');
+    $this->load->view('../courses/teacher', $data);
+    $this->load->view('templates/footer');
+  }
 }

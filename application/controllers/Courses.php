@@ -28,8 +28,33 @@ class Courses extends CI_Controller
     }
   }
 
-  //edit classroom 
-  public function edit()
-  {
+  //teacher's view of the course
+  public function teacher() {
+    $data['title'] = 'Teacher\'s Course Page';
+
+    $course_id = $this->uri->segment(3);
+    $classroom_id = $this->uri->segment(4);
+
+    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
+    $data['enrolledStudents'] = $this->course_model->get_enrolledStudents_for_teacher($classroom_id);
+
+    $this->load->view('templates/header');
+    $this->load->view('courses/teacher', $data);
+    $this->load->view('templates/footer');
+
+  }
+
+  public function add_student_from_classroom() {
+    $msg['success']= $this->course_model->add_student_from_classroom();
+    $msg['username'] = $this->input->post('username');
+    
+    echo json_encode($msg);
+  }
+
+  public function remove_student_from_classroom() {
+    $msg['success']= $this->course_model->remove_student_from_classroom();
+    $msg['username'] = $this->input->post('username');
+    
+    echo json_encode($msg);
   }
 }
