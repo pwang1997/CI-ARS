@@ -48,14 +48,15 @@ class Courses extends CI_Controller
   public function add_student_from_classroom() {
     $msg['success']= $this->course_model->add_student_from_classroom();
     $msg['username'] = $this->input->post('username');
-    
     echo json_encode($msg);
   }
 
   public function add_lab_from_classroom() {
-    $msg['success']= $this->course_model->add_lab_from_classroom();
-    $msg['username'] = $this->input->post('username');
-    
+    $result = $this->course_model->add_lab_from_classroom();
+    $msg['success'] = $result['success'];
+    $msg['lab_id'] = $result['lab_id'];
+    $msg['username'] = $this->input->post('student_username');
+    $msg['ta_username'] = $this->input->post('ta_username');
     echo json_encode($msg);
   }
 
