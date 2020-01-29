@@ -16,7 +16,7 @@ class Question_model extends CI_Model
     $choices = $this->input->post('choices');
 
     //quiz exists for the lab
-    if ($this->hasQuestion($lab_index)) {
+    if ($this->has_question_in_quiz($lab_index)) {
       $quiz_id = $this->getQuiz($lab_index);
       if (!empty($quiz_id)) {
         $quiz_id = $quiz_id[0]['id'];
@@ -48,7 +48,7 @@ class Question_model extends CI_Model
     return  $this->db->affected_rows() > 0;
   }
 
-  public function hasQuestion($lab_index)
+  public function has_question_in_quiz($lab_index)
   {
     $result = $this->db->get_where('quizs', array('lab_id' => $lab_index))->result_array();
     return !empty($result);

@@ -77,6 +77,7 @@
 						<tr>
 							<th scope="col">Lab</th>
 							<th scope="col">Teaching Assistant</th>
+							<th scope="col">Student Name</th>
 							<th scope="col">Action</th>
 							<th></th>
 						</tr>
@@ -86,6 +87,7 @@
 							<tr class="table-light">
 								<th scope="row"><a href="../../../questions/teacher/<?php echo $lab['lab_index'];?>"><?php echo $lab['lab_index']; ?></a></th>
 								<th><?php echo $lab['username']; ?></th>
+								<th><?php echo $student['username']; ?></th>
 								<th><button type="button" class="btn btn-primary" id="<?php echo "btn_" . $student['username']; ?>">Remove</button></th>
 								<th><button type="button" class="btn btn-primary" id="<?php echo "btn_" . $student['username'] . "2"; ?>">Modify</button></th>
 							</tr>
@@ -179,7 +181,7 @@
 							$(".modal").modal('hide');
 							$('#ta_username').val("");
 							$("#list_of_lab > tbody").append('<tr class="table-light">' +
-								'<th scrope="row">' + response.lab_id + '</th>' + '<th>'+response.ta_username+'</th><th><button type="button" class="btn btn-primary" id=btn_' + response.ta_username + '>Remove</button></th>' +
+								'<th scrope="row">' + response.lab_id + '</th>' + '<th>'+response.ta_username+'</th><th>'+response.username+'</th><th><button type="button" class="btn btn-primary" id=btn_' + response.ta_username + '>Remove</button></th>' +
 								'<th><button type="button" class="btn btn-primary">Modify</button></th>' + '</tr>');
 						} else {
 							alert('Student does not exitst');

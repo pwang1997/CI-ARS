@@ -91,7 +91,7 @@ class Course_model extends CI_Model
     $classroom_id = $this->input->post('classroom_id');
     $ta_id = $this->check_username_exists($ta_username);//get ta's user id
     $enrolled_id = $this->get_enrolledStudent($classroom_id, $student_username)['id'];//get student's enroll id
-    $already_exists = $this->is_student_in_lab($enrolled_id);
+    $already_exists = $this->is_student_in_lab($enrolled_id);//given enrolled student is registered in the lab
     $lab_index = $this->get_lab_id($ta_id, $enrolled_id);
 
     // print_r($already_exists);
