@@ -73,7 +73,8 @@ class Courses extends CI_Controller
     $classroom_id = $this->uri->segment(4);
 
     $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
-    $data['labs'] = $this->course_model->get_labs_for_user($course_id, $classroom_id);
+    $data['quizs'] = $this->course_model->get_quizs_for_teacher($course_id, $classroom_id);
+    $data['num_of_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/student', $data);

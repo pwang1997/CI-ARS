@@ -100,18 +100,6 @@ class Course_model extends CI_Model
     return $result;
   }
 
-  public function is_student_in_lab($enrolled_id) {
-    return !empty($this->db->get_where('labs', array('enrolledStudent_id' => $enrolled_id))->result_array());
-  }
-
-  public function get_lab_id($ta_id, $enrolled_id) {
-    $query = $this->db->get_where('labs', array('assistant_id' => $ta_id, 'enrolledStudent_id'=>$enrolled_id))->result_array();
-    if(!empty($query)) {
-      return $query[0]['id'];
-    } else {
-      return $this->db->select('id')->order_by('id', 'desc')->limit(1)->get('labs')->result_array()[0]['id'];
-    }
-  }
   /**
    * remove student from classroom(in the view of teacher)
    */
@@ -157,11 +145,13 @@ class Course_model extends CI_Model
   /**
    * query rows of labs by selecting classroom_id and current user's id(teacher/ student)
    */
-  public function get_labs_for_user($course_id, $classroom_id) {
+  public function get_quizs_for_user($classroom_id) {
     $user_id = $this->session->id;
-
-    return $this->db->select('*')
-    ->where(array('student_id'=>$user_id, 'classroom_id' => $classroom_id))
-    ->join('labs', 'labs.enrolledStudent_id = enrolledStudents.id')->get('enrolledStudents')->result_array();
+    return $this->db->select('*')->from('enrolledStudents')->where(array('enrolledStudents.student_id' => $user_id, 
+    'enrolledStudents.classroom_id'=>$classroom_id))->join('quizs', 'quizs.classroom_id = enrolledStudents.classroom_id')
+    ->get()->result_array();
+    // return $this->db->select('*')
+    // ->where(array('student_id'=>$user_id, 'classroom_id' => $classroom_id))
+    // ->join('labs', 'labs.enrolledStudent_id = enrolledStudents.id')->get('enrolledStudents')->result_array();
   }
 }
