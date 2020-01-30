@@ -42,6 +42,16 @@ class Questions extends CI_Controller
         $this->load->view('templates/footer');
     }
 
+    public function question_base() {
+        $data['title'] = 'Question Base';
+        
+        $data['result'] = $this->question_model->get_question_base();
+
+        $this->load->view('templates/header');
+        $this->load->view('questions/question_base', $data);
+        $this->load->view('templates/footer');
+    }
+
     public function create_question() {
         $lab_index = $this->input->post('lab_index');
         $msg['success'] = $this->question_model->create($lab_index);

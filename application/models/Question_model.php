@@ -74,4 +74,22 @@ class Question_model extends CI_Model
 
     return $this->db->insert('studentResponse', $data);
   }
+
+  public function get_question_base() {
+    $teacher_id = $this->session->id;
+    if($this->session->role != "teacher") return;
+    else {
+      $this->db->distinct();
+      $this->db->select("courses.course_name as course_name, courses.course_code as course_code,
+      users.username as teacher_name, classrooms.section_id as section, questions.id as question_index, 
+      questions.is_public as is_public");
+      $this->db->from("users");
+      $this->db->where('users.id', $teacher_id);
+      $this->db->join('classrooms', 'users.id = classrooms.taught_by');
+      $this->db->join('courses', 'classrooms.course_id = courses.id');
+      $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
+      $this->db->join('questions', 'quizs.id = questions.quiz_id');
+      return $this->db->get()->result_array();
+    }
+  }
 }
