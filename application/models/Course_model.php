@@ -49,11 +49,15 @@ class Course_model extends CI_Model
     return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id))->result_array();
   }
 
-  public function get_labs($classroom_id) {
-    $this->db->select('users.username as username, labs.id as lab_index');
-    $this->db->join('enrolledStudents', 'enrolledStudents.id = labs.enrolledStudent_id');
-    $this->db->join('users', 'users.id=labs.assistant_id');
-    return $this->db->get_where('labs', array('enrolledStudents.classroom_id' => $classroom_id))->result_array();
+  public function get_quizs_for_teacher($classroom_id) {
+    $this->db->select('quizs.id as quiz_index, users.username as username');
+    $this->db->from('users');
+    $this->db->join('enrolledStudents', 'users.id = enrolledStudents.student_id');
+    $this->db->join('classrooms', 'enrolledStudents.classroom_id = classrooms.id');
+    $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
+    $this->db->group_by('quizs.id');
+    $this->db->where(array('enrolledStudents.classroom_id' => $classroom_id));
+    return $this->db->get()->result_array();
   }
 
   /**
@@ -81,31 +85,19 @@ class Course_model extends CI_Model
     }
   }
 
-  /**
-   * each TA dtermines a lab. each student can only be in one lab for each classroom
-   * @return boolean
-   */
-  public function add_lab_from_classroom() {
-    $ta_username = $this->input->post('ta_username');
-    $student_username = $this->input->post('student_username');
+  public function add_quiz_from_classroom() {
     $classroom_id = $this->input->post('classroom_id');
-    $ta_id = $this->check_username_exists($ta_username);//get ta's user id
-    $enrolled_id = $this->get_enrolledStudent($classroom_id, $student_username)['id'];//get student's enroll id
-    $already_exists = $this->is_student_in_lab($enrolled_id);//given enrolled student is registered in the lab
-    $lab_index = $this->get_lab_id($ta_id, $enrolled_id);
+    return array('success' => $this->db->insert('quizs', array("classroom_id" => $classroom_id)), 'quiz_index' => $this->db->insert_id());
+  }
 
-    // print_r($already_exists);
-    if($ta_id !== False && $enrolled_id !== FALSE && $already_exists === FALSE) {
-      $data = array(
-        'id' => $lab_index,
-        'assistant_id' => $ta_id,
-        'enrolledStudent_id' => $enrolled_id
-      );
-      $this->db->insert('labs', $data);
-      return  array('success' => $this->db->affected_rows() > 0, 'lab_id' => $lab_index);
-    } else {
-      return false;
+  public function get_number_of_questions($arr_quiz) {
+    $result = array();
+    foreach($arr_quiz as $quiz) {
+      $quiz_id = $quiz['quiz_index'];
+      $result[$quiz_id] = $this->db->select('count(*) as num_questions')->from('questions')->join('quizs', 'quizs.id=questions.quiz_id')
+      ->where(array('questions.quiz_id' => $quiz_id))->get()->result_array()[0];
     }
+    return $result;
   }
 
   public function is_student_in_lab($enrolled_id) {

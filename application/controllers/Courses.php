@@ -37,7 +37,8 @@ class Courses extends CI_Controller
 
     $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
     $data['enrolledStudents'] = $this->course_model->get_enrolledStudents_for_teacher($classroom_id);
-    $data['labs'] = $this->course_model->get_labs($classroom_id);
+    $data['quizs'] = $this->course_model->get_quizs_for_teacher($classroom_id);
+    $data['num_of_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/teacher', $data);
@@ -51,12 +52,10 @@ class Courses extends CI_Controller
     echo json_encode($msg);
   }
 
-  public function add_lab_from_classroom() {
-    $result = $this->course_model->add_lab_from_classroom();
+  public function add_quiz_from_classroom() {
+    $result = $this->course_model->add_quiz_from_classroom();
     $msg['success'] = $result['success'];
-    $msg['lab_id'] = $result['lab_id'];
-    $msg['username'] = $this->input->post('student_username');
-    $msg['ta_username'] = $this->input->post('ta_username');
+    $msg['quiz_index'] = $result['quiz_index'];
     echo json_encode($msg);
   }
 

@@ -19,10 +19,10 @@ class Questions extends CI_Controller
     {
         $data['title'] = 'Teacher\'s Quiz Page';
 
-        $lab_index = $this->uri->segment(3);
-        $data['hasQuestion'] = $this->question_model->has_question_in_quiz($lab_index);
-        $data['question_list'] =$this->question_model->getQuestions($lab_index);
-        $data['lab_index'] = $lab_index;
+        $quiz_index = $this->uri->segment(3);
+        $data['hasQuestion'] = $this->question_model->has_question_in_quiz($quiz_index);
+        $data['question_list'] =$this->question_model->getQuestions($quiz_index);
+        $data['quiz_index'] = $quiz_index;
 
         $this->load->view('templates/header');
         $this->load->view('questions/teacher', $data);
