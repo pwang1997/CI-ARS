@@ -25,23 +25,28 @@
           <li class="nav-item">
             <a class="nav-link" href="<?php echo base_url(); ?>about">About</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="<?php echo base_url(); ?>users/teacher">T</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="<?php echo base_url(); ?>users/student">S</a>
-          </li>
+          <!-- teacher's header-->
+          <?php if ($this->session->role == "teacher") : ?>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>users/teacher">Classrooms</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>questions/question_base">Question Base</a>
+            </li>
+          <?php elseif ($this->session->role == "student") : ?>
+            <!-- student's header -->
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>users/student">Student</a>
+            </li>
+          <?php endif; ?>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
           <?php if ($this->session->userdata('logged_in')) : ?>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo base_url(); ?>
-              <?php if ($this->session->role === 'teacher') : ?>
-                <?php echo 'users/teacher'; ?>
-              <?php else : ?>
-                <?php echo 'users/student'; ?>
-              <?php endif; ?>"><?php echo $this->session->username; ?>
+              <a class="nav-link" href="<?php echo base_url(); ?><?php if ($this->session->role === 'teacher') : ?><?php echo 'users/teacher'; ?>
+              <?php else : ?><?php echo 'users/student'; ?><?php endif; ?>">
+              <?php echo $this->session->username; ?>
               </a>
             </li>
             <li class=" nav-item">
