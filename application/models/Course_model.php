@@ -50,6 +50,14 @@ class Course_model extends CI_Model
   }
 
   public function get_quizs_for_teacher($classroom_id) {
+    $this->db->select('quizs.id as quiz_index');
+    $this->db->from('quizs');
+    $this->db->group_by('quizs.id');
+    $this->db->where(array('classroom_id' => $classroom_id));
+    return $this->db->get()->result_array();
+  }
+
+  public function get_quizs_for_student($classroom_id) {
     $this->db->select('quizs.id as quiz_index, users.username as username');
     $this->db->from('users');
     $this->db->join('enrolledStudents', 'users.id = enrolledStudents.student_id');
