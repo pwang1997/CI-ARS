@@ -33,9 +33,9 @@ class Questions extends CI_Controller
     {
         $data['title'] = 'Student\'s Quiz Page';
 
-        $lab_index = $this->uri->segment(3);
-        $data['lab_index'] = $lab_index;
-        $data['question_list'] =$this->question_model->getQuestions($lab_index);
+        $quiz_index = $this->uri->segment(3);
+        $data['quiz_index'] = $quiz_index;
+        $data['question_list'] =$this->question_model->getQuestions($quiz_index);
         
         $this->load->view('templates/header');
         $this->load->view('questions/student', $data);
@@ -53,7 +53,7 @@ class Questions extends CI_Controller
     }
 
     public function create_question() {
-        $lab_index = $this->input->post('lab_index');
+        $lab_index = $this->input->post('quiz_index');
         $msg['success'] = $this->question_model->create($lab_index);
         echo json_encode($msg);
     }

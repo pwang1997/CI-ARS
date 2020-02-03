@@ -16,6 +16,8 @@
             <th>Section</th>
             <th>Teacher's Name</th>
             <th>Question Index</th>
+            <th>Category</th>
+            <th>Difficulty</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +38,8 @@
                         <?php echo $row['question_index']; ?>
                     <? endif; ?>
                 </td>
+                <td><?php echo $row['category']; ?></td>
+                <td><?php echo $row['difficulty']; ?></td>
             </tr>
         <?php endforeach; ?>
     </tbody>
