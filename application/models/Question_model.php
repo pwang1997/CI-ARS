@@ -30,6 +30,9 @@ class Question_model extends CI_Model
     return $this->db->insert('questions', $data);
   }
 
+  public function has_question_in_quiz($quiz_index) {
+    return $this->db->select('COUNT(id) as counter')->get_where('questions', array('quiz_id'=>$quiz_index))->result_array()[0]['counter'] != 0;
+  }
 
   public function getQuiz($lab_index)
   {
@@ -68,7 +71,6 @@ class Question_model extends CI_Model
       $this->db->join('courses', 'classrooms.course_id = courses.id');
       $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
       $this->db->join('questions', 'quizs.id = questions.quiz_id');
-      $this->db->group_by('quizs.id');
       return $this->db->get()->result_array();
     }
   }
