@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+$route['analysis/category_cloud'] = 'analysis/category_cloud';
+
 $route['questions/view/:num'] = 'questions/view';
 $route['questions/question_base'] = 'questions/question_base';
 $route['questions/student/:num'] = 'questions/student';
