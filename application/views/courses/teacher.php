@@ -106,9 +106,9 @@
 					New Quiz
 				</button>
 
-			</div>
 		</div>
 	</div>
+</div>
 	<script>
 		$(document).ready(() => {
 			classroom_id = $("#classroom_id");
