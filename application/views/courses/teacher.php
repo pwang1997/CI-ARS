@@ -92,11 +92,11 @@
 						<?php $i = 1; ?>
 						<?php foreach ($quizs as $quiz) : ?>
 							<tr class="table-light">
-								<th><a href="<?php echo base_url();?>questions/teacher/<?php echo $quiz['quiz_index']; ?>"><?php echo $i++; ?></a></th>
+								<th><a href="<?php echo base_url(); ?>questions/teacher/<?php echo $quiz['quiz_index']; ?>"><?php echo $i++; ?></a></th>
 								<th><?php echo $num_of_questions[$quiz['quiz_index']]['num_questions']; ?></th>
 								<th>
-									<button type="button" class="btn btn-outline-primary btn_remove_quiz" >Remove</button>
-									<button type="button" class="btn btn-outline-primary btn_edit_quiz">Edit</button>
+									<button type="button" class="btn btn-outline-primary btn_remove_quiz">Remove</button>
+									<button type="button" class="btn btn-outline-primary btn_start_quiz" id="<?php echo $quiz['quiz_index']; ?>">Start</button>
 								</th>
 							</tr>
 						<?php endforeach; ?>
@@ -105,102 +105,108 @@
 				<button type="button" id="btn_add_quiz" class="btn btn-primary">
 					New Quiz
 				</button>
-
 			</div>
 		</div>
 	</div>
 </div>
-	<script>
-		$(document).ready(() => {
-			classroom_id = $("#classroom_id");
-			$('#btn_add_student').click((e) => {
-				e.preventDefault();
-				sname = $("#username");
-				last_student = $("#list_of_students > tbody").length + 1;
+<script>
+	$(document).ready(() => {
+		classroom_id = $("#classroom_id");
+		$('#btn_add_student').click((e) => {
+			e.preventDefault();
+			sname = $("#username");
+			last_student = $("#list_of_students > tbody").length + 1;
 
-				$.ajax({
-					url: "<?php echo base_url(); ?>courses/add_student_from_classroom",
-					type: "POST",
-					dataType: "JSON",
-					data: {
-						"username": sname.val(),
-						"classroom_id": classroom_id.val()
-					},
-					success: function(response) {
-						if (response.success) {
-							$(".modal").modal('hide');
-							$("#username").val("");
-							$("#list_of_students > tbody").append('<tr class="table-light">' +
-								'<th scrope="row">' + response.username + '</th>' + '<th><button type="button" class="btn btn-outline-primary btn_remove_student" id=btn_' + response.username + '>Remove</button>' +
-								'<button type="button" class="btn btn-outline-primary">Edit</button></th>' + '</tr>');
-						} else {
-							alert('Student does not exitst');
-						}
-					},
-					fail: function() {
-						alert("failed");
+			$.ajax({
+				url: "<?php echo base_url(); ?>courses/add_student_from_classroom",
+				type: "POST",
+				dataType: "JSON",
+				data: {
+					"username": sname.val(),
+					"classroom_id": classroom_id.val()
+				},
+				success: function(response) {
+					if (response.success) {
+						$(".modal").modal('hide');
+						$("#username").val("");
+						$("#list_of_students > tbody").append('<tr class="table-light">' +
+							'<th scrope="row">' + response.username + '</th>' + '<th><button type="button" class="btn btn-outline-primary btn_remove_student" id=btn_' + response.username + '>Remove</button>' +
+							'<button type="button" class="btn btn-outline-primary">Edit</button></th>' + '</tr>');
+					} else {
+						alert('Student does not exitst');
 					}
-				});
+				},
+				fail: function() {
+					alert("failed");
+				}
 			});
+		});
 
-			$('.btn_remove_student').click((e) => {
-				e.preventDefault();
-				var target = e.target.id;
-				// alert(target);
-				sname = $('#' + target).parent().prev().text();
+		$('.btn_remove_student').click((e) => {
+			e.preventDefault();
+			var target = e.target.id;
+			// alert(target);
+			sname = $('#' + target).parent().prev().text();
 
-				$.ajax({
-					url: "<?php echo base_url(); ?>courses/remove_student_from_classroom",
-					type: "POST",
-					dataType: "JSON",
-					data: {
-						"username": sname,
-						"classroom_id": classroom_id.val()
-					},
-					success: function(response) {
-						if (response.success) {
-							$("#" + target).parent().parent().remove();
-						} else {
-							alert('Student does not exitst');
-						}
-					},
-					fail: function() {
-						alert("failed");
+			$.ajax({
+				url: "<?php echo base_url(); ?>courses/remove_student_from_classroom",
+				type: "POST",
+				dataType: "JSON",
+				data: {
+					"username": sname,
+					"classroom_id": classroom_id.val()
+				},
+				success: function(response) {
+					if (response.success) {
+						$("#" + target).parent().parent().remove();
+					} else {
+						alert('Student does not exitst');
 					}
-				});
+				},
+				fail: function() {
+					alert("failed");
+				}
 			});
+		});
 
-			$('#btn_add_quiz').click((e) => {
-				e.preventDefault();
-				$.ajax({
-					url: "<?php echo base_url(); ?>courses/add_quiz_from_classroom",
-					type: "POST",
-					dataType: "JSON",
-					data: {
-						"classroom_id" : classroom_id.val()
-					},
-					success: function(response) {
-						if(response.success) {
-							quiz_index = response.quiz_index;
-							var newContent = 
-							'<tr class="table-light">' + 
-							'<th><a href="<?php echo base_url();?>questions/teacher/'+quiz_index+'"><?php echo $i++; ?></a></th>' +
+		$('#btn_add_quiz').click((e) => {
+			e.preventDefault();
+			$.ajax({
+				url: "<?php echo base_url(); ?>courses/add_quiz_from_classroom",
+				type: "POST",
+				dataType: "JSON",
+				data: {
+					"classroom_id": classroom_id.val()
+				},
+				success: function(response) {
+					if (response.success) {
+						quiz_index = response.quiz_index;
+						var newContent =
+							'<tr class="table-light">' +
+							'<th><a href="<?php echo base_url(); ?>questions/teacher/' + quiz_index + '"><?php echo $i++; ?></a></th>' +
 							'<th>0</th>' +
 							'<th><button type="button" class="btn btn-outline-primary btn_remove_quiz" >Remove</button>' +
-							'<button type="button" class="btn btn-outline-primary btn_edit_quiz">Edit</button></th></tr>';
-							$('#list_of_quiz tbody').append(newContent);
-						} else {
-							alert("failed ")
-						}
-					},
-					fail: function() {
-						alert("failed");
+							'<button type="button" class="btn btn-outline-primary btn_start_quiz">Start</button></th></tr>';
+						$('#list_of_quiz tbody').append(newContent);
+					} else {
+						alert("failed ")
 					}
-				});
+				},
+				fail: function() {
+					alert("failed");
+				}
 			});
-
-			$('.btn_remove_quiz').click((e)=> {
-				e.preventDefault();
-			})
 		});
-	</script>
+
+		$('.btn_remove_quiz').click((e) => {
+			e.preventDefault();
+		})
+		//jump to question(ongoing) view
+		$('button').click(function() {
+			quiz_index = this.id;
+			head = <?php echo ("'" . base_url() . "questions/ongoing_quiz_teacher/'"); ?> + `${quiz_index}`;
+			location.replace(head);
+
+		})
+	});
+</script>
