@@ -74,4 +74,24 @@ class Question_model extends CI_Model
       return $this->db->get()->result_array();
     }
   }
+
+  public function update_question($quiz_index)
+  {
+      $quiz_id = $this->getQuiz($quiz_index);
+      if (!empty($quiz_id)) {
+        $quiz_id = $quiz_id[0]['id'];
+      } else {
+        return false;
+      }
+      $data = array(
+        'quiz_id' => $quiz_id,
+        'duration' => $this->input->post('duration'),
+        'content' => $this->input->post('content'),
+        'category' => $this->input->post('category'),
+        'difficulty' => $this->input->post('difficulty'),
+        'timer_type' => $this->input->post('timer_type'),
+        'is_public' => $this->input->post('isPublic')
+      );
+      return $this->db->where('id', $this->input->post('id'))->update('questions', $data);
+  }
 }

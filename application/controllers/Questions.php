@@ -62,4 +62,10 @@ class Questions extends CI_Controller
         $msg['success'] = $this->question_model->student_response();
         echo json_encode($msg);
     }
+
+    public function update_question() {
+        $quiz_index = $this->input->post('quiz_index');
+        $msg['success'] = $this->question_model->update_question($quiz_index);
+        echo json_encode($msg);
+    }
 }
