@@ -39,6 +39,9 @@
               <a class="nav-link" href="<?php echo base_url(); ?>users/student">Student</a>
             </li>
           <?php endif; ?>
+          <li class="nav-item">
+              <a class="nav-link" href="<?php echo base_url(); ?>analysis/category_cloud">Category Cloud</a>
+            </li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
