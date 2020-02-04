@@ -94,4 +94,22 @@ class Question_model extends CI_Model
       );
       return $this->db->where('id', $this->input->post('id'))->update('questions', $data);
   }
+
+  public function get_question($question_index) {
+    return $this->db->get_where('questions', array('id'=>$question_index))->result_array()[0];
+  }
+
+  public function get_all_courses() {
+    return $this->db->select('*')->from('classrooms')->where('taught_by',$this->session->id)
+    ->join('courses', 'courses.id = classrooms.course_id')->get()->result_array();
+  }
+
+
+  public function get_all_quizs() {
+    
+  }
+  public function add_to_quiz() {
+    $teacher_id = $this->session->id;
+
+  }
 }

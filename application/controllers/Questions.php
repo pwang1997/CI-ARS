@@ -52,6 +52,17 @@ class Questions extends CI_Controller
         $this->load->view('templates/footer');
     }
 
+    public function view() {
+        $question_index = $this->uri->segment(3);
+        $data['question'] =$this->question_model->get_question($question_index);
+        $data['courses'] = $this->question_model->get_all_courses();
+        $data['quizs'] = $this->question_model->get_all_quizs();
+
+        $this->load->view('templates/header');
+        $this->load->view('questions/view', $data);
+        $this->load->view('templates/footer');
+    }
+
     public function create_question() {
         $lab_index = $this->input->post('quiz_index');
         $msg['success'] = $this->question_model->create($lab_index);
