@@ -3,125 +3,204 @@
 <?php elseif (empty($this->session->username)) : ?>
     <?php redirect('users/login'); ?>
 <?php endif; ?>
-
+<h2><?php echo $title; ?></h2>
+<div id="toast">
+    
 </div>
 
-<div class="row">
-    <div class="col-2">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action active" id="list-quiz-detail" data-toggle="list" href="#list-quiz" role="tab" aria-controls="quiz">Quiz</a>
-            <a class="list-group-item list-group-item-action" id="list-add-question" data-toggle="list" href="#list-add" role="tab" aria-controls="add-question">Add Question</a>
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <img src="..." class="rounded mr-2" alt="...">
+    <strong class="mr-auto">Bootstrap</strong>
+    <small>11 mins ago</small>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    Hello, world! This is a toast message.
+  </div>
+</div>
 
-        </div>
-    </div>
-    <div class="col-10">
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-detail">
-                <h2><?= $title; ?></h2>
-                <p><strong>Lab Index: </strong><?php echo $lab_index; ?></p>
+<div class="form_question">
+    <?php echo form_open('questions/create'); ?>
+    <input type="hidden" id="quiz_index" value=<?php echo $lab_index; ?>>
+    <!-- content + buttons  -->
+    <div class="row">
+        <div class="col-8">
+            <br>
+            <div class="form-group">
+                <textarea class="form-control" id="content" rows="18" style="resize:none" placeholder="question content"></textarea>
             </div>
-            <div class="tab-pane fade" id="list-add" role="tabpanel" aria-labelledby="list-add-question">
-                <?php echo form_open('questions/create'); ?>
-                <div class="mx-auto">
+        </div>
+        <div class="col-4">
+            <br>
+            <div class="d-flex flex-column">
+                <div class="p-2">
                     <div class="form-group">
-                        <label for="timer_type">Timer Type</label>
-                        <select class="form-control" id="timer_type" name="timer_type">
-                            <option>count down</option>
-                            <option>count up</option>
+                        <select class="form-control" id="timerType">
+                            <option value="" diabled selected>Timer Type</option>
+                            <option value="timeup">timeup</option>
+                            <option value="timedown">timedown</option>
                         </select>
+                        <small class="form-text text-muted">timer type</small>
                     </div>
-                    <div class="form-group">
-                        <label for="question_type">Question Type</label>
-                        <select class="form-control" id="question_type" name="question_type">
-                            <option>True/False</option>
-                            <option>Multiple Choice(Single Answer)</option>
-                            <option>Multiple Choice(Multiple Answer)</option>
-                        </select>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label for="num_choices">Number of Choices</label>
-                        <select class="form-control" id="num_choices" name="num_choices">
-                            <?php for ($i = 2; $i <= 10; $i++) : ?>
-                                <option><?php //echo $i; 
-                                        ?></option>
-                            <? endfor; ?>
-                        </select>
-                    </div> -->
-                    <div class="form-group">
-                        <label for="duration">Duration(s)</label>
-                        <input type="text" class="form-control" id="duration" name="duration" placeholder="Duration of the question">
-                    </div>
-                    <div class="form-group">
-                        <label for="content">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="3" spellcheck="true" placeholder="Enter Context of the Question"></textarea>
-                    </div>
-
-                    <div class="form-group" id="choices">
-                        <label for="choices">Answer</label>
-                        <div id="true_or_false">
-                            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="choices" value="True">
-                                <label class="form-check-label" for="choices">True</label></div>
-                            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="choices" value="False">
-                                <label class="form-check-label" for="choices">False</label></div>
-                        </div>
-                    </div>
-                    <button type="submit" id="submit" class="btn btn-primary">Submit</button>
                 </div>
-                <?php echo form_close(); ?>
+                <div class="p-2">
+                    <div class="form-group">
+                        <select class="form-control" id="isPublic">
+                            <option value="" diabled selected>Access</option>
+                            <option value="false">private</option>
+                            <option value="true">public</option>
+                        </select>
+                        <small class="form-text text-muted">access</small>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <div class="form-group">
+                        <select class="form-control" id="difficulty">
+                            <option value="" diabled selected>Difficulty</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <small class="form-text text-muted">difficulty</small>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="category" placeholder="category">
+                        <small class="form-text text-muted">category</small>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="duration" placeholder="duration(in second)">
+                        <small class="form-text text-muted">duration</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <!-- answer type -->
+    <div class="row">
+        <div class="col-md-12">
+            <p>Answer Type</p>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="answer_type" id="answer_type1" value="true_or_false" data-toggle="collapse" href="#add_option" role="button" aria-expanded="false" aria-controls="add_option">
+                <label class="form-check-label" for="answer_type1">True or False</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="answer_type" id="answer_type2" value="multiple_answer">
 
+                <label class="form-check-label" for="answer_type2">Multiple Answers</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input " type="radio" name="answer_type" id="answer_type3" value="single_answer">
+                <label class="form-check-label" for="answer_type3">Single Answer</label>
+            </div>
+        </div>
+    </div>
+    <!-- answer/choices -->
+    <div class="row">
+        <div class="col-md-12 choice_row">
+
+        </div>
+    </div>
+    <!-- submit -->
+    <div class="row">
+        <div class="offset-md-11">
+            <input type="submit" class="btn btn-outline-primary" value="Submit">
+        </div>
+    </div>
+    <?php echo form_close(); ?>
+</div>
 
 <script>
     $(document).ready(() => {
-        $("#question_type").change((e) => {
-            // selected = $("#question_type option:selected").text();
-            // num_choices = $("#num_choices option:selected").text();
-            // target = $("#choices").children();
-            // alert(selected);
-            // if (selected == "True/False") {
-            //     $("#true_or_false").show();
-            //     $("#single_answer").hide();
-            //     $("#multiple_answer").hide();
-            // } else if (selected == "Multiple Choice(Single Answer)") {
-            //     $("#true_or_false").hide();
-            //     $("#single_answer").show();
-            //     $("#multiple_answer").hide();
-            // } else {
-            //     $("#true_or_false").hide();
-            //     $("#single_answer").hide();
-            //     $("#multiple_answer").show();
-            // }
-        });
+        //toggle on answer type
+        $("input[type='radio']").change((e) => {
+            selected_value = $("input[name='answer_type']:checked").val();
+            $(".choice_row").empty();
+            $(".choice_row").append("<p>Choices</p>");
+            newContent = "";
+            if (selected_value == "true_or_false") {
+                newContent = '<div class="form-check">' +
+                    '<input class="form-check-input" type="radio" name="choice_row" value="true">' +
+                    '<label class="form-check-label">True</label></div>';
+                newContent += '<div class="form-check">' +
+                    '<input class="form-check-input" type="radio" name="choice_row" value="false">' +
+                    '<label class="form-check-label">False</label></div>';
+                $(".choice_row").append(newContent);
+            } else if (selected_value == "multiple_answer") {
+                i = 0;
+                for (; i < 4; i++) {
+                    newContent += '<div class="form-check">' +
+                        `<input class="form-check-input" type="checkbox" name="choice_row"  value="${i}">` +
+                        '<label class="form-check-label" contenteditable="true">' +
+                        `${i}</label></div>`;
+                }
+                newContent += '<button type="button" class="btn btn-outline-primary" id="add_option"">Add option</button>';
+                //append event listener
+                $(".choice_row").first().append(newContent);
+                $('#add_option').click((e) => {
+                    temp = '<div class="form-check">' +
+                        `<input class="form-check-input" type="checkbox" name="choice_row"  value="${i++}">` +
+                        '<label class="form-check-label" contenteditable="true">' +
+                        `placeholder</label></div>`
+                    $('.choice_row div').last().after(temp);
+                });
 
-        $("#submit").click((e) => {
+            } else {
+                i = 0;
+                for (; i < 4; i++) {
+                    newContent += '<div class="form-check">' +
+                        `<input class="form-check-input" type="radio" name="choice_row"  value="${i}">` +
+                        '<label class="form-check-label" contenteditable="true">' +
+                        `${i}</label></div>`;
+                }
+                newContent += '<button type="button" class="btn btn-outline-primary" id="add_option"">Add option</button>';
+                //append event listener
+                $(".choice_row").first().append(newContent);
+                $('#add_option').click((e) => {
+                    temp = '<div class="form-check">' +
+                        `<input class="form-check-input" type="radio" name="choice_row"  value="${i++}">` +
+                        '<label class="form-check-label" contenteditable="true">' +
+                        `placeholder</label></div>`;
+                    $('.choice_row div').last().after(temp);
+                });
+
+            }
+        }) //end of radio toggle
+
+        //submit form
+        $("input[type='submit']").click((e) => {
             e.preventDefault();
-            timer_type = $("#timer_type option:selected").text();
-            question_type = $("#question_type option:selected").text();
-            // num_choices = $("#num_choices option:selected").text();
-            duration = $("#duration").val();
-            content = $("#content").val();
+            choices = [];
+            //get all values of choices
+            $('input[name="choice_row"]').each(function() {
+                choices.push($(this).val());
+            });
 
-            choices = "true/false";
-            answer = $("input[name=choices]:checked").val();;
-
+            // console.log(metaData)
             $.ajax({
                 url: "<?php echo base_url(); ?>questions/create_question",
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    "timer_type" : timer_type,
-                    "question_type" : question_type,
-                    "duration" : duration,
-                    "content" : content,
-                    "answer" : answer,
-                    "choices" : choices,
-                    'lab_index' :<?php echo $lab_index; ?>
+                    'quiz_index': $('#quiz_index').val(),
+                    'timer_type': $('#timerType').val(),
+                    'duration': $('#duration').val(),
+                    'content': $('#content').val(),
+                    'isPublic': $('#isPublic').val(),
+                    'question_type': $('input[name="answer_type"]').val(),
+                    'choices': JSON.stringify(choices),
+                    'answer': $('input[name="choice_row"]:checked').val(),
+                    'difficulty': $('#difficulty').val(),
+                    'category': $('#category').val()
                 },
                 success: function(response) {
-                    if(response.success) {
+                    if (response.success) {
                         alert("success");
                     } else {
                         alert("failed to insert question1");
@@ -131,22 +210,7 @@
                     alert("failed to insert question2");
                 }
             })
-        });
+        }); //end of submnit
 
-        // function true_or_false(element) {
-        //     target.empty();
-        //     target.append('<div class="form-check"><input class="form-check-input" type="radio" name="choices" value="True">' +
-        //         '<label class="form-check-label" for="choices">True</label></div>');
-        //     target.append('<div class="form-check"><input class="form-check-input" type="radio" name="choices" value="False">' +
-        //         '<label class="form-check-label" for="choices">False</label></div>');
-        // }
-
-        // function multiple_choices_single_answer(element, num_choice) {
-        //     element.empty();
-        // }
-
-        // function multiple_choices_multiple_answer(element, num_choice) {
-        //     element.empty();
-        // }
     });
 </script>
