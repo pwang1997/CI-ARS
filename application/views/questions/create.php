@@ -162,10 +162,9 @@
             choices = [];
             //get all values of choices
             $('input[name="choice_row"]').each(function() {
-                choices.push($(this).val());
+                choices.push($(this).next().text());
             });
 
-            // console.log(metaData)
             $.ajax({
                 url: "<?php echo base_url(); ?>questions/create_question",
                 type: "POST",
@@ -176,9 +175,9 @@
                     'duration': $('#duration').val(),
                     'content': $('#content').val(),
                     'isPublic': $('#isPublic').val(),
-                    'question_type': $('input[name="answer_type"]').val(),
+                    'question_type': $('input[name="answer_type"]:checked').val(),
                     'choices': JSON.stringify(choices),
-                    'answer': $('input[name="choice_row"]:checked').val(),
+                    'answer': $('input[name="choice_row"]:checked').next().text(),
                     'difficulty': $('#difficulty').val(),
                     'category': $('#category').val()
                 },
