@@ -204,8 +204,10 @@
 		//jump to question(ongoing) view
 		$('button').click(function() {
 			quiz_index = this.id;
-			head = <?php echo ("'" . base_url() . "questions/ongoing_quiz_teacher/'"); ?> + `${quiz_index}`;
-			location.replace(head);
+			if (!isNaN(quiz_index)) {
+				head = <?php echo ("'" . base_url() . "questions/ongoing_quiz_teacher/'"); ?> + `${quiz_index}`;
+				location.replace(head);
+			}
 
 		})
 	});

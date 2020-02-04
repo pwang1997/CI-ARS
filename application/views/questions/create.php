@@ -22,7 +22,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="timerType">
-                            <option value="" diabled selected>Timer Type</option>
+                            <option value="" disabled selected>Timer Type</option>
                             <option value="timeup">timeup</option>
                             <option value="timedown">timedown</option>
                         </select>
@@ -32,7 +32,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="isPublic">
-                            <option value="" diabled selected>Access</option>
+                            <option value="" disabled selected>Access</option>
                             <option value="false">private</option>
                             <option value="true">public</option>
                         </select>
@@ -42,7 +42,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="difficulty">
-                            <option value="" diabled selected>Difficulty</option>
+                            <option value="" disabled selected>Difficulty</option>
                             <option value="easy">Easy</option>
                             <option value="medium">Medium</option>
                             <option value="hard">Hard</option>

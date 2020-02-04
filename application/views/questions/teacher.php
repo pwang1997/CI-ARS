@@ -22,7 +22,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="timerType_<?php echo $question['id'];?>">
-                            <option value="" diabled>Timer Type</option>
+                            <option value="" disabled>Timer Type</option>
                             <option value="timeup" <?php if ($question['timer_type'] == "timeup") echo "selected"; ?>>timeup</option>
                             <option value="timedown" <?php if ($question['timer_type'] == "timedown") echo "selected"; ?>>timedown</option>
                         </select>
@@ -32,7 +32,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="isPublic_<?php echo $question['id'];?>">
-                            <option value="" diabled>Access</option>
+                            <option value="" disabled>Access</option>
                             <option value="false" <?php if ($question['is_public'] == "false") echo "selected"; ?>>private</option>
                             <option value="true" <?php if ($question['is_public'] == "true") echo "selected"; ?>>public</option>
                         </select>
@@ -42,7 +42,7 @@
                 <div class="p-2">
                     <div class="form-group">
                         <select class="form-control" id="difficulty_<?php echo $question['id'];?>">
-                            <option value="" diabled>Difficulty</option>
+                            <option value="" disabled>Difficulty</option>
                             <option value="easy" <?php if ($question['difficulty'] == "easy") echo "selected"; ?>>Easy</option>
                             <option value="medium" <?php if ($question['difficulty'] == "medium") echo "selected"; ?>>Medium</option>
                             <option value="hard" <?php if ($question['difficulty'] == "hard") echo "selected"; ?>>Hard</option>
