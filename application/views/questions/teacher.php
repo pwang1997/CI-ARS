@@ -6,7 +6,6 @@
     <?php redirect('questions/create/' . $quiz_index); ?>
 <?php endif; ?>
 
-<? print_r($question_list); ?>
 <?php foreach ($question_list as $question) : ?>
     <input type="hidden" id="quiz_index_<?php echo $question['id'];?>" value=<?php echo $quiz_index; ?>>
     <!-- content + buttons  -->
