@@ -106,6 +106,7 @@
 					New Quiz
 				</button>
 
+			</div>
 		</div>
 	</div>
 </div>
