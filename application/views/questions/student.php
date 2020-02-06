@@ -89,7 +89,8 @@
 
 <script>
     $(document).ready(() => {
-        var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
+        // var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
+        var wsurl = 'ws://127.0.0.1:8080/server/server.php';
         var websocket, cmd, message, client_name, question_index, role, question_instance_id;
 
         if (window.WebSocket) {
