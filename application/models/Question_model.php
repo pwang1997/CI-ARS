@@ -20,7 +20,6 @@ class Question_model extends CI_Model
         'duration' => $this->input->post('duration'),
         'content' => $this->input->post('content'),
         'answer' => $this->input->post('answer'),
-        'question_type' => $this->input->post('question_type'),
         'choices' => $this->input->post('choices'),
         'category' => $this->input->post('category'),
         'difficulty' => $this->input->post('difficulty'),
