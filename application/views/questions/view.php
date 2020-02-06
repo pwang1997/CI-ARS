@@ -62,51 +62,28 @@
         </div>
     </div>
 </div>
-<!-- answer type -->
-<div class="row">
-    <div class="col-md-12">
-        <p>Answer Type</p>
-        <div class="form-check form-check-inline">
-            <input disabled class="form-check-input" type="radio" name="answer_type" id="answer_type1" value="true_or_false" <?php if ($question['question_type'] == "true_or_false") echo "checked"; ?>>
-            <label class="form-check-label" for="answer_type1">True or False</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input disabled class="form-check-input" type="radio" name="answer_type" id="answer_type2" value="multiple_answer" <?php if ($question['question_type'] == "multiple_answer") echo "checked"; ?>>
-            <label class="form-check-label" for="answer_type2">Multiple Answers</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input disabled class="form-check-input " type="radio" name="answer_type" id="answer_type3" value="single_answer" <?php if ($question['question_type'] == "single_answer") echo "checked"; ?>>
-            <label class="form-check-label" for="answer_type3">Single Answer</label>
-        </div>
+    <!-- answer heading -->
+    <div class="form-group row">
+        <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
     </div>
-</div>
-
 <!-- answer/choices -->
-<div class="row">
-    <div class="float-left inline-block">
-        <div class="col-md-12 choice_row" id="choice_row">
-            <p>Choices</p>
-            <?php if ($question['question_type'] == "true_or_false") : ?>
-                <div class="form-check">
-                    <input disabled class="form-check-input" type="radio" name="choice_row" value="true">
-                    <label class="form-check-label">True</label></div>
-                <div class="form-check">
-                    <input disabled class="form-check-input" type="radio" name="choice_row" value="false">
-                    <label class="form-check-label">False</label></div>
-            <?php elseif ($question['question_type'] == "multiple_answer") : ?>
-                <div class="form-check">
-                    <input disabled class="form-check-input" type="radio" name="choice_row" value="true">
-                    <label class="form-check-label" contenteditable="true">True</label></div>
-
-            <?php else : ?>
-                <div class="form-check">
-                    <input disabledclass="form-check-input" type="radio" name="choice_row" value="true">
-                    <label class="form-check-label" contenteditable="true">True</label></div>
-
-            <? endif; ?>
+<?php $choices = (json_decode($question['choices']));
+    $answers = json_decode($question['answer']);
+    $i = 1;
+    foreach ($choices as $choice) : ?>
+        <div class="form-group row choice_row">
+            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+            <div class="col-sm-6">
+                <input type="text" disabled choice_row class="form-control"  name="choice_row" autocomplete="on" placeholder="<?php echo $choice; ?>">
+            </div>
+            <div class="form-check col-sm-1">
+                <input class="form-check-input" disabled type="checkbox" name="answers" value="correct" 
+                <?php if (array_search($choice, $answers) !="") echo "checked"; ?>>
+            </div>
         </div>
-    </div>
-</div>
+    <? $i++;
+    endforeach; ?>
+
 
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">
     Add to quiz
