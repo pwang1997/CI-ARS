@@ -78,34 +78,36 @@
 				</div>
 			</div>
 			<!-- quizs  -->
-			<div class="card-groups">
-				<?php
-				for ($i = 0; $i < sizeof($quizs); $i++) {
-					if ($i % 3 == 0) {
-				?>
-						<div class="row">
+			<div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
+				<div class="card-groups">
+					<?php
+					for ($i = 0; $i < sizeof($quizs); $i++) {
+						if ($i % 3 == 0) {
+					?>
+							<div class="row">
+								<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+								<div class="col-md-1"></div>
+							<?php } elseif ($i % 3 == 2) {
+							?>
+								<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+							</div>
+						<?php } else { ?>
 							<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
 							<div class="col-md-1"></div>
-						<?php } elseif ($i % 3 == 2) {
-						?>
-							<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+					<?php }
+					}
+					?>
+					<?php if (sizeof($quizs) % 3 != 0) : ?>
+					<?php endif; ?>
+				</div>
+				<div class="row">
+					<div class='card bg-outline-primary mb-3 col-md-3'>
+						<div class='card-body'>
+							<h5 class='card-title'><a href='#' id="add_quiz" class='text-secondary'>New Quiz</a></h5>
 						</div>
-					<?php } else { ?>
-						<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
-						<div class="col-md-1"></div>
-				<?php }
-				}
-				?>
-				<?php if (sizeof($quizs) % 3 != 0) : ?>
-			</div>
-		<?php endif; ?>
-		<div class="row">
-			<div class='card bg-outline-primary mb-3 col-md-3'>
-				<div class='card-body'>
-					<h5 class='card-title'><a href='#' id="add_quiz" class='text-secondary'>New Quiz</a></h5>
+					</div>
 				</div>
 			</div>
-		</div>
 		</div>
 
 		<?php
@@ -226,7 +228,7 @@
 					},
 					success: function(response) {
 						if (response.success) {
-							alert('success');
+							// alert('success');
 							$(`#card_${quiz_index}`).remove();
 						} else {
 							alert("failed ")
