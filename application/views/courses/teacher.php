@@ -85,14 +85,14 @@
 						if ($i % 3 == 0) {
 					?>
 							<div class="row">
-								<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+								<?php addedCard($i+1, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
 								<div class="col-md-1"></div>
 							<?php } elseif ($i % 3 == 2) {
 							?>
-								<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+								<?php addedCard($i+1, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
 							</div>
 						<?php } else { ?>
-							<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+							<?php addedCard($i+1, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
 							<div class="col-md-1"></div>
 					<?php }
 					}

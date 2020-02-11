@@ -19,7 +19,9 @@ class Questions extends CI_Controller
     {
         $quiz_index = $this->uri->segment(3);
 
-        $data['title'] = 'Quiz '.$quiz_index;
+        $data['num_questions'] = $this->question_model->get_num_question($quiz_index);
+        $data['categories'] = $this->question_model->get_categories($quiz_index);
+        $data['title'] = 'Quiz ';
         $data['hasQuestion'] = $this->question_model->has_question_in_quiz($quiz_index);
         $data['question_list'] =$this->question_model->getQuestions($quiz_index);
         $data['quiz_index'] = $quiz_index;

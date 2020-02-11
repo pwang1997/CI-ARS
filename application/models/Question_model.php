@@ -144,4 +144,18 @@ class Question_model extends CI_Model
     );
     return $this->db->insert('studentResponse', $data);
   }
+
+  public function get_num_question($quiz_index) {
+    return $this->db->select('COUNT(id) as size')->from('questions')->where(array('quiz_id'=>$quiz_index))->get()->result_array()[0];
+  }
+
+  public function get_categories($quiz_index) {
+    $result = $this->db->select('category')->from('questions')->where(array('quiz_id'=>$quiz_index))
+    ->group_by('category')->get()->result_array();
+
+    foreach($result as $key=>$val) {
+      $row[$key] = $val['category'];
+    }
+    return $row;
+  }
 }

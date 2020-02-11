@@ -5,7 +5,10 @@
 <?php elseif ($hasQuestion == FALSE) : ?>
     <?php redirect('questions/create/' . $quiz_index); ?>
 <?php endif; ?>
-<h3><?php echo $title; ?></h3>
+<h3><?php echo ($title); ?></h3>
+<span>Question pool: <?php echo ($num_questions['size']); ?></span>
+
+<span class="float-right">Categories: <?php echo implode(',', $categories);?></span>
 <?php $j = 1; ?>
 <?php foreach ($question_list as $question) : ?>
     <div id="question_<?= $question['id'] ?>">
@@ -150,8 +153,8 @@
                             'isPublic': $('#isPublic_' + this.id).val(),
                             'difficulty': $('#difficulty_' + this.id).val(),
                             'category': category,
-                            'choices' : JSON.stringify(choices),
-                            'answer' : JSON.stringify(answers)
+                            'choices': JSON.stringify(choices),
+                            'answer': JSON.stringify(answers)
                         },
                         success: function(response) {
                             if (response.success) {
