@@ -38,7 +38,7 @@ class Courses extends CI_Controller
     $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id);
     $data['enrolledStudents'] = $this->course_model->get_enrolledStudents_for_teacher($classroom_id);
     $data['quizs'] = $this->course_model->get_quizs_for_teacher($classroom_id);
-    $data['num_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
+    $data['num_questions'] = $this->course_model->get_number_of_questions_for_teacher($data['quizs']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/teacher', $data);
@@ -78,7 +78,7 @@ class Courses extends CI_Controller
 
     $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id);
     $data['quizs'] = $this->course_model->get_quizs_for_student($course_id, $classroom_id);
-    $data['num_of_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
+    $data['num_of_questions'] = $this->course_model->get_number_of_questions_for_student($data['quizs']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/student', $data);

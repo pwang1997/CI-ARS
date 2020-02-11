@@ -109,7 +109,7 @@ class Course_model extends CI_Model
     // return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
     return $this->db->delete('quizs', array('id'=>$quiz_id));
   }
-  public function get_number_of_questions($arr_quiz)
+  public function get_number_of_questions_for_teacher($arr_quiz)
   {
     $query_arr = array();
     $new = array();
@@ -122,7 +122,22 @@ class Course_model extends CI_Model
     foreach ($query_arr as $k => $v) {
       $new[$k] = $v['num_questions'];
     }
+    return $new;
+  }
 
+  public function get_number_of_questions_for_student($arr_quiz)
+  {
+    $query_arr = array();
+    $new = array();
+    foreach ($arr_quiz as $quiz) {
+      $quiz_id = $quiz['quiz_index'];
+      $query_arr[$quiz_id] = $this->db->select('count(*) as num_questions')->from('questions')->join('quizs', 'quizs.id=questions.quiz_id')
+        ->where(array('questions.quiz_id' => $quiz_id))->get()->result_array()[0];
+    }
+
+    foreach ($query_arr as $k => $v) {
+      $new[$k] = $v['num_questions'];
+    }
     return $new;
   }
 

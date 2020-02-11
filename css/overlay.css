@@ -29,3 +29,15 @@
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
 } */
+
+.pad {
+    /* padding: 15px; */
+    /* width: 40%; */
+    height: 20px;
+}
+
+.progress {
+    width: 100%;
+    /* width: 40%; */
+    /* height: 20px */
+}

@@ -4,7 +4,7 @@
     <div class="col-2">
         <div class="list-group" id="list-tab" role="tablist">
             <a class="list-group-item list-group-item-action active" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="lab">Course Detail</a>
-            <a class="list-group-item list-group-item-action" id="list-lab-list" data-toggle="list" href="#list-lab" role="tab" aria-controls="lab">Quizs</a>
+            <a class="list-group-item list-group-item-action" id="list-quiz-list" data-toggle="list" href="#list-quiz" role="tab" aria-controls="quiz">Quizs</a>
             <a class="list-group-item list-group-item-action" id="list-grade-list" data-toggle="list" href="#list-grade" role="tab" aria-controls="grade">Grade</a>
 
         </div>
@@ -20,7 +20,7 @@
                 <p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
             </div>
             <!-- quiz list  -->
-            <div class="tab-pane fade" id="list-lab" role="tabpanel" aria-labelledby="list-lab">
+            <!-- <div class="tab-pane fade" id="list-lab" role="tabpanel" aria-labelledby="list-lab">
                 <table class="table table-hover" id="list_of_students">
                     <thead>
                         <tr>
@@ -32,15 +32,50 @@
                     <tbody>
                         <?php foreach ($quizs as $quiz) : ?>
                             <tr class="table-light">
-                                <th scope="row"><a href="<?php echo base_url(); ?>questions/student/<?php echo $quiz['quiz_index']; ?>">
-                                        <?php echo $quiz['quiz_index']; ?></a></th>
+                                <th scope="row"><a href="<?php // echo base_url(); ?>questions/student/<?php //echo $quiz['quiz_index']; ?>">
+                                        <?php //echo $quiz['quiz_index']; ?></a></th>
                                 <th>
-                                    <?php echo $num_of_questions[$quiz['quiz_index']]['num_questions']; ?>
+                                    <?php //echo $num_of_questions[$quiz['quiz_index']]['num_questions']; ?>
                                 </th>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div> -->
+
+            <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
+                <div class="card-groups">
+                    <?php
+                    for ($i = 0; $i < sizeof($quizs); $i++) {
+                        if ($i % 3 == 0) {
+                    ?>
+                            <div class="row">
+                                <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
+                                <div class="col-md-1"></div>
+                            <?php } elseif ($i % 3 == 2) {
+                            ?>
+                                <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
+                            </div>
+                        <?php } else { ?>
+                            <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
+                            <div class="col-md-1"></div>
+                    <?php }
+                    }
+                    ?>
+                    <?php if (sizeof($quizs) % 3 != 0) : ?>
+                    <?php endif; ?>
+                    <?php
+                    function addedCard($index, $quiz_id)
+                    {
+                        echo "<div class='card bg-outline-primary mb-3 col-md-3' id='card_{$quiz_id}'>
+		<div class='card-body'>
+		  <h5 class='card-title'><a href='" . base_url() . "questions/student/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
+		</div>
+	  </div>";
+                    }
+                    ?>
+                </div>
+               
             </div>
         </div>
     </div>

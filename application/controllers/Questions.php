@@ -37,7 +37,6 @@ class Questions extends CI_Controller
 
         $quiz_index = $this->uri->segment(3);
         $data['quiz_index'] = $quiz_index;
-        $data['question'] =$this->question_model->get_question($quiz_index);
         
         $this->load->view('templates/header');
         $this->load->view('questions/student', $data);
@@ -100,9 +99,8 @@ class Questions extends CI_Controller
         echo json_encode($msg);
     }
 
-    public function update_student_question_session() {
+    public function get_question_for_student() {
         $question_index = $this->input->post('question_index');
-        $msg['success'] = $this->question_model->update_student_question_session($question_index);
         $msg['result'] = $this->question_model->get_question($question_index);
         echo json_encode($msg);
     }

@@ -6,89 +6,126 @@
 
 
 <?php foreach ($question_list as $question) : ?>
-    <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
-    <!-- content + buttons  -->
-    <div class="row">
-        <div class="col-8">
-            <br>
-            <div class="form-group">
-                <textarea disabled class="form-control" id="content_<?php echo $question['id']; ?>" rows="18" style="resize:none" placeholder="<?php echo $question['content']; ?>"></textarea>
+    <div id="question_<?= $question['id'] ?>">
+        <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
+        <!-- content + buttons  -->
+        <div class="row">
+            <div class="col-8">
+                <br>
+                <div class="form-group row" style="position:relative;">
+                    <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
+                        <div class="editor" id="editor_<?= $question['id']; ?>" style="min-height:100%; height:auto;"><?= $question['content']; ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <br>
+                <div class="d-flex flex-column">
+                    <div class="p-2">
+                        <p id="timerType_<?php echo $question['id']; ?>">Timer Type: <span><?php echo $question['timer_type']; ?></span></p>
+                    </div>
+
+                    <div class="p-2">
+                        <p id="difficulty_<?php echo $question['id']; ?>">Difficulty: <span><?php echo $question['difficulty']; ?></span></p>
+                    </div>
+
+                    <div class="p-2">
+                        <p id="category_<?php echo $question['id']; ?>">Category: <span><?php echo $question['category']; ?></span></p>
+                    </div>
+
+                    <div class="p-2">
+                        <p id="duration_<?php echo $question['id']; ?>">
+                            <?php if ($question['timer_type'] == 'timedown') : ?>
+                                Remaining Time:<?php echo $question['duration']; ?> seconds
+                            <?php else: ?>
+                                Time:<?php echo $question['duration']; ?> seconds
+                            <? endif; ?>
+                        </p>
+                        <div class="pad">
+                            <?php if ($question['timer_type'] == 'timedown') : ?>
+                                <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="<?= $question['duration']; ?>" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
+                            <!-- <div class="alert alert-success" role="alert">Loading completed!</div> -->
+                            <?php else: ?>
+                                <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="0" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
+                            <?php endif;?>
+                        </div>
+                    </div>
+
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
+                    </div>
+
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
+                    </div>
+
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-4">
-            <br>
-            <div class="d-flex flex-column">
-                <div class="p-2">
-                    <p id="timerType_<?php echo $question['id']; ?>">Timer Type: <span><?php echo $question['timer_type']; ?></span></p>
-                </div>
 
-                <div class="p-2">
-                    <p id="difficulty_<?php echo $question['id']; ?>">Difficulty: <span><?php echo $question['difficulty']; ?></span></p>
-                </div>
-
-                <div class="p-2">
-                    <p id="category_<?php echo $question['id']; ?>">Category: <span><?php echo $question['category']; ?></span></p>
-                </div>
-
-                <div class="p-2">
-                    <p id="duration_<?php echo $question['id']; ?>">Remaining Time: <span><?php echo $question['duration']; ?></span>s</p>
-                </div>
-
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
-                </div>
-
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
-                </div>
-
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
-                </div>
-            </div>
+        <br><br>
+        <!-- answer heading -->
+        <div class="form-group row">
+            <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
         </div>
-    </div>
-
-    <!-- answer/choices -->
-    <div class="row">
-        <div class="float-left inline-block">
-            <div class="col-md-12 choice_row" id="choice_row_<?php echo $question['id']; ?>">
-                <?php if ($question['question_type'] == "true_or_false") : ?>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="choice_row_<?php echo $question['id']; ?>" value="true" <?php if ($question['answer'] == "true") echo "checked"; ?>>
-                        <label class="form-check-label">True</label></div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="choice_row_<?php echo $question['id']; ?>" value="false" <?php if ($question['answer'] == "false") echo "checked"; ?>>
-                        <label class="form-check-label">False</label></div>
-                <?php elseif ($question['question_type'] == "multiple_answer") : ?>
-                    <?php $choices = (json_decode($question['choices']));
-                    foreach ($choices as $choice) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="choice_row_<?php echo $question['id']; ?>" value="<?php echo $choice; ?>" <?php if ($choice == $question['answer']) echo "checked" ?>>
-                            <label class="form-check-label"><?php echo $choice; ?></label>
-                        </div>
-                    <? endforeach; ?>
-                <?php else : ?>
-                    <?php $choices = (json_decode($question['choices']));
-                    foreach ($choices as $choice) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="choice_row_<?php echo $question['id']; ?>" value="<?php echo $choice; ?>" <?php if ($choice == $question['answer']) echo "checked" ?>>
-                            <label class="form-check-label"><?php echo $choice; ?></label>
-                        </div>
-                    <? endforeach; //end choices 
-                    ?>
-                <? endif; //end  question type
-                ?>
-            </div>
+        <!-- answer/choices -->
+        <div id="option_row<?= $question['id']; ?>">
+            <?php $choices = (json_decode($question['choices']));
+            $answers = json_decode($question['answer']);
+            $i = 1;
+            foreach ($choices as $choice) : ?>
+                <div class="form-group row choice_row">
+                    <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" disabled class="form-control" name="choice<?= $i; ?>" autocomplete="on" placeholder="<?php echo $choice; ?>">
+                    </div>
+                    <div class="form-check col-sm-1">
+                        <input class="form-check-input" disabled type="checkbox" name="choice_row_<?php echo $question['id']; ?>" value="<?= $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
+                    </div>
+                </div>
+            <? $i++;
+            endforeach; ?>
         </div>
     </div>
     <br><br>
     <div class="border-top my-3 d-block"></div>
+
 <?php endforeach; //end question_list 
 ?>
 
 <script>
     $(document).ready(() => {
+        ids = $("[id^=question_]");
+        arr_ids = [];
+        for (i = 0; i < ids.length; i++) {
+            arr_ids.push((ids[i]).id.substring(9));
+        };
+
+        quills = [];
+        for (i = 0; i < ids.length; i++) {
+            id = "#editor_" + arr_ids[i];
+            console.log(id);
+            quill = new Quill(`#editor_${arr_ids[i]}`, {
+                modules: {
+                    toolbar: [
+                        [{
+                            header: [1, 2, false]
+                        }],
+                        ['bold', 'italic', 'underline'],
+                        ['image', 'code-block']
+                    ]
+                },
+                scrollingContainer: '#scrolling-container',
+                placeholder: 'Question Content',
+                theme: 'snow' // or 'bubble'
+            });
+            // quills.push(quill);
+            quill.enable(false);
+        }
+
         // var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
         var wsurl = 'ws://127.0.0.1:8080/server/server.php';
         var websocket;
@@ -149,6 +186,15 @@
                                 "question_instance_id": response.question_instance_id
                             }
                             websocket.send(JSON.stringify(msg));
+                            console.log(time_remain = $(`#progress_bar_${question_id}`).html().split(" "))
+                            timer_type = $(`#timerType_${question_id} > span`).html()
+                            console.log(timer_type)
+                            if(timer_type == "timedown") {
+                                animate_time_down(time_remain[0], time_remain[0], $(`#progress_bar_${question_id}`))
+                            } else {
+                                animate_time_up(0, time_remain[0], $(`#progress_bar_${question_id}`))
+                            }
+
                         } else {
                             alert("failed to insert question1");
                         }
@@ -160,8 +206,6 @@
             } catch (ex) {
                 console.log(ex);
             }
-
-
         });
 
         $('.pause').click(function() {
@@ -197,5 +241,51 @@
                 console.log(ex);
             }
         });
+
+        // var init_progress, max_progress, action;
+
+        function animate_time_down(init_progress, max_progress, $element) {
+            setTimeout(function() {
+                init_progress -= 1;
+                if (init_progress >= 0) {
+                    $element.attr('value', init_progress);
+                    $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                    animate_time_down(init_progress, max_progress, $element);
+                } else {
+                    msg = {
+                        "cmd": "timeout",
+                        "msg": null,
+                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                        "question_index": null,
+                        "question_instance_id": null
+                    }
+                    websocket.send(JSON.stringify(msg));
+                    return false;
+                }
+            }, 1000);
+        };
+
+        function animate_time_up(init_progress, max_progress, $element) {
+            setTimeout(function() {
+                init_progress++;
+                if (init_progress <= max_progress) {
+                    $element.attr('value', init_progress);
+                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                    animate_time_up(init_progress, max_progress, $element);
+                } else {
+                    msg = {
+                        "cmd": "timeout",
+                        "msg": null,
+                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                        "question_index": null,
+                        "question_instance_id": null
+                    }
+                    websocket.send(JSON.stringify(msg));
+                    return false;
+                }
+            }, 1000);
+        };
     })
 </script>

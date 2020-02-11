@@ -120,22 +120,6 @@ class Question_model extends CI_Model
       'question_instance_id' => $this->db->insert_id());
   }
 
-  public function update_student_question_session($question_index) {
-    $result = $this->db->get_where('questions', array('id'=>$question_index))->result_array()[0];
-    $userdata = array(
-      'choices' => $result['choices'],
-      'answer' => $result['answer'],
-      'duration' => $result['duration'],
-      'content' => $result['content'],
-      'question_type' => $result['question_type'],
-      'category' => $result['category'],
-      'difficulty' => $result['difficulty'],
-      'timer_type' => $result['timer_type']
-    );
-    $this->session->set_userdata($userdata);
-    return !empty($this->session->content);
-  }
-
   public function submit_student_response() {
     $data = array(
       'question_instance_id' => $this->input->post('question_instance_id'),
