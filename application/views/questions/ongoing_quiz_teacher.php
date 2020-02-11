@@ -254,10 +254,14 @@
             try {
                 action = "close";
                 if (timer_type == "timeup") {
-                    $(`#progress_bar_${question_id}`).val(0);
+                    element = $(`#progress_bar_${question_id}`);
+                    element.attr('aria-valuenow', 0);
+                    element.css('width','0%');
                     $(`#duration_${question_id}`).html(`Time: ${default_duration} seconds`);
                 } else if (timer_type == "timedown") {
-                    $(`#progress_bar_${question_id}`).val(default_duration);
+                    element = $(`#progress_bar_${question_id}`);
+                    element.attr('aria-valuenow', default_duration);
+                    element.css('width','100%');
                     $(`#duration_${question_id}`).html(`Remaining Time: ${default_duration} seconds`);
                 }
                 websocket.send(JSON.stringify(msg));
