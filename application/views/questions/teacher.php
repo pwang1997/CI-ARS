@@ -102,6 +102,7 @@
     <?php endforeach; //end question_list 
     ?>
     </div>
+    <div class="border-top my-3 d-block"></div>
     <button type="button" class="btn btn-outline-primary" id="new_question">New Question</button>
 
     <script>
