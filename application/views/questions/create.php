@@ -168,7 +168,7 @@
                     'quiz_index': $('#quiz_index').val(),
                     'timer_type': $('input[name=timer_types]:checked').val(),
                     'duration': $('input[name=duration]').val(),
-                    'content': quill.getContents()['ops'][0]['insert'],
+                    'content': quill.root.innerHTML.trim(),
                     'isPublic': $('input[name=accesses]:checked').val(),
                     'choices': JSON.stringify(choices),
                     'answer': JSON.stringify(answers),

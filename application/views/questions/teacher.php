@@ -8,7 +8,7 @@
 <h3><?php echo ($title); ?></h3>
 <span>Question pool: <?php echo ($num_questions['size']); ?></span>
 
-<span class="float-right">Categories: <?php echo implode(',', $categories);?></span>
+<span class="float-right">Categories: <?php echo implode(',', $categories); ?></span>
 <?php $j = 1; ?>
 <?php foreach ($question_list as $question) : ?>
     <div id="question_<?= $question['id'] ?>">
@@ -19,8 +19,10 @@
         <div class="row">
             <div class="col-8">
                 <br>
-                <div class="form-group">
-                    <textarea class="form-control" id="content_<?php echo $question['id']; ?>" rows="18" style="resize:none" placeholder="<?php echo $question['content']; ?>"></textarea>
+                <div class="form-group row" style="position:relative;">
+                    <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
+                        <div class="editor" id="editor_<?= $question['id']; ?>" style="min-height:100%; height:auto;"><?= $question['content']; ?></div>
+                    </div>
                 </div>
             </div>
             <div class="col-4">
@@ -110,6 +112,33 @@
 
     <script>
         $(document).ready(() => {
+            
+            ids = $("[id^=question_]");
+            arr_ids = [];
+            for(i = 0; i < ids.length; i++) {
+                arr_ids.push((ids[i]).id.substring(9));
+            };
+
+            quills = [];
+            for(i = 0; i < ids.length; i++) {
+                id = "#editor_" + arr_ids[i];
+                console.log(id);
+                quill = new Quill(`#editor_${arr_ids[i]}`, {
+                    modules: {
+                        toolbar: [
+                            [{
+                                header: [1, 2, false]
+                            }],
+                            ['bold', 'italic', 'underline'],
+                            ['image', 'code-block']
+                        ]
+                    },
+                    scrollingContainer: '#scrolling-container',
+                    placeholder: 'Question Content',
+                    theme: 'snow' // or 'bubble'
+                });
+                // quills.push(quill);
+            }
 
             $('#new_question').click((e) => {
                 location.replace(<?php echo "'" . base_url() . "questions/create/" . $quiz_index . "'"; ?>);
@@ -122,11 +151,11 @@
             $("button").click(function() {
                 //update question
                 if ($(this).hasClass('update')) {
-                    // alert(this.id); // or alert($(this).attr('id'));
-                    content = ($('#content_' + this.id).val() == "") ? $('#content_' + this.id).attr('placeholder') : $('#content_' + this.id).val();
+                    //($('#content_' + this.id).val() == "") ? $('#content_' + this.id).attr('placeholder') : $('#content_' + this.id).val();
+                    content = quill.root.innerHTML.trim();
                     category = ($('#category_' + this.id).val() == "") ? $('#category_' + this.id).attr('placeholder') : $('#category_' + this.id).val();
                     duration = ($('#duration_' + this.id).val() == "") ? $('#duration_' + this.id).attr('placeholder') : $('#duration_' + this.id).val();
-
+                    console.log(content);
                     choices = [];
                     answers = [];
                     //get all values of choices

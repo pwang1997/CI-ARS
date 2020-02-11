@@ -24,13 +24,13 @@
     $(document).ready(() => {
       //hide toast
       off();
-      
+
       $(".close").click(function() {
         $('#overlay').hide();
       });
     })
   </script>
-  <link href="../css/overlay.css" rel="stylesheet">
+  <link href="<?php echo base_url(); ?>/css/overlay.css" rel="stylesheet">
 </head>
 
 <body>
