@@ -41,13 +41,13 @@
                                 Time:<?php echo $question['duration']; ?> seconds
                             <? endif; ?>
                         </p>
-                        <div class="pad">
+                        <div class="progress">
                             <?php if ($question['timer_type'] == 'timedown') : ?>
-                                <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="<?= $question['duration']; ?>" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
-                                <!-- <div class="alert alert-success" role="alert">Loading completed!</div> -->
+                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:100%" aria-valuenow="<?= $question['duration'] ?>" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
                             <?php else : ?>
-                                <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="0" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
+                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
                             <?php endif; ?>
+
                         </div>
                     </div>
 
@@ -163,7 +163,7 @@
 
         $(".start").click(function() {
             question_id = (this.id).split("_")[1];
-            // console.log(question_id);
+
             try {
                 $.ajax({
                     url: "<?php echo base_url(); ?>questions/add_question_instance",
@@ -184,8 +184,8 @@
                                 "question_instance_id": response.question_instance_id
                             }
                             websocket.send(JSON.stringify(msg));
-                            time_remain = $(`#progress_bar_${question_id}`).html().split(" ")
-                            default_duration = time_remain[0];
+                            time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
+                            default_duration = time_remain;
                             timer_type = $(`#timerType_${question_id} > span`).html()
                             action = "start";
                             if (timer_type == "timedown") {
@@ -207,18 +207,18 @@
         });
 
         $('.pause').click(function() {
-            console.log("pause clicked")
-            if (action == "pause") {
-                action = "resume";
-                $(this).html("Resume");
-            } else if (action == "resume" || action == "start") {
+            if (action == "start") {
                 action = "pause";
+                $(this).html("Resume");
+            } else if (action == "resume") {
+                action = "pause";
+                $(this).html("Resume");
+            } else if (action == "pause") {
+                action = "resume";
                 $(this).html("Pause");
             }
-            console.log(action);
-            // $(this).removeClass("pause");
+
             question_id = (this.id).split("_")[1];
-            // console.log(question_id);
             var msg = {
                 "cmd": action,
                 "msg": null,
@@ -226,7 +226,7 @@
                 "role": <?php echo "'" . $this->session->role . "'"; ?>,
                 "question_index": question_id
             }
-            // console.log(timer_type);
+            //restore pause/resume state
             init = $(`#progress_bar_${question_id}`).val();
             duration = $(`#progress_bar_${question_id}`).attr('max');
             if (timer_type == "timeup") {
@@ -240,7 +240,7 @@
                 console.log(ex);
             }
         });
-
+        //reset question timer
         $('.btn-close').click(function() {
             question_id = (this.id).split("_")[1];
             // console.log(question_id);
@@ -266,17 +266,27 @@
             }
         });
 
-
+        //DOM variables
         var action = "",
             timer_type = "",
             default_duration = "";
 
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
+                console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
-                        $element.attr('value', init_progress);
+                        $element.attr('aria-valuenow', init_progress);
+                        percentage = init_progress / max_progress;
+                        $element.css('width', percentage * 100 + "%");
+                        if (percentage <= 0.5) {
+                            $element.addClass('bg-warning');
+                        } 
+                        if(percentage <= 0.3) {
+                            $element.removeClass('bg-warning');
+                            $element.addClass('bg-danger');
+                        }
                         $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
                         animate_time_down(init_progress, max_progress, $element);
                     } else {
@@ -294,8 +304,10 @@
                 } else if (action == "close") {
                     action = "close";
                     return false;
+                } else {
+                    animate_time_down(init_progress, max_progress, $element);
                 }
-                console.log(action);
+                // console.log(action);
             }, 1000);
         };
 
@@ -304,7 +316,17 @@
                 if (action == "start" || action == "resume") {
                     init_progress++;
                     if (init_progress <= max_progress) {
-                        $element.attr('value', init_progress);
+                        // $element.attr('value', init_progress);
+                        $element.attr('aria-valuenow', init_progress);
+                        percentage = init_progress / max_progress;
+                        $element.css('width', percentage * 100 + "%");
+                        if (percentage >= 0.5) {
+                            $element.addClass('bg-warning');
+                        } 
+                        if(percentage >= 0.9) {
+                            $element.removeClass('bg-warning');
+                            $element.addClass('bg-danger');
+                        }
                         $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
                         animate_time_up(init_progress, max_progress, $element);
                     } else {
@@ -321,6 +343,8 @@
                     }
                 } else if (action == "close") {
                     return false;
+                } else {
+                    animate_time_up(init_progress, max_progress, $element);
                 }
             }, 1000);
         };
