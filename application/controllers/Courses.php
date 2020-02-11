@@ -35,10 +35,10 @@ class Courses extends CI_Controller
     $course_id = $this->uri->segment(3);
     $classroom_id = $this->uri->segment(4);
 
-    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
+    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id);
     $data['enrolledStudents'] = $this->course_model->get_enrolledStudents_for_teacher($classroom_id);
     $data['quizs'] = $this->course_model->get_quizs_for_teacher($classroom_id);
-    $data['num_of_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
+    $data['num_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/teacher', $data);
@@ -72,7 +72,7 @@ class Courses extends CI_Controller
     $course_id = $this->uri->segment(3);
     $classroom_id = $this->uri->segment(4);
 
-    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id)[0];
+    $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id);
     $data['quizs'] = $this->course_model->get_quizs_for_student($course_id, $classroom_id);
     $data['num_of_questions'] = $this->course_model->get_number_of_questions($data['quizs']);
 

@@ -28,7 +28,7 @@
         <div class="col-sm-10">
             <div class="btn-group btn-group-toggle" data-toggle="buttons" id="isPublic">
                 <label class="btn btn-outline-primary">
-                    <input type="radio" name="accesses"  value="false" autocomplete="off"> Private
+                    <input type="radio" name="accesses" value="false" autocomplete="off"> Private
                 </label>
                 <label class="btn btn-outline-primary">
                     <input type="radio" name="accesses" value="true" autocomplete="off"> Public
@@ -119,24 +119,31 @@
             placeholder: 'Question Content',
             theme: 'snow' // or 'bubble'
         });
-        
+
         //add n choices
+        var num_choices = <?= $i; ?>;
         $('#add_more_choices').click(function() {
+            if (num_choices <= 4) {
+                num_choices = 5;
+            }
             var moreChoices = `<div class="form-group row choice_row">
-            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?php echo $i; ?></label>
+            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice ${num_choices}</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" id="choice<?php echo $i; ?>" autocomplete="on">
+                <input type="text" class="form-control" id="choice${num_choices}" autocomplete="on">
             </div>
             <div class="form-check col-sm-1">
                 <input class="form-check-input" type="checkbox" name="answers" value="correct">
             </div>
         </div>`;
-            <?php $i++; ?>
+            num_choices++;
             $('.additional_choices').append(moreChoices);
         });
 
         $('#remove_blanks').click(function() {
-            <?php $i--; ?>
+            num_choices--;
+            if (num_choices <= 4) {
+                num_choices = 5;
+            }
             $('.additional_choices').children().last().remove();
         });
 
@@ -150,8 +157,8 @@
             $('input[name="answers"]').each(function() {
                 if ($(this).is(':checked')) {
                     answers.push($(this).parent().prev().children().first().val());
-                } 
-                    choices.push($(this).parent().prev().children().first().val());
+                }
+                choices.push($(this).parent().prev().children().first().val());
             });
 
             choices = choices.filter(Boolean);

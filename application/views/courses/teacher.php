@@ -8,8 +8,8 @@
 <div class="row">
 	<div class="col-2">
 		<div class="list-group" id="list-tab" role="tablist">
-			<a class="list-group-item list-group-item-action active" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="lab">Course Detail</a>
-			<a class="list-group-item list-group-item-action" id="list-lab-list" data-toggle="list" href="#list-lab" role="tab" aria-controls="lab">Quiz</a>
+			<a class="list-group-item list-group-item-action active" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="course">Course Detail</a>
+			<a class="list-group-item list-group-item-action" id="list-quiz-list" data-toggle="list" href="#list-quiz" role="tab" aria-controls="quiz">Quizs</a>
 			<a class="list-group-item list-group-item-action" id="list-student-list" data-toggle="list" href="#list-student" role="tab" aria-controls="student">Students</a>
 		</div>
 	</div>
@@ -35,10 +35,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php $i = 1; ?>
+						<?php $j = 1; ?>
 						<?php foreach ($enrolledStudents as $student) : ?>
 							<tr class="table-light">
-								<th><?php echo $i++; ?></th>
+								<th><?php echo $j++; ?></th>
 								<th scope="row"><?php echo $student['username']; ?></th>
 								<th>
 									<button type="button" class="btn btn-outline-primary btn_remove_student" id="<?php echo "btn_" . $student['username']; ?>">Remove</button>
@@ -78,35 +78,52 @@
 				</div>
 			</div>
 			<!-- quizs  -->
-			<div class="tab-pane fade" id="list-lab" role="tabpanel" aria-labelledby="list-lab">
-				<table class="table table-hover" id="list_of_quiz">
-					<thead>
-						<tr>
-							<th scope="col">Quiz</th>
-							<th scope="col">Number of Questions</th>
-							<th scope="col">Action</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php $i = 1; ?>
-						<?php foreach ($quizs as $quiz) : ?>
-							<tr class="table-light">
-								<th><a href="<?php echo base_url(); ?>questions/teacher/<?php echo $quiz['quiz_index']; ?>"><?php echo $i++; ?></a></th>
-								<th><?php echo $num_of_questions[$quiz['quiz_index']]['num_questions']; ?></th>
-								<th>
-									<button type="button" class="btn btn-outline-primary btn_remove_quiz">Remove</button>
-									<button type="button" class="btn btn-outline-primary btn_start_quiz" id="<?php echo $quiz['quiz_index']; ?>">Start</button>
-								</th>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-				<button type="button" id="btn_add_quiz" class="btn btn-primary">
-					New Quiz
-				</button>
+			<div class="card-groups">
+				<?php
+				for ($i = 0; $i < sizeof($quizs); $i++) {
+					if ($i % 3 == 0) {
+				?>
+						<div class="row">
+							<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+							<div class="col-md-1"></div>
+						<?php } elseif ($i % 3 == 2) {
+						?>
+							<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+						</div>
+					<?php } else { ?>
+						<?php addedCard($i, $quizs[$i]['id'], $quizs[$i]['created_at'], $num_questions[$quizs[$i]['id']]); ?>
+						<div class="col-md-1"></div>
+				<?php }
+				}
+				?>
+				<?php if (sizeof($quizs) % 3 != 0) : ?>
+			</div>
+		<?php endif; ?>
+		<div class="row">
+			<div class='card bg-outline-primary mb-3 col-md-3'>
+				<div class='card-body'>
+					<h5 class='card-title'><a href='#' id="add_quiz" class='text-secondary'>New Quiz</a></h5>
+				</div>
 			</div>
 		</div>
+		</div>
+
+		<?php
+		function addedCard($index, $quiz_id, $created_at, $num_questions)
+		{
+			echo "<div class='card bg-outline-primary mb-3 col-md-3'>
+		<div class='card-body'>
+		  <h5 class='card-title'><a href='".base_url()."/questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
+		  <p class='card-text'><a href='".base_url()."/questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
+		</div>
+		<div class='card-footer'>
+		  <small class='text-muted'>created at ${created_at}</small>
+		  <button type='button' class='btn btn-outline-primary'>start</button>
+		  <button type='button' class='btn btn-outline-danger'>remove</button>
+		</div>
+	  </div>";
+		}
+		?>
 	</div>
 </div>
 <script>
@@ -169,7 +186,7 @@
 			});
 		});
 
-		$('#btn_add_quiz').click((e) => {
+		$('#add_quiz').click((e) => {
 			e.preventDefault();
 			$.ajax({
 				url: "<?php echo base_url(); ?>courses/add_quiz_from_classroom",
@@ -181,13 +198,7 @@
 				success: function(response) {
 					if (response.success) {
 						quiz_index = response.quiz_index;
-						var newContent =
-							'<tr class="table-light">' +
-							'<th><a href="<?php echo base_url(); ?>questions/teacher/' + quiz_index + '"><?php echo $i++; ?></a></th>' +
-							'<th>0</th>' +
-							'<th><button type="button" class="btn btn-outline-primary btn_remove_quiz" >Remove</button>' +
-							'<button type="button" class="btn btn-outline-primary btn_start_quiz">Start</button></th></tr>';
-						$('#list_of_quiz tbody').append(newContent);
+						location.replace("<?php echo (base_url() . "questions/create/"); ?>" + quiz_index);
 					} else {
 						alert("failed ")
 					}
@@ -198,9 +209,6 @@
 			});
 		});
 
-		$('.btn_remove_quiz').click((e) => {
-			e.preventDefault();
-		})
 		//jump to question(ongoing) view
 		$('button').click(function() {
 			quiz_index = this.id;
