@@ -87,6 +87,7 @@ class Users extends CI_Controller
 
     $course_list = $this->user_model->get_courses_for_teachers($this->session->id);
     $data['course_list'] = $course_list;
+    $data['section_list'] = $this->user_model->get_section_list($course_list);
     // print_r($data['course_list']);
 
     $this->load->view('templates/header');

@@ -11,14 +11,14 @@ for ($i = 0; $i < sizeof($course_list); $i++) {
   if ($i % 3 == 0) {
 ?>
     <div class="row">
-      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id']); ?>
+      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id'], $section_list[$i]['section_id']); ?>
       <div class="col-md-1"></div>
     <?php } elseif ($i % 3 == 2) {
     ?>
-      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id']); ?>
+      <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id'], $section_list[$i]['section_id']); ?>
     </div>
   <?php } else { ?>
-    <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id']); ?>
+    <?php addedCard($course_list[$i]['course_name'], $course_list[$i]['course_id'], $course_list[$i]['classroom_id'], $section_list[$i]['section_id']); ?>
     <div class="col-md-1"></div>
 <?php }
 }
@@ -36,12 +36,12 @@ for ($i = 0; $i < sizeof($course_list); $i++) {
 </div>
 
 <?php
-function addedCard($course_name, $course_id, $classroom_id)
+function addedCard($course_name, $course_id, $classroom_id,$section)
 {
   echo ' <div class="card text-white bg-primary mb-3 col-md-3">
         <div class="card-header">' . $course_name . '</div>
         <div class="card-body">
-          <h4 class="card-title"><a href="../courses/teacher/' . $course_id . '/'. $classroom_id.'" class="text-secondary">Section' . $course_id . '</a></h4>
+          <h4 class="card-title"><a href="../courses/teacher/' . $course_id . '/'. $classroom_id.'" class="text-secondary">Section ' . $section . '</a></h4>
         </div>
       </div>';
 }

@@ -71,4 +71,11 @@ class User_model extends CI_Model
     }
     return $result;
   }
+
+  public function get_section_list($course_list) {
+    foreach($course_list as $course) {
+      $result[] = $this->db->select('section_id')->from('classrooms')->where(array('course_id'=>$course['course_id']))->get()->result_array()[0];
+    }
+    return $result;
+  }
 }
