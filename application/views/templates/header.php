@@ -9,9 +9,28 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <!-- Main Quill library -->
   <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
-
   <!-- Theme included stylesheets -->
   <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <!-- Customized js and css  -->
+  <script>
+    function on() {
+      $('#overlay').show();
+    }
+
+    function off() {
+      $('#overlay').hide();
+    }
+
+    $(document).ready(() => {
+      //hide toast
+      off();
+      
+      $(".close").click(function() {
+        $('#overlay').hide();
+      });
+    })
+  </script>
+  <link href="../css/overlay.css" rel="stylesheet">
 </head>
 
 <body>
@@ -74,7 +93,26 @@
     </nav>
   </header>
 
+  <div id="overlay" onclick="off()">
+    <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center">
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="mr-auto">Notification</strong>
+          <small>n time ago</small>
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="toast-body">
+          Body
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="container">
+
     <!-- Flash message -->
     <?php if ($this->session->flashdata('user_registered')) : ?>
       <?php echo '<div class="alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>' . $this->session->flashdata('user_registered') . '</div>'; ?>
