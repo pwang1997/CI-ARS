@@ -24,7 +24,7 @@
             <br>
             <div class="form-group row" style="position:relative;">
                 <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
-                    <div id="editor" style="min-height:100%; height:auto;"><?= $this->session->content ?></div>
+                    <div id="editor" style="min-height:100%; height:auto;"></div>
                 </div>
             </div>
         </div>
@@ -62,6 +62,7 @@
         </div>
     <? $i++;
     endforeach; ?>
+    <div class="options"></div>
 </div>
 
 <script>
@@ -111,20 +112,37 @@
                             if (response.result != null) {
                                 console.log(response);
                                 $('#content').val(response.result.content)
-                                $('#editor').val(response.result.content)
-                                // $('#progress_bar').val(response.result.duration)
+                                $('#editor').html(response.result.content)
                                 timer_type = response.result.timer_type;
                                 choices = response.result.choices;
                                 duration = response.result.duration;
-                                console.log(timer_type)
+                                default_duration = duration;
+                                // console.log(timer_type)
+                                action = "start";
                                 if (timer_type == "timedown") {
                                     $(`#duration`).html(`Remaining Time: ${duration} seconds`);
                                     $(`.pad`).html(`<progress class="progress" id="progress_bar" value="${duration}" max="${duration}">${duration} seconds</progress>`);
                                     animate_time_down(duration, duration, $(`#progress_bar`))
-                                } else {
+                                } else if (timer_type == "timeup") {
                                     $(`#duration`).html(`Time: 0 seconds`);
                                     $(`.pad`).html(`<progress class="progress" id="progress_bar" value="0" max="${duration}">0 seconds</progress>`);
                                     animate_time_up(0, duration, $(`#progress_bar`))
+                                }
+                                // update question choices
+                                // arr_choices = response.result.choices.split(",");
+                                var arr = JSON.parse("[" + response.result.choices + "]")[0];
+                                // console.log(arr);
+                                for (i = 0; i < arr.length; i++) {
+                                    newContent = `<div class="form-group row choice_row">
+                                                    <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i}</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="${arr[i]}">
+                                                    </div>
+                                                    <div class="form-check col-sm-1">
+                                                        <input class="form-check-input" type="checkbox" name="answers" value="${arr[i]}">
+                                                    </div>
+                                                </div>`;
+                                    $('.options').append(newContent);
                                 }
                             } else {
                                 alert("failed to insert question1");
@@ -137,6 +155,8 @@
                 } else if (cmd == "timeout" || cmd == "close") {
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
+                } else {
+                    action = cmd;
                 }
             }
 
@@ -185,47 +205,69 @@
             })
         });
 
+        var action = "",
+            timer_type = "",
+            default_duration = "";
+
         function animate_time_down(init_progress, max_progress, $element) {
+
             setTimeout(function() {
-                init_progress -= 1;
-                if (init_progress >= 0) {
-                    $element.attr('value', init_progress);
-                    $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
-                    animate_time_down(init_progress, max_progress, $element);
-                } else {
-                    msg = {
-                        "cmd": "timeout",
-                        "msg": null,
-                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                        "question_index": null,
-                        "question_instance_id": null
+                console.log(action);
+                if (action == "start" || action == "resume") {
+                    init_progress -= 1;
+                    if (init_progress >= 0) {
+                        $element.attr('value', init_progress);
+                        $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        animate_time_down(init_progress, max_progress, $element);
+                    } else {
+                        msg = {
+                            "cmd": "timeout",
+                            "msg": null,
+                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                            "question_index": null,
+                            "question_instance_id": null
+                        }
+                        websocket.send(JSON.stringify(msg));
+                        return false;
                     }
-                    websocket.send(JSON.stringify(msg));
+                } else if (action == "close") {
                     return false;
+                } else if (action == "pause") {
+                    console.log("quiz has been paused")
                 }
+                animate_time_down(init_progress, max_progress, $element);
             }, 1000);
         };
 
         function animate_time_up(init_progress, max_progress, $element) {
+
             setTimeout(function() {
-                init_progress++;
-                if (init_progress <= max_progress) {
-                    $element.attr('value', init_progress);
-                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                    animate_time_up(init_progress, max_progress, $element);
-                } else {
-                    msg = {
-                        "cmd": "timeout",
-                        "msg": null,
-                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                        "question_index": null,
-                        "question_instance_id": null
+                console.log(action);
+                if (action == "start" || action == "resume") {
+                    init_progress++;
+                    if (init_progress <= max_progress) {
+                        $element.attr('value', init_progress);
+                        $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                        animate_time_up(init_progress, max_progress, $element);
+                    } else {
+                        msg = {
+                            "cmd": "timeout",
+                            "msg": null,
+                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                            "question_index": null,
+                            "question_instance_id": null
+                        }
+                        websocket.send(JSON.stringify(msg));
+                        return false;
                     }
-                    websocket.send(JSON.stringify(msg));
+                } else if (action == "close") {
                     return false;
+                } else if (action == "pause") {
+                    console.log("quiz has been paused")
                 }
+                animate_time_up(init_progress, max_progress, $element);
             }, 1000);
         };
     });

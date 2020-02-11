@@ -37,17 +37,17 @@
                         <p id="duration_<?php echo $question['id']; ?>">
                             <?php if ($question['timer_type'] == 'timedown') : ?>
                                 Remaining Time:<?php echo $question['duration']; ?> seconds
-                            <?php else: ?>
+                            <?php else : ?>
                                 Time:<?php echo $question['duration']; ?> seconds
                             <? endif; ?>
                         </p>
                         <div class="pad">
                             <?php if ($question['timer_type'] == 'timedown') : ?>
                                 <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="<?= $question['duration']; ?>" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
-                            <!-- <div class="alert alert-success" role="alert">Loading completed!</div> -->
-                            <?php else: ?>
+                                <!-- <div class="alert alert-success" role="alert">Loading completed!</div> -->
+                            <?php else : ?>
                                 <progress class="progress" id="progress_bar_<?= $question['id']; ?>" value="0" max="<?= $question['duration']; ?>"><?= $question['duration']; ?> seconds</progress>
-                            <?php endif;?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -107,7 +107,6 @@
         quills = [];
         for (i = 0; i < ids.length; i++) {
             id = "#editor_" + arr_ids[i];
-            console.log(id);
             quill = new Quill(`#editor_${arr_ids[i]}`, {
                 modules: {
                     toolbar: [
@@ -175,7 +174,6 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            console.log("success");
                             console.log(response);
                             var msg = {
                                 "cmd": "start",
@@ -186,15 +184,15 @@
                                 "question_instance_id": response.question_instance_id
                             }
                             websocket.send(JSON.stringify(msg));
-                            console.log(time_remain = $(`#progress_bar_${question_id}`).html().split(" "))
+                            time_remain = $(`#progress_bar_${question_id}`).html().split(" ")
+                            default_duration = time_remain[0];
                             timer_type = $(`#timerType_${question_id} > span`).html()
-                            console.log(timer_type)
-                            if(timer_type == "timedown") {
-                                animate_time_down(time_remain[0], time_remain[0], $(`#progress_bar_${question_id}`))
-                            } else {
-                                animate_time_up(0, time_remain[0], $(`#progress_bar_${question_id}`))
+                            action = "start";
+                            if (timer_type == "timedown") {
+                                animate_time_down(default_duration, default_duration, $(`#progress_bar_${question_id}`))
+                            } else if (timer_type == "timeup") {
+                                animate_time_up(0, default_duration, $(`#progress_bar_${question_id}`))
                             }
-
                         } else {
                             alert("failed to insert question1");
                         }
@@ -209,14 +207,32 @@
         });
 
         $('.pause').click(function() {
+            console.log("pause clicked")
+            if (action == "pause") {
+                action = "resume";
+                $(this).html("Resume");
+            } else if (action == "resume" || action == "start") {
+                action = "pause";
+                $(this).html("Pause");
+            }
+            console.log(action);
+            // $(this).removeClass("pause");
             question_id = (this.id).split("_")[1];
             // console.log(question_id);
             var msg = {
-                "cmd": "pause",
+                "cmd": action,
                 "msg": null,
                 "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
                 "role": <?php echo "'" . $this->session->role . "'"; ?>,
                 "question_index": question_id
+            }
+            // console.log(timer_type);
+            init = $(`#progress_bar_${question_id}`).val();
+            duration = $(`#progress_bar_${question_id}`).attr('max');
+            if (timer_type == "timeup") {
+                animate_time_up(init, duration, $(`#progress_bar_${question_id}`))
+            } else if (timer_type == "timedown") {
+                animate_time_down(init, duration, $(`#progress_bar_${question_id}`))
             }
             try {
                 websocket.send(JSON.stringify(msg));
@@ -236,53 +252,74 @@
                 "question_index": question_id
             }
             try {
+                action = "close";
+                if (timer_type == "timeup") {
+                    $(`#progress_bar_${question_id}`).val(0);
+                    $(`#duration_${question_id}`).html(`Time: ${default_duration} seconds`);
+                } else if (timer_type == "timedown") {
+                    $(`#progress_bar_${question_id}`).val(default_duration);
+                    $(`#duration_${question_id}`).html(`Remaining Time: ${default_duration} seconds`);
+                }
                 websocket.send(JSON.stringify(msg));
             } catch (ex) {
                 console.log(ex);
             }
         });
 
-        // var init_progress, max_progress, action;
+
+        var action = "",
+            timer_type = "",
+            default_duration = "";
 
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
-                init_progress -= 1;
-                if (init_progress >= 0) {
-                    $element.attr('value', init_progress);
-                    $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
-                    animate_time_down(init_progress, max_progress, $element);
-                } else {
-                    msg = {
-                        "cmd": "timeout",
-                        "msg": null,
-                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                        "question_index": null,
-                        "question_instance_id": null
+                if (action == "start" || action == "resume") {
+                    init_progress -= 1;
+                    if (init_progress >= 0) {
+                        $element.attr('value', init_progress);
+                        $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        animate_time_down(init_progress, max_progress, $element);
+                    } else {
+                        msg = {
+                            "cmd": "timeout",
+                            "msg": null,
+                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                            "question_index": null,
+                            "question_instance_id": null
+                        }
+                        websocket.send(JSON.stringify(msg));
+                        return false;
                     }
-                    websocket.send(JSON.stringify(msg));
+                } else if (action == "close") {
+                    action = "close";
                     return false;
                 }
+                console.log(action);
             }, 1000);
         };
 
         function animate_time_up(init_progress, max_progress, $element) {
             setTimeout(function() {
-                init_progress++;
-                if (init_progress <= max_progress) {
-                    $element.attr('value', init_progress);
-                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                    animate_time_up(init_progress, max_progress, $element);
-                } else {
-                    msg = {
-                        "cmd": "timeout",
-                        "msg": null,
-                        "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                        "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                        "question_index": null,
-                        "question_instance_id": null
+                if (action == "start" || action == "resume") {
+                    init_progress++;
+                    if (init_progress <= max_progress) {
+                        $element.attr('value', init_progress);
+                        $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                        animate_time_up(init_progress, max_progress, $element);
+                    } else {
+                        msg = {
+                            "cmd": "timeout",
+                            "msg": null,
+                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                            "question_index": null,
+                            "question_instance_id": null
+                        }
+                        websocket.send(JSON.stringify(msg));
+                        return false;
                     }
-                    websocket.send(JSON.stringify(msg));
+                } else if (action == "close") {
                     return false;
                 }
             }, 1000);
