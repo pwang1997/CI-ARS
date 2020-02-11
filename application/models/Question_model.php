@@ -89,7 +89,9 @@ class Question_model extends CI_Model
         'category' => $this->input->post('category'),
         'difficulty' => $this->input->post('difficulty'),
         'timer_type' => $this->input->post('timer_type'),
-        'is_public' => $this->input->post('isPublic')
+        'is_public' => $this->input->post('isPublic'),
+        'choices' => $this->input->post('choices'),
+        'answer' => $this->input->post('answer')
       );
       return $this->db->where('id', $this->input->post('id'))->update('questions', $data);
   }

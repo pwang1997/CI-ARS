@@ -78,29 +78,31 @@
         <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
     </div>
     <!-- choice content + answer -->
-    <?php for ($i = 1; $i <= 4; $i++) : ?>
-        <div class="form-group row choice_row">
-            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
-            <div class="col-sm-6">
-                <input type="text" class="form-control" id="choice<?= $i; ?>" autocomplete="on">
+    <div class="option_row">
+        <?php for ($i = 1; $i <= 4; $i++) : ?>
+            <div class="form-group row choice_row">
+                <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="choice<?= $i; ?>" autocomplete="on">
+                </div>
+                <div class="form-check col-sm-1">
+                    <input class="form-check-input" type="checkbox" name="answers" value="correct">
+                </div>
             </div>
-            <div class="form-check col-sm-1">
-                <input class="form-check-input" type="checkbox" name="answers" value="correct">
-            </div>
-        </div>
-    <?php endfor; ?>
-    <div class="additional_choices"></div>
-    <!-- add choices/ remove empty choices -->
-    <div class="form-group row">
-        <button type="button" class="btn btn-primary" id="add_more_choices">Add</button>
-        <button type="button" class="btn btn-primary" id="remove_blanks">Remove</button>
+        <?php endfor; ?>
     </div>
+</div>
+<!-- add choices/ remove empty choices -->
+<div class="form-group row">
+    <button type="button" class="btn btn-primary" id="add_more_choices">Add</button>
+    <button type="button" class="btn btn-primary" id="remove_blanks">Remove</button>
+</div>
 
-    <!-- submit -->
-    <div class="row">
-        <input type="submit" class="btn btn-outline-primary btn-block" value="Submit">
-    </div>
-    <?php echo form_close(); ?>
+<!-- submit -->
+<div class="row">
+    <input type="submit" class="btn btn-outline-primary btn-block" value="Submit">
+</div>
+<?php echo form_close(); ?>
 </div>
 
 <script>
@@ -121,11 +123,8 @@
         });
 
         //add n choices
-        var num_choices = <?= $i; ?>;
         $('#add_more_choices').click(function() {
-            if (num_choices <= 4) {
-                num_choices = 5;
-            }
+            num_choices = $(`.option_row > .choice_row`).length + 1;
             var moreChoices = `<div class="form-group row choice_row">
             <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice ${num_choices}</label>
             <div class="col-sm-6">
@@ -135,16 +134,12 @@
                 <input class="form-check-input" type="checkbox" name="answers" value="correct">
             </div>
         </div>`;
-            num_choices++;
-            $('.additional_choices').append(moreChoices);
+            $('.option_row').append(moreChoices);
         });
 
         $('#remove_blanks').click(function() {
-            num_choices--;
-            if (num_choices <= 4) {
-                num_choices = 5;
-            }
-            $('.additional_choices').children().last().remove();
+
+            $('.option_row').children().last().remove();
         });
 
         //submit form
@@ -155,10 +150,12 @@
             answers = [];
             //get all values of choices
             $('input[name="answers"]').each(function() {
-                if ($(this).is(':checked')) {
+                if ($(this).is(':checked') ) {
                     answers.push($(this).parent().prev().children().first().val());
                 }
-                choices.push($(this).parent().prev().children().first().val());
+                if ($(this).parent().prev().children().first().val() != "") {
+                    choices.push($(this).parent().prev().children().first().val());
+                }
             });
 
             choices = choices.filter(Boolean);

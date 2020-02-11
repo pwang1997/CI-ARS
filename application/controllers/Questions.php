@@ -17,9 +17,9 @@ class Questions extends CI_Controller
     //teacher's view of the course
     public function teacher()
     {
-        $data['title'] = 'Teacher\'s Quiz Page';
-
         $quiz_index = $this->uri->segment(3);
+
+        $data['title'] = 'Quiz '.$quiz_index;
         $data['hasQuestion'] = $this->question_model->has_question_in_quiz($quiz_index);
         $data['question_list'] =$this->question_model->getQuestions($quiz_index);
         $data['quiz_index'] = $quiz_index;

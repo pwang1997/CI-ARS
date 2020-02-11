@@ -115,8 +115,8 @@
 		{
 			echo "<div class='card bg-outline-primary mb-3 col-md-3' id='card_{$quiz_id}'>
 		<div class='card-body'>
-		  <h5 class='card-title'><a href='" . base_url() . "/questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
-		  <p class='card-text'><a href='" . base_url() . "/questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
+		  <h5 class='card-title'><a href='" . base_url() . "questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
+		  <p class='card-text'><a href='" . base_url() . "questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
 		</div>
 		<div class='card-footer'>
 		  <small class='text-muted'>created at ${created_at}</small>
