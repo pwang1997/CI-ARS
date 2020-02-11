@@ -111,15 +111,15 @@
 		<?php
 		function addedCard($index, $quiz_id, $created_at, $num_questions)
 		{
-			echo "<div class='card bg-outline-primary mb-3 col-md-3'>
+			echo "<div class='card bg-outline-primary mb-3 col-md-3' id='card_{$quiz_id}'>
 		<div class='card-body'>
-		  <h5 class='card-title'><a href='".base_url()."/questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
-		  <p class='card-text'><a href='".base_url()."/questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
+		  <h5 class='card-title'><a href='" . base_url() . "/questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
+		  <p class='card-text'><a href='" . base_url() . "/questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
 		</div>
 		<div class='card-footer'>
 		  <small class='text-muted'>created at ${created_at}</small>
-		  <button type='button' class='btn btn-outline-primary'>start</button>
-		  <button type='button' class='btn btn-outline-danger'>remove</button>
+		  <button type='button' class='btn btn-outline-primary start' id=st_{$quiz_id}>start</button>
+		  <button type='button' class='btn btn-outline-danger remove' id=rm_{$quiz_id}>remove</button>
 		</div>
 	  </div>";
 		}
@@ -211,10 +211,31 @@
 
 		//jump to question(ongoing) view
 		$('button').click(function() {
-			quiz_index = this.id;
-			if (!isNaN(quiz_index)) {
+			quiz_index = this.id.substring(3);
+			console.log(quiz_index)
+			if ($(this).hasClass('start')) {
 				head = <?php echo ("'" . base_url() . "questions/ongoing_quiz_teacher/'"); ?> + `${quiz_index}`;
 				location.replace(head);
+			} else if ($(this).hasClass('remove')) {
+				$.ajax({
+					url: "<?php echo base_url(); ?>courses/remove_quiz_from_classroom",
+					type: "POST",
+					dataType: "JSON",
+					data: {
+						"quiz_id": quiz_index
+					},
+					success: function(response) {
+						if (response.success) {
+							alert('success');
+							$(`#card_${quiz_index}`).remove();
+						} else {
+							alert("failed ")
+						}
+					},
+					fail: function() {
+						alert("failed");
+					}
+				})
 			}
 
 		})

@@ -104,6 +104,11 @@ class Course_model extends CI_Model
     return array('success' => $this->db->insert('quizs', array("classroom_id" => $classroom_id)), 'quiz_index' => $this->db->insert_id());
   }
 
+  public function remove_quiz_from_classroom() {
+    $quiz_id = $this->input->post('quiz_id');
+    // return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
+    return $this->db->delete('quizs', array('id'=>$quiz_id));
+  }
   public function get_number_of_questions($arr_quiz)
   {
     $query_arr = array();

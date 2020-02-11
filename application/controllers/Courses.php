@@ -59,6 +59,10 @@ class Courses extends CI_Controller
     echo json_encode($msg);
   }
 
+  public function remove_quiz_from_classroom() {
+    $msg['success'] = $this->course_model->remove_quiz_from_classroom();
+    echo json_encode($msg);
+  }
   public function remove_student_from_classroom() {
     $msg['success']= $this->course_model->remove_student_from_classroom();
     $msg['username'] = $this->input->post('username');
