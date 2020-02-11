@@ -10,7 +10,13 @@
     <div class="col-8">
         <br>
         <div class="form-group">
-            <textarea disabled class="form-control" id="content" rows="18" style="resize:none" placeholder="<?php echo $question['content']; ?>"></textarea>
+            <!-- <textarea disabled class="form-control" id="content" rows="18" style="resize:none" placeholder="<?php //echo $question['content']; 
+                                                                                                                    ?>"></textarea> -->
+            <div class="form-group row" style="position:relative;">
+                <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
+                    <div id="editor" style="min-height:100%; height:auto;"><?= $question['content']; ?></div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-4">
@@ -62,27 +68,26 @@
         </div>
     </div>
 </div>
-    <!-- answer heading -->
-    <div class="form-group row">
-        <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
-    </div>
+<!-- answer heading -->
+<div class="form-group row">
+    <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
+</div>
 <!-- answer/choices -->
 <?php $choices = (json_decode($question['choices']));
-    $answers = json_decode($question['answer']);
-    $i = 1;
-    foreach ($choices as $choice) : ?>
-        <div class="form-group row choice_row">
-            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
-            <div class="col-sm-6">
-                <input type="text" disabled choice_row class="form-control"  name="choice_row" autocomplete="on" placeholder="<?php echo $choice; ?>">
-            </div>
-            <div class="form-check col-sm-1">
-                <input class="form-check-input" disabled type="checkbox" name="answers" value="correct" 
-                <?php if (array_search($choice, $answers) !="") echo "checked"; ?>>
-            </div>
+$answers = json_decode($question['answer']);
+$i = 1;
+foreach ($choices as $choice) : ?>
+    <div class="form-group row choice_row">
+        <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+        <div class="col-sm-6">
+            <input type="text" disabled choice_row class="form-control" name="choice_row" autocomplete="on" placeholder="<?php echo $choice; ?>">
         </div>
-    <? $i++;
-    endforeach; ?>
+        <div class="form-check col-sm-1">
+            <input class="form-check-input" disabled type="checkbox" name="answers" value="correct" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
+        </div>
+    </div>
+<? $i++;
+endforeach; ?>
 
 
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">
@@ -134,7 +139,23 @@
         })
 
         $('#course').change(function() {
-            
+
         })
+
+        var quill = new Quill('#editor', {
+            modules: {
+                toolbar: [
+                    [{
+                        header: [1, 2, false]
+                    }],
+                    ['bold', 'italic', 'underline'],
+                    ['image', 'code-block']
+                ]
+            },
+            scrollingContainer: '#scrolling-container',
+            placeholder: 'Question Content',
+            theme: 'snow' // or 'bubble'
+        });
+        quill.enable(false);
     })
 </script>
