@@ -227,9 +227,10 @@
                 "question_index": question_id
             }
             //restore pause/resume state
-            init = $(`#progress_bar_${question_id}`).val();
-            duration = $(`#progress_bar_${question_id}`).attr('max');
+            init = $(`#progress_bar_${question_id}`).attr('aria-valuenow');
+            duration = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
             if (timer_type == "timeup") {
+                init = ($(`#duration_${question_id}`).html().split(' '))[1];
                 animate_time_up(init, duration, $(`#progress_bar_${question_id}`))
             } else if (timer_type == "timedown") {
                 animate_time_down(init, duration, $(`#progress_bar_${question_id}`))
@@ -256,14 +257,15 @@
                 if (timer_type == "timeup") {
                     element = $(`#progress_bar_${question_id}`);
                     element.attr('aria-valuenow', 0);
-                    element.css('width','0%');
+                    element.css('width', '0%');
                     $(`#duration_${question_id}`).html(`Time: ${default_duration} seconds`);
                 } else if (timer_type == "timedown") {
                     element = $(`#progress_bar_${question_id}`);
                     element.attr('aria-valuenow', default_duration);
-                    element.css('width','100%');
+                    element.css('width', '100%');
                     $(`#duration_${question_id}`).html(`Remaining Time: ${default_duration} seconds`);
                 }
+                $(`#pause_${question_id}`).html('Pause');
                 websocket.send(JSON.stringify(msg));
             } catch (ex) {
                 console.log(ex);
@@ -286,8 +288,8 @@
                         $element.css('width', percentage * 100 + "%");
                         if (percentage <= 0.5) {
                             $element.addClass('bg-warning');
-                        } 
-                        if(percentage <= 0.3) {
+                        }
+                        if (percentage <= 0.3) {
                             $element.removeClass('bg-warning');
                             $element.addClass('bg-danger');
                         }
@@ -319,17 +321,19 @@
             setTimeout(function() {
                 if (action == "start" || action == "resume") {
                     init_progress++;
-                    if (init_progress <= max_progress) {
+                    if (true) {
                         // $element.attr('value', init_progress);
-                        $element.attr('aria-valuenow', init_progress);
-                        percentage = init_progress / max_progress;
-                        $element.css('width', percentage * 100 + "%");
-                        if (percentage >= 0.5) {
-                            $element.addClass('bg-warning');
-                        } 
-                        if(percentage >= 0.9) {
-                            $element.removeClass('bg-warning');
-                            $element.addClass('bg-danger');
+                        if (init_progress <= max_progress) {
+                            $element.attr('aria-valuenow', init_progress);
+                            percentage = init_progress / max_progress;
+                            $element.css('width', percentage * 100 + "%");
+                            if (percentage >= 0.5) {
+                                $element.addClass('bg-warning');
+                            }
+                            if (percentage >= 0.9) {
+                                $element.removeClass('bg-warning');
+                                $element.addClass('bg-danger');
+                            }
                         }
                         $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
                         animate_time_up(init_progress, max_progress, $element);
