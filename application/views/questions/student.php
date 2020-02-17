@@ -125,7 +125,7 @@
                                     animate_time_down(duration, duration, $(`#progress_bar`))
                                 } else if (timer_type == "timeup") {
                                     $(`#duration`).html(`Time: 0 seconds`);
-                                    
+
                                     $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
                                     animate_time_up(0, duration, $(`#progress_bar`))
                                 }
@@ -170,19 +170,16 @@
             }
         }
 
-
-        $('.submit').click(function(e) {
-            e.preventDefault();
+        function sendAnswers() {
             answers = [];
             //get all values of choices
             $('input[name="answers"]').each(function() {
                 if ($(this).is(':checked')) {
-                    answers.push($(this).parent().prev().children().first().val());
+                    answers.push(this.value);
                 }
             });
-
             answers = answers.filter(Boolean);
-
+            console.log(answers);
             $.ajax({
                 url: "<?php echo base_url(); ?>questions/submit_student_response",
                 type: "POST",
@@ -195,7 +192,7 @@
                 success: function(response) {
                     if (response.success) {
                         console.log(response);
-                        alert('submitted')
+                        // alert('submitted')
                     } else {
                         alert("failed to insert question1");
                     }
@@ -204,6 +201,11 @@
                     alert("failed to insert question2");
                 }
             })
+        }
+
+        $('.submit').click(function(e) {
+            e.preventDefault();
+            sendAnswers();
         });
 
         var action = "",
@@ -212,7 +214,7 @@
 
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
-                console.log(action);
+                // console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
@@ -238,6 +240,7 @@
                             "question_instance_id": null
                         }
                         websocket.send(JSON.stringify(msg));
+                        sendAnswers();
                         return false;
                     }
                 } else if (action == "close") {
@@ -271,7 +274,7 @@
                     animate_time_up(init_progress, max_progress, $element);
                 } else if (action == "close") {
                     return false;
-                } else  {
+                } else {
                     animate_time_up(init_progress, max_progress, $element);
                 }
             }, 1000);
