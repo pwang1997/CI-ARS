@@ -50,17 +50,22 @@
 
                         </div>
                     </div>
+                    <div class="row p-2">
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
+                        </div>
 
-                    <div class="p-2">
-                        <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
+                        </div>
+
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
+                        </div>
                     </div>
 
                     <div class="p-2">
-                        <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
-                    </div>
-
-                    <div class="p-2">
-                        <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
+                        <button type="button" class="btn btn-primary btn-summary" id="summary_<?php echo $question['id']; ?>">Summary</button>
                     </div>
                 </div>
             </div>
@@ -131,25 +136,24 @@
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
-            //连接建立
+            //open connection
             websocket.onopen = function(evevt) {
                 console.log("Connected to WebSocket server.");
             }
-            //收到消息
+            //receive message
             websocket.onmessage = function(event) {
-                var msg = JSON.parse(event.data); //解析收到的json消息数据
+                var msg = JSON.parse(event.data);
 
-                var type = msg.type; // 消息类型
-                var umsg = msg.message; //消息文本
-                var uname = msg.name; //发送人
+                var type = msg.type; //cmd ie. start/pause/resume/close/timeout
+                var umsg = msg.message;
+                var uname = msg.name;
 
-                console.log(type + " " + umsg + " " + uname);
-                if (type == 'usermsg') {
-                    console.log(`usermsg ${umsg}: ${uname}`)
-                }
-                if (type == 'system') {
-                    console.log(`system ${umsg}: ${uname}`)
-                }
+                // if (type == 'usermsg') {
+                //     console.log(`usermsg ${umsg}: ${uname}`)
+                // }
+                // if (type == 'system') {
+                //     console.log(`system ${umsg}: ${uname}`)
+                // }
             }
 
             websocket.onerror = function(event) {
@@ -162,48 +166,50 @@
         }
 
         $(".start").click(function() {
-            question_id = (this.id).split("_")[1];
-
-            try {
-                $.ajax({
-                    url: "<?php echo base_url(); ?>questions/add_question_instance",
-                    type: "POST",
-                    dataType: "JSON",
-                    data: {
-                        'question_meta_id': question_id,
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            console.log(response);
-                            var msg = {
-                                "cmd": "start",
-                                "msg": null,
-                                "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                                "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                                "question_index": question_id,
-                                "question_instance_id": response.question_instance_id
+            if (!$(this).hasClass('disabled')) {
+                question_id = (this.id).split("_")[1];
+                try {
+                    $.ajax({
+                        url: "<?php echo base_url(); ?>questions/add_question_instance",
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            'question_meta_id': question_id,
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                console.log(response);
+                                var msg = {
+                                    "cmd": "start",
+                                    "msg": null,
+                                    "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                                    "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                                    "question_index": question_id,
+                                    "question_instance_id": response.question_instance_id
+                                }
+                                websocket.send(JSON.stringify(msg));
+                                time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
+                                default_duration = time_remain;
+                                timer_type = $(`#timerType_${question_id} > span`).html()
+                                action = "start";
+                                if (timer_type == "timedown") {
+                                    animate_time_down(default_duration, default_duration, $(`#progress_bar_${question_id}`))
+                                } else if (timer_type == "timeup") {
+                                    animate_time_up(0, default_duration, $(`#progress_bar_${question_id}`))
+                                }
+                            } else {
+                                alert("failed to insert question1");
                             }
-                            websocket.send(JSON.stringify(msg));
-                            time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
-                            default_duration = time_remain;
-                            timer_type = $(`#timerType_${question_id} > span`).html()
-                            action = "start";
-                            if (timer_type == "timedown") {
-                                animate_time_down(default_duration, default_duration, $(`#progress_bar_${question_id}`))
-                            } else if (timer_type == "timeup") {
-                                animate_time_up(0, default_duration, $(`#progress_bar_${question_id}`))
-                            }
-                        } else {
-                            alert("failed to insert question1");
+                        },
+                        fail: function() {
+                            alert("failed to insert question2");
                         }
-                    },
-                    fail: function() {
-                        alert("failed to insert question2");
-                    }
-                })
-            } catch (ex) {
-                console.log(ex);
+                    })
+                } catch (ex) {
+                    console.log(ex);
+                }
             }
+            $(this).addClass('disabled');
         });
 
         $('.pause').click(function() {
@@ -244,7 +250,6 @@
         //reset question timer
         $('.btn-close').click(function() {
             question_id = (this.id).split("_")[1];
-            // console.log(question_id);
             var msg = {
                 "cmd": "close",
                 "msg": null,
@@ -270,6 +275,10 @@
             } catch (ex) {
                 console.log(ex);
             }
+            //remove disable class for start button
+            if ($(`#start_${question_id}`).hasClass('disabled')) {
+                $(`#start_${question_id}`).removeClass('disabled');
+            }
         });
 
         //DOM variables
@@ -279,7 +288,6 @@
 
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
-                console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
@@ -289,7 +297,7 @@
                         if (percentage <= 0.5) {
                             $element.addClass('bg-warning');
                         }
-                        if (percentage <= 0.3) {
+                        if (percentage <= 0.2 || init_progress <= 5) { //remaining time is less than 5 seconds
                             $element.removeClass('bg-warning');
                             $element.addClass('bg-danger');
                         }
@@ -305,6 +313,11 @@
                             "question_instance_id": null
                         }
                         websocket.send(JSON.stringify(msg));
+                        //remove disable class on start button
+                        question_id = ($element[0].id).split("_")[2];
+                        if ($(`#start_${question_id}`).hasClass('disabled')) {
+                            $(`#start_${question_id}`).removeClass('disabled');
+                        }
                         return false;
                     }
                 } else if (action == "close") {
@@ -321,34 +334,21 @@
             setTimeout(function() {
                 if (action == "start" || action == "resume") {
                     init_progress++;
-                    if (true) {
-                        // $element.attr('value', init_progress);
-                        if (init_progress <= max_progress) {
-                            $element.attr('aria-valuenow', init_progress);
-                            percentage = init_progress / max_progress;
-                            $element.css('width', percentage * 100 + "%");
-                            if (percentage >= 0.5) {
-                                $element.addClass('bg-warning');
-                            }
-                            if (percentage >= 0.9) {
-                                $element.removeClass('bg-warning');
-                                $element.addClass('bg-danger');
-                            }
+                    if (init_progress <= max_progress) {
+                        $element.attr('aria-valuenow', init_progress);
+                        percentage = init_progress / max_progress;
+                        $element.css('width', percentage * 100 + "%");
+                        if (percentage >= 0.5) {
+                            $element.addClass('bg-warning');
                         }
-                        $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                        animate_time_up(init_progress, max_progress, $element);
-                    } else {
-                        msg = {
-                            "cmd": "timeout",
-                            "msg": null,
-                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                            "question_index": null,
-                            "question_instance_id": null
+                        if (percentage >= 0.9) {
+                            $element.removeClass('bg-warning');
+                            $element.addClass('bg-danger');
                         }
-                        websocket.send(JSON.stringify(msg));
-                        return false;
                     }
+                    //update timer
+                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                    animate_time_up(init_progress, max_progress, $element);
                 } else if (action == "close") {
                     return false;
                 } else {

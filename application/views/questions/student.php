@@ -34,7 +34,7 @@
                 <div class="p-2">
                     <p id="duration">
                     </p>
-                    <div class="pad">
+                    <div class="progress">
                     </div>
                 </div>
                 <div class="p-2">
@@ -121,11 +121,12 @@
                                 action = "start";
                                 if (timer_type == "timedown") {
                                     $(`#duration`).html(`Remaining Time: ${duration} seconds`);
-                                    $(`.pad`).html(`<progress class="progress" id="progress_bar" value="${duration}" max="${duration}">${duration} seconds</progress>`);
+                                    $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:100%" aria-valuenow="${duration}" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
                                     animate_time_down(duration, duration, $(`#progress_bar`))
                                 } else if (timer_type == "timeup") {
                                     $(`#duration`).html(`Time: 0 seconds`);
-                                    $(`.pad`).html(`<progress class="progress" id="progress_bar" value="0" max="${duration}">0 seconds</progress>`);
+                                    
+                                    $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
                                     animate_time_up(0, duration, $(`#progress_bar`))
                                 }
                                 // update question choices
@@ -210,13 +211,21 @@
             default_duration = "";
 
         function animate_time_down(init_progress, max_progress, $element) {
-
             setTimeout(function() {
                 console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
-                        $element.attr('value', init_progress);
+                        $element.attr('aria-valuenow', init_progress);
+                        percentage = init_progress / max_progress;
+                        $element.css('width', percentage * 100 + "%");
+                        if (percentage <= 0.5) {
+                            $element.addClass('bg-warning');
+                        }
+                        if (percentage <= 0.2 || init_progress <= 5) { //remaining time is less than 5 seconds
+                            $element.removeClass('bg-warning');
+                            $element.addClass('bg-danger');
+                        }
                         $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
                         animate_time_down(init_progress, max_progress, $element);
                     } else {
@@ -235,39 +244,36 @@
                     return false;
                 } else if (action == "pause") {
                     console.log("quiz has been paused")
+                    animate_time_down(init_progress, max_progress, $element);
                 }
-                animate_time_down(init_progress, max_progress, $element);
             }, 1000);
         };
 
         function animate_time_up(init_progress, max_progress, $element) {
-
             setTimeout(function() {
                 console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress++;
                     if (init_progress <= max_progress) {
-                        $element.attr('value', init_progress);
-                        $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                        animate_time_up(init_progress, max_progress, $element);
-                    } else {
-                        msg = {
-                            "cmd": "timeout",
-                            "msg": null,
-                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
-                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                            "question_index": null,
-                            "question_instance_id": null
+                        $element.attr('aria-valuenow', init_progress);
+                        percentage = init_progress / max_progress;
+                        $element.css('width', percentage * 100 + "%");
+                        if (percentage >= 0.5) {
+                            $element.addClass('bg-warning');
                         }
-                        websocket.send(JSON.stringify(msg));
-                        return false;
+                        if (percentage >= 0.9) {
+                            $element.removeClass('bg-warning');
+                            $element.addClass('bg-danger');
+                        }
                     }
+                    //update timer
+                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                    animate_time_up(init_progress, max_progress, $element);
                 } else if (action == "close") {
                     return false;
-                } else if (action == "pause") {
-                    console.log("quiz has been paused")
+                } else  {
+                    animate_time_up(init_progress, max_progress, $element);
                 }
-                animate_time_up(init_progress, max_progress, $element);
             }, 1000);
         };
     });
