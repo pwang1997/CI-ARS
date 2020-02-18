@@ -12,23 +12,14 @@
   <!-- Theme included stylesheets -->
   <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <!-- Customized js and css  -->
+  <script src="<?= base_url(); ?>js/global.js"></script>
   <script>
     function on() {
       $('#overlay').show();
     }
-
     function off() {
       $('#overlay').hide();
     }
-
-    $(document).ready(() => {
-      //hide toast
-      off();
-
-      $(".close").click(function() {
-        $('#overlay').hide();
-      });
-    })
   </script>
   <link href="<?php echo base_url(); ?>/css/overlay.css" rel="stylesheet">
 </head>
@@ -93,7 +84,7 @@
     </nav>
   </header>
 
-  <div id="overlay" onclick="off()">
+  <div id="overlay" style="display:none;" onclick="off()">
     <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center">
       <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
