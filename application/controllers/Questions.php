@@ -107,6 +107,14 @@ class Questions extends CI_Controller
 
     public function submit_student_response() {
         $msg['success'] = $this->question_model->submit_student_response();
+        $msg['cmd'] = "submit";
+        $msg['msg'] = $this->input->post('answer');
+        $msg['question_instance_id'] = $this->input->post('question_instance_id');
+        echo json_encode($msg);
+    }
+
+    public function get_num_students_answered() {
+        $msg['num_students_answered'] = $this->question_model->get_num_students_answered();
         echo json_encode($msg);
     }
 }

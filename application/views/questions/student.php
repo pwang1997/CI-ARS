@@ -45,20 +45,20 @@
     </div>
     <!-- answer/choices -->
     <div>
-    <?php $choices = (isset($this->session->choices)) ? json_decode($this->session->choices) : [];
-    $i = 1;
-    foreach ($choices as $choice) : ?>
-        <div class="form-group row choice_row">
-            <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
-            <div class="col-sm-6">
-                <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
+        <?php $choices = (isset($this->session->choices)) ? json_decode($this->session->choices) : [];
+        $i = 1;
+        foreach ($choices as $choice) : ?>
+            <div class="form-group row choice_row">
+                <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+                <div class="col-sm-6">
+                    <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
+                </div>
+                <div class="form-check col-sm-1">
+                    <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
+                </div>
             </div>
-            <div class="form-check col-sm-1">
-                <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
-            </div>
-        </div>
-    <? $i++;
-    endforeach; ?>
+        <? $i++;
+        endforeach; ?>
     </div>
     <div class="options"></div>
 </div>
@@ -82,6 +82,14 @@
 
             websocket.onopen = function(evevt) {
                 console.log("Connected to WebSocket server.");
+                msg = {
+                    'cmd': "connect",
+                    'from': <?php echo "'" . $this->session->id . "'"; ?>,
+                    'client_name': <?php echo "'" . $this->session->username . "'"; ?>,
+                    'role': <?php echo "'" . $this->session->role . "'"; ?>
+                };
+
+                websocket.send(JSON.stringify(msg));
             }
 
             websocket.onmessage = function(event) {
@@ -153,12 +161,12 @@
                     $('.submit').addClass('disabled');
                     $('button[name=choice]').addClass('disabled');
 
-                } else if(cmd == "close") {//remove question contents
+                } else if (cmd == "close") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
-                    $('.options').empty();//remove options
-                    $('.progress').empty();//remove timer progress bar
-                    $('.choice_row').parent().empty();//remove choices
+                    $('.options').empty(); //remove options
+                    $('.progress').empty(); //remove timer progress bar
+                    $('.choice_row').parent().empty(); //remove choices
                 } else {
                     action = cmd;
                 }
@@ -195,7 +203,16 @@
                 success: function(response) {
                     if (response.success) {
                         console.log(response);
-                        // alert('submitted')
+                        msg = {
+                            "cmd": response.cmd,
+                            "msg": response.msg,
+                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
+                            "question_index": null,
+                            "question_instance_id" : response.question_instance_id
+                        }
+                        console.log(msg)
+                        websocket.send(JSON.stringify(msg));
                     } else {
                         alert("failed to insert question1");
                     }
@@ -210,17 +227,17 @@
             e.preventDefault();
             sendAnswers();
         });
-        
+
         var action = "",
-        timer_type = "",
-        default_duration = "";
-        
+            timer_type = "",
+            default_duration = "";
+
         //toggle choice buttons with 'active'
         function toggleActive() {
             $('button[name=choice]').each(function() {
                 btn_id = $(this)[0].id;
-                $(`#${btn_id}`).on('click', function(){
-                    if($(this).hasClass('active')) {
+                $(`#${btn_id}`).on('click', function() {
+                    if ($(this).hasClass('active')) {
                         $(this).removeClass('active')
                     } else {
                         $(this).addClass('active')
@@ -228,6 +245,7 @@
                 })
             })
         }
+
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
                 if (action == "start" || action == "resume") {

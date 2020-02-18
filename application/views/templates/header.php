@@ -7,6 +7,7 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js" integrity="sha256-T9tvV3x+/vCnCoFciKNZwbaJ46q9lh6iZjD0ZjD95lE=" crossorigin="anonymous"></script>
   <!-- Main Quill library -->
   <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
   <!-- Theme included stylesheets -->
@@ -17,6 +18,7 @@
     function on() {
       $('#overlay').show();
     }
+
     function off() {
       $('#overlay').hide();
     }
@@ -119,4 +121,8 @@
 
     <?php if ($this->session->flashdata('user_loggedout')) : ?>
       <?php echo '<div class="alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>' . $this->session->flashdata('user_loggedout') . '</div>'; ?>
+    <?php endif; ?>
+
+    <?php if (isset($this->session->role) && $this->session->role == "student") : ?>
+
     <?php endif; ?>

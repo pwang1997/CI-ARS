@@ -142,4 +142,10 @@ class Question_model extends CI_Model
     }
     return $row;
   }
+
+  public function get_num_students_answered() {
+    $question_instance_id = $this->input->post('question_instance_id');
+    return $this->db->select('count(distinct student_id) as num')->from('studentResponse')->where(array('question_instance_id' => $question_instance_id))
+    ->group_by('student_id')->get()->result_array()[0]['num'];
+  }
 }

@@ -3,8 +3,8 @@
 <?php elseif (empty($this->session->username)) : ?>
     <?php redirect('users/login'); ?>
 <?php endif; ?>
-
-
+<h3>Number of Online Students: <span id="num_students_online">0</span></h3>
+<h3>Number of Answered Students: <span id="num_students_answered">0</span></h3>
 <?php foreach ($question_list as $question) : ?>
     <div id="question_<?= $question['id'] ?>">
         <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
@@ -139,21 +139,42 @@
             //open connection
             websocket.onopen = function(evevt) {
                 console.log("Connected to WebSocket server.");
+                msg = {
+                    'cmd': "connect",
+                    'from': <?php echo "'" . $this->session->id . "'"; ?>,
+                    'client_name': <?php echo "'" . $this->session->username . "'"; ?>,
+                    'role': <?php echo "'" . $this->session->role . "'"; ?>,
+                    'chamber_id': <?php echo "'" . $quiz_index . "'"; ?>
+                };
+
+                websocket.send(JSON.stringify(msg));
             }
             //receive message
             websocket.onmessage = function(event) {
                 var msg = JSON.parse(event.data);
 
-                var type = msg.type; //cmd ie. start/pause/resume/close/timeout
-                var umsg = msg.message;
-                var uname = msg.name;
+                var type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
+                var uname = msg.client_name;
+                var role = msg.role;
+                var num_clients = msg.num_clients;
 
-                // if (type == 'usermsg') {
-                //     console.log(`usermsg ${umsg}: ${uname}`)
-                // }
-                // if (type == 'system') {
-                //     console.log(`system ${umsg}: ${uname}`)
-                // }
+                console.log(`${type} : ${uname} `)
+
+                if(type=="connect") { //update number of students in the class room
+                    $('#num_students_online').html(num_clients-1);
+                } else if(type=="submit") {//update number of students answered the question
+                    $.ajax({
+                        url: <?php echo "'".base_url()."questions/get_num_students_answered'"; ?> ,
+                        type: "POST",
+                        dataType: "JSON",
+                        data : {
+                            'question_instance_id' : msg.question_instance_id
+                        },
+                        success: function(response) {
+                            $('#num_students_answered').html(response.num_students_answered);
+                        }
+                    })
+                }
             }
 
             websocket.onerror = function(event) {
@@ -279,6 +300,12 @@
             if ($(`#start_${question_id}`).hasClass('disabled')) {
                 $(`#start_${question_id}`).removeClass('disabled');
             }
+        });
+
+        $(`.btn-summary`).click(function() {
+            question_id = (this.id).split("_")[1];
+            console.log(question_id);
+
         });
 
         //DOM variables
