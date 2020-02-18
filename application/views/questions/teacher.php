@@ -87,7 +87,7 @@
                 <div class="form-group row choice_row">
                     <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" name="choice<?= $i; ?>" autocomplete="on" placeholder="<?php echo $choice; ?>">
+                        <input type="text" class="form-control" name="choice<?= $i; ?>" id=<?php echo $question['id']."_".$i ?> autocomplete="on" placeholder="<?php echo $choice; ?>">
                     </div>
                     <div class="form-check col-sm-1">
                         <input class="form-check-input" type="checkbox" name="choice_row_<?php echo $question['id']; ?>" value="<?= $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
@@ -122,7 +122,7 @@
             quills = [];
             for(i = 0; i < ids.length; i++) {
                 id = "#editor_" + arr_ids[i];
-                console.log(id);
+                // console.log(id);
                 quill = new Quill(`#editor_${arr_ids[i]}`, {
                     modules: {
                         toolbar: [
@@ -204,7 +204,7 @@
                     var moreChoices = `<div class="form-group row choice_row">
                                         <label for="choice${num_choices}" class="col-sm-2 col-form-label">:Choice ${num_choices}</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control" name="choice${num_choices}" autocomplete="on">
+                                            <input type="text" class="form-control" name="choice${num_choices}" id="${question_index}_${num_choices}" autocomplete="on">
                                         </div>
                                         <div class="form-check col-sm-1">
                                             <input class="form-check-input" type="checkbox" name="choice_row_${question_index}" value="">

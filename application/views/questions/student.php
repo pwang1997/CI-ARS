@@ -43,11 +43,8 @@
             </div>
         </div>
     </div>
-    <!-- answer heading -->
-    <div class="form-group row question_on invisible">
-        <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
-    </div>
     <!-- answer/choices -->
+    <div>
     <?php $choices = (isset($this->session->choices)) ? json_decode($this->session->choices) : [];
     $i = 1;
     foreach ($choices as $choice) : ?>
@@ -62,6 +59,7 @@
         </div>
     <? $i++;
     endforeach; ?>
+    </div>
     <div class="options"></div>
 </div>
 
@@ -125,26 +123,22 @@
                                     animate_time_down(duration, duration, $(`#progress_bar`))
                                 } else if (timer_type == "timeup") {
                                     $(`#duration`).html(`Time: 0 seconds`);
-
                                     $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
                                     animate_time_up(0, duration, $(`#progress_bar`))
                                 }
                                 // update question choices
                                 // arr_choices = response.result.choices.split(",");
                                 var arr = JSON.parse("[" + response.result.choices + "]")[0];
-                                // console.log(arr);
                                 for (i = 0; i < arr.length; i++) {
                                     newContent = `<div class="form-group row choice_row">
-                                                    <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i}</label>
+                                                    <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i+1}</label>
                                                     <div class="col-sm-6">
-                                                        <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="${arr[i]}">
-                                                    </div>
-                                                    <div class="form-check col-sm-1">
-                                                        <input class="form-check-input" type="checkbox" name="answers" value="${arr[i]}">
+                                                        <button type="button" class="btn btn-outline-primary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
                                                     </div>
                                                 </div>`;
                                     $('.options').append(newContent);
                                 }
+                                toggleActive();
                             } else {
                                 alert("failed to insert question1");
                             }
@@ -153,9 +147,18 @@
                             alert("failed to insert question2");
                         }
                     })
-                } else if (cmd == "timeout" || cmd == "close") {
+                } else if (cmd == "timeout") {
+                    //disable the interface
+                    console.log('timeout')
+                    $('.submit').addClass('disabled');
+                    $('button[name=choice]').addClass('disabled');
+
+                } else if(cmd == "close") {//remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
+                    $('.options').empty();//remove options
+                    $('.progress').empty();//remove timer progress bar
+                    $('.choice_row').parent().empty();//remove choices
                 } else {
                     action = cmd;
                 }
@@ -173,13 +176,13 @@
         function sendAnswers() {
             answers = [];
             //get all values of choices
-            $('input[name="answers"]').each(function() {
-                if ($(this).is(':checked')) {
-                    answers.push(this.value);
+            $('button[name=choice]').each(function() {
+                if ($(this).hasClass('active')) {
+                    answers.push($(this)[0].innerHTML);
                 }
             });
             answers = answers.filter(Boolean);
-            console.log(answers);
+            console.log(answers)
             $.ajax({
                 url: "<?php echo base_url(); ?>questions/submit_student_response",
                 type: "POST",
@@ -207,14 +210,26 @@
             e.preventDefault();
             sendAnswers();
         });
-
+        
         var action = "",
-            timer_type = "",
-            default_duration = "";
-
+        timer_type = "",
+        default_duration = "";
+        
+        //toggle choice buttons with 'active'
+        function toggleActive() {
+            $('button[name=choice]').each(function() {
+                btn_id = $(this)[0].id;
+                $(`#${btn_id}`).on('click', function(){
+                    if($(this).hasClass('active')) {
+                        $(this).removeClass('active')
+                    } else {
+                        $(this).addClass('active')
+                    }
+                })
+            })
+        }
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
-                // console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
@@ -241,6 +256,7 @@
                         }
                         websocket.send(JSON.stringify(msg));
                         sendAnswers();
+                        $element.removeClass('bg-danger');
                         return false;
                     }
                 } else if (action == "close") {
@@ -254,7 +270,6 @@
 
         function animate_time_up(init_progress, max_progress, $element) {
             setTimeout(function() {
-                console.log(action);
                 if (action == "start" || action == "resume") {
                     init_progress++;
                     if (init_progress <= max_progress) {
@@ -273,6 +288,7 @@
                     $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
                     animate_time_up(init_progress, max_progress, $element);
                 } else if (action == "close") {
+                    $element.removeClass('bg-danger');
                     return false;
                 } else {
                     animate_time_up(init_progress, max_progress, $element);

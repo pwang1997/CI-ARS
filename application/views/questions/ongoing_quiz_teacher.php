@@ -313,15 +313,17 @@
                             "question_instance_id": null
                         }
                         websocket.send(JSON.stringify(msg));
-                        //remove disable class on start button
+                        //remove disable, danger class on start button
                         question_id = ($element[0].id).split("_")[2];
                         if ($(`#start_${question_id}`).hasClass('disabled')) {
                             $(`#start_${question_id}`).removeClass('disabled');
                         }
+                        $element.removeClass('bg-danger');
                         return false;
                     }
                 } else if (action == "close") {
                     action = "close";
+                    $element.removeClass('bg-danger');
                     return false;
                 } else {
                     animate_time_down(init_progress, max_progress, $element);
@@ -350,6 +352,7 @@
                     $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
                     animate_time_up(init_progress, max_progress, $element);
                 } else if (action == "close") {
+                    $element.removeClass('bg-danger');
                     return false;
                 } else {
                     animate_time_up(init_progress, max_progress, $element);
