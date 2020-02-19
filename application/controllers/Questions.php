@@ -73,7 +73,17 @@ class Questions extends CI_Controller
         $this->load->view('questions/ongoing_quiz_teacher', $data);
         $this->load->view('templates/footer');
     }
-
+    
+    public function summary() {
+        $question_id = $this->uri->segment(3);
+        $question_instance_id = $this->uri->segment(4);
+        $data['title'] = "summary of question instance " . $question_instance_id;
+        $data['question_instance_id'] = $question_instance_id;
+        $data['question'] = $this->question_model->get_question($question_id);
+        $this->load->view('templates/header');
+        $this->load->view('questions/summary', $data);
+        $this->load->view('templates/footer');
+    }
     public function create_question() {
         $lab_index = $this->input->post('quiz_index');
         $msg['success'] = $this->question_model->create($lab_index);
@@ -115,6 +125,20 @@ class Questions extends CI_Controller
 
     public function get_num_students_answered() {
         $msg['num_students_answered'] = $this->question_model->get_num_students_answered();
+        echo json_encode($msg);
+    }
+
+    public function get_answered_question_instance() {
+        $question_instance_id = $this->uri->segment(3);
+        $msg['data'] = $this->question_model->get_answered_question_instance($question_instance_id);
+        $msg['dataset'] = array();
+        foreach($msg['data'] as $data) {
+            $data = str_replace('"', "'", $data['answer']);
+            array_push($msg['dataset'], $data);
+        }
+        unset($msg['data']);
+        // print_r(str_replace('"', "'", $msg['dataset'][0]['answer']));
+        // print_r($msg['dataset']);
         echo json_encode($msg);
     }
 }

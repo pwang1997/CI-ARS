@@ -148,4 +148,13 @@ class Question_model extends CI_Model
     return $this->db->select('count(distinct student_id) as num')->from('studentResponse')->where(array('question_instance_id' => $question_instance_id))
     ->group_by('student_id')->get()->result_array()[0]['num'];
   }
+
+  public function get_answered_question_instance($question_instance_id) {
+    $subquery = "SELECT MAX(id)
+                FROM studentResponse
+                GROUP BY student_id";
+      
+    return $this->db->select("answer")->from("studentResponse")->where(array('question_instance_id'=>$question_instance_id))
+    ->where("id IN ($subquery)", null, FALSE)->get()->result_array();
+  }
 }

@@ -4,6 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $route['analysis/category_cloud'] = 'analysis/category_cloud';
 
 $route['questions/ongoing_quiz_teacher/:num'] = 'questions/ongoing_quiz_teacher';
+$route['questions/summary/:num/:num'] = 'questions/summary';
 $route['questions/view/:num'] = 'questions/view';
 $route['questions/question_base'] = 'questions/question_base';
 $route['questions/student/:num'] = 'questions/student';

@@ -4,7 +4,7 @@
     <?php redirect('users/login'); ?>
 <?php endif; ?>
 <h3>Number of Online Students: <span id="num_online_students">0</span></h3>
-<h3>Number of Answered Students: <span id="num_students_answered">0</span></h3>
+<h3>Number of Answered Students: <span id="num_students_answered" name="">0</span></h3>
 <?php foreach ($question_list as $question) : ?>
     <div id="question_<?= $question['id'] ?>">
         <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
@@ -170,6 +170,7 @@
                         },
                         success: function(response) {
                             $('#num_students_answered').html(response.num_students_answered);
+                            $('#num_students_answered').attr('name', msg.question_instance_id)
                         }
                     })
                 }
@@ -300,7 +301,8 @@
         $(`.btn-summary`).click(function() {
             question_id = (this.id).split("_")[1];
             console.log(question_id);
-
+            question_instance_id = $('#num_students_answered').attr('name');
+            window.open(<?php echo "'".base_url()."questions/summary/'"; ?> + question_id + "/"+ question_instance_id)
         });
 
         //DOM variables
