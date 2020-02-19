@@ -124,5 +124,27 @@
     <?php endif; ?>
 
     <?php if (isset($this->session->role) && $this->session->role == "student") : ?>
+      <script>
+        // var wsurl = 'ws://127.0.0.1:8080/server/server.php';
+        // var websocket, cmd, message, client_name, question_index, role, question_instance_id;
 
+        // if (window.WebSocket) {
+        //   websocket = new WebSocket(wsurl);
+        //   sessionStorage.setItem("ws_instance", websocket);
+
+        //   websocket.onopen = function(evevt) {
+        //     console.log("Connected to WebSocket server.");
+        //     msg = {
+        //       'cmd': "connect",
+        //       'from_id': <?php echo "'" . $this->session->id . "'"; ?>,
+        //       'username': <?php echo "'" . $this->session->username . "'"; ?>,
+        //       'role': <?php echo "'" . $this->session->role . "'"; ?>
+        //     };
+
+        //     websocket.send(JSON.stringify(msg));
+        //   }
+        // } else {
+        //   alert('this browser does not support websocket, please use Google Chrome or FireFox');
+        // }
+      </script>
     <?php endif; ?>

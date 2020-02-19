@@ -85,20 +85,19 @@
                 msg = {
                     'cmd': "connect",
                     'from': <?php echo "'" . $this->session->id . "'"; ?>,
-                    'client_name': <?php echo "'" . $this->session->username . "'"; ?>,
-                    'role': <?php echo "'" . $this->session->role . "'"; ?>
+                    'username': <?php echo "'" . $this->session->username . "'"; ?>,
+                    'role': <?php echo "'" . $this->session->role . "'"; ?>,
                 };
 
                 websocket.send(JSON.stringify(msg));
             }
-
             websocket.onmessage = function(event) {
                 var msg = JSON.parse(event.data);
 
                 cmd = msg.cmd;
                 message = msg.message;
                 client_name = msg.client_name;
-                question_index = msg.question_index;
+                question_index = msg.question_id;
                 role = msg.role;
                 question_instance_id = msg.question_instance_id;
 
@@ -205,11 +204,11 @@
                         console.log(response);
                         msg = {
                             "cmd": response.cmd,
-                            "msg": response.msg,
-                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "answers": response.msg,
+                            "username": <?php echo "'" . $this->session->username . "'"; ?>,
                             "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                            "question_index": null,
-                            "question_instance_id" : response.question_instance_id
+                            "question_id": null,
+                            "question_instance_id": response.question_instance_id
                         }
                         console.log(msg)
                         websocket.send(JSON.stringify(msg));
@@ -266,11 +265,8 @@
                     } else {
                         msg = {
                             "cmd": "timeout",
-                            "msg": null,
-                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "username": <?php echo "'" . $this->session->username . "'"; ?>,
                             "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                            "question_index": null,
-                            "question_instance_id": null
                         }
                         websocket.send(JSON.stringify(msg));
                         sendAnswers();

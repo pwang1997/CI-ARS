@@ -3,7 +3,7 @@
 <?php elseif (empty($this->session->username)) : ?>
     <?php redirect('users/login'); ?>
 <?php endif; ?>
-<h3>Number of Online Students: <span id="num_students_online">0</span></h3>
+<h3>Number of Online Students: <span id="num_online_students">0</span></h3>
 <h3>Number of Answered Students: <span id="num_students_answered">0</span></h3>
 <?php foreach ($question_list as $question) : ?>
     <div id="question_<?= $question['id'] ?>">
@@ -136,15 +136,13 @@
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
-            //open connection
             websocket.onopen = function(evevt) {
                 console.log("Connected to WebSocket server.");
                 msg = {
                     'cmd': "connect",
-                    'from': <?php echo "'" . $this->session->id . "'"; ?>,
-                    'client_name': <?php echo "'" . $this->session->username . "'"; ?>,
-                    'role': <?php echo "'" . $this->session->role . "'"; ?>,
-                    'chamber_id': <?php echo "'" . $quiz_index . "'"; ?>
+                    'from_id': <?php echo "'" . $this->session->id . "'"; ?>,
+                    'username': <?php echo "'" . $this->session->username . "'"; ?>,
+                    'role': <?php echo "'" . $this->session->role . "'"; ?>
                 };
 
                 websocket.send(JSON.stringify(msg));
@@ -154,21 +152,21 @@
                 var msg = JSON.parse(event.data);
 
                 var type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
-                var uname = msg.client_name;
+                var uname = msg.username;
                 var role = msg.role;
-                var num_clients = msg.num_clients;
+                var num_clients = msg.num_online_students;
 
-                console.log(`${type} : ${uname} `)
-
-                if(type=="connect") { //update number of students in the class room
-                    $('#num_students_online').html(num_clients-1);
-                } else if(type=="submit") {//update number of students answered the question
+                // console.log(`${type} : ${uname} `)
+                console.log(msg);
+                if (type == "connect") { //update number of students in the class room
+                    $('#num_online_students').html(num_clients - 1);
+                } else if (type == "submit") { //update number of students answered the question
                     $.ajax({
-                        url: <?php echo "'".base_url()."questions/get_num_students_answered'"; ?> ,
+                        url: <?php echo "'" . base_url() . "questions/get_num_students_answered'"; ?>,
                         type: "POST",
                         dataType: "JSON",
-                        data : {
-                            'question_instance_id' : msg.question_instance_id
+                        data: {
+                            'question_instance_id': msg.question_instance_id
                         },
                         success: function(response) {
                             $('#num_students_answered').html(response.num_students_answered);
@@ -202,10 +200,9 @@
                                 console.log(response);
                                 var msg = {
                                     "cmd": "start",
-                                    "msg": null,
-                                    "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                                    "username": <?php echo "'" . $this->session->username . "'"; ?>,
                                     "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                                    "question_index": question_id,
+                                    "question_id": question_id,
                                     "question_instance_id": response.question_instance_id
                                 }
                                 websocket.send(JSON.stringify(msg));
@@ -248,10 +245,9 @@
             question_id = (this.id).split("_")[1];
             var msg = {
                 "cmd": action,
-                "msg": null,
-                "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                "username": <?php echo "'" . $this->session->username . "'"; ?>,
                 "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                "question_index": question_id
+                "question_id": question_id
             }
             //restore pause/resume state
             init = $(`#progress_bar_${question_id}`).attr('aria-valuenow');
@@ -273,10 +269,9 @@
             question_id = (this.id).split("_")[1];
             var msg = {
                 "cmd": "close",
-                "msg": null,
-                "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                "username": <?php echo "'" . $this->session->username . "'"; ?>,
                 "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                "question_index": question_id
+                "question_id": question_id
             }
             try {
                 action = "close";
@@ -333,11 +328,8 @@
                     } else {
                         msg = {
                             "cmd": "timeout",
-                            "msg": null,
-                            "client_name": <?php echo "'" . $this->session->username . "'"; ?>,
+                            "username": <?php echo "'" . $this->session->username . "'"; ?>,
                             "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                            "question_index": null,
-                            "question_instance_id": null
                         }
                         websocket.send(JSON.stringify(msg));
                         //remove disable, danger class on start button
