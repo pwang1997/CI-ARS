@@ -120,4 +120,11 @@ class Users extends CI_Controller
     $this->load->view('../courses/teacher', $data);
     $this->load->view('templates/footer');
   }
+
+  public function get_session() {
+    $msg['id'] = $this->session->id;
+    $msg['username'] = $this->session->username;
+    $msg['role'] = $this->session->role;
+    print_r(json_encode($msg));
+  }
 }
