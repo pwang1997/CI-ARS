@@ -75,8 +75,7 @@
 
                                         <div class="col-md-3">
                                             <div class="dropdown">
-                                            <!-- dropdown-toggle -->
-                                                <button class="btn btn-primary pause " id="pause_<?php echo $question['id']; ?>" type="button" id="dropdown_pause" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <button class="btn btn-primary pause dropdown-toggle" id="pause_<?php echo $question['id']; ?>" type="button" id="dropdown_pause" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     Pause
                                                 </button>
                                                 <div class="dropdown-menu" id="dropdown_menu_<?php echo $question['id']; ?>" aria-labelledby="dropdown_pause">
@@ -312,7 +311,7 @@
             var current_state = $(this).html();
 
             if (current_state == "Pause") {
-                action = "pause";
+                // action = "pause";
                 $(this).html("Resume");
                 // $(this).addClass("dropdown-toggle");
             } else if(current_state == "Resume") {
