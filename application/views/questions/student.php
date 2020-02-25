@@ -72,7 +72,7 @@
             theme: 'snow' // or 'bubble'
         });
         quill.enable(false);
-
+        
         // var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
         var wsurl = 'ws://127.0.0.1:8080/server/server.php';
         var websocket, cmd, message, client_name, question_index, role, question_instance_id;
@@ -140,7 +140,7 @@
                                     newContent = `<div class="form-group row choice_row">
                                                     <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i+1}</label>
                                                     <div class="col-sm-6">
-                                                        <button type="button" class="btn btn-outline-primary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
+                                                        <button type="button" class="btn btn-outline-secondary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
                                                     </div>
                                                 </div>`;
                                     $('.options').append(newContent);
@@ -238,8 +238,10 @@
                 $(`#${btn_id}`).on('click', function() {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active')
+                        $(this).removeClass('btn-primary').addClass('btn-outline-secondary');
                     } else {
                         $(this).addClass('active')
+                        $(this).removeClass('btn-outline-secondary').addClass('btn-primary');
                     }
                 })
             })
@@ -309,5 +311,6 @@
                 }
             }, 1000);
         };
+        
     });
 </script>
