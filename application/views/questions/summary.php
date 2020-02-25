@@ -57,6 +57,7 @@
         });
         quill.enable(false);
 
+
         $.ajax({
             url: "<?php echo base_url(); ?>questions/get_question_for_student",
             type: "POST",
@@ -261,7 +262,7 @@
                     $('#chart').empty();
                     dataset = [];
                     frequency = [];
-
+                    $('#num_response').html(response.dataset.length);
                     choices = <?php echo $question['choices']; ?>;
                     for (i = 0; i < choices.length; i++) {
                         frequency.push(0);

@@ -23,7 +23,7 @@
             <?php $index = 1;
             foreach ($question_list as $question) : ?>
                 <div class="tab-pane fade <?php if ($index == 1) echo "show active"; ?>" id="list-<?= $question['id']; ?>" role="tabpanel" aria-labelledby="list-question_<?= $question['id']; ?>">
-                    <h5>Quesation <?= $index; ?></h5>
+                    <h5>Question <?= $index; ?></h5>
                     <div id="question_<?= $question['id'] ?>">
                         <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
                         <!-- content + buttons  -->
@@ -89,10 +89,12 @@
                                             <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
                                         </div>
                                     </div>
-
                                     <div class="p-2">
-                                        <button type="button" class="btn btn-primary btn-summary" id="summary_<?php echo $question['id']; ?>">Summary</button>
+                                        <button type="button" class="btn btn-primary btn-display_answer" id="display_answer_<?php echo $question['id']; ?>">Display Answer</button>
                                     </div>
+                                    <!-- <div class="p-2">
+                                        <button type="button" class="btn btn-primary btn-summary" id="summary_<?php echo $question['id']; ?>">Summary</button>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -216,6 +218,23 @@
             }
         }
 
+        $(".btn-display_answer").click(function() {
+            question_id = (this.id).split("_")[2];
+            var answers = [];
+            $.each($(`input[name='choice_row_${question_id}']:checked`), function() {
+                answers.push($(this).val());
+            });
+            answers = JSON.stringify(answers)
+            console.log(answers);
+            msg = {
+                'cmd': "display_answer",
+                'question_id': question_id,
+                'answers': answers
+            }
+
+            websocket.send(JSON.stringify(msg));
+        });
+
         $(".start").click(function() {
             if (!$(this).hasClass('disabled')) {
                 question_id = (this.id).split("_")[1];
@@ -244,6 +263,7 @@
                                 default_duration = time_remain;
                                 timer_type = $(`#timerType_${question_id} > span`).html()
                                 action = "start";
+                                window.open(<?php echo "'" . base_url() . "questions/summary/'"; ?> + question_id + "/" + response.question_instance_id)
                                 if (timer_type == "timedown") {
                                     animate_time_down(default_duration, default_duration, $(`#progress_bar_${question_id}`))
                                 } else if (timer_type == "timeup") {
@@ -301,7 +321,7 @@
             console.log("PAUSE DISABLE")
             question_id = (this.id).split("_")[2];
             $(`#pause_${question_id}`).html("Resume");
-            action="pause";
+            action = "pause";
             sendPauseMessage(question_id, action, "pause_disable", timer_type)
 
         })
@@ -314,7 +334,7 @@
                 // action = "pause";
                 $(this).html("Resume");
                 // $(this).addClass("dropdown-toggle");
-            } else if(current_state == "Resume") {
+            } else if (current_state == "Resume") {
                 action = "resume";
                 $(this).html("Pause");
                 // $(this).removeClass("dropdown-toggle");
@@ -374,8 +394,9 @@
         $(`.btn-summary`).click(function() {
             question_id = (this.id).split("_")[1];
             console.log(question_id);
-            question_instance_id = $('#num_students_answered').attr('name');
-            window.open(<?php echo "'" . base_url() . "questions/summary/'"; ?> + question_id + "/" + question_instance_id)
+            var popup = window.open(<?php echo "'" . base_url() . "questions/summary/'"; ?> + question_id + "/" + question_instance_id);
+            popup.blur();
+            window.focus();
         });
 
         //DOM variables
@@ -448,7 +469,7 @@
                 } else if (action == "close") {
                     $element.removeClass('bg-danger');
                     return false;
-                } else if(action == "pause"){
+                } else if (action == "pause") {
                     // animate_time_up(init_progress, max_progress, $element);
                     return;
                 }

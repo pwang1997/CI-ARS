@@ -53,10 +53,10 @@
             <div class="form-group row choice_row">
                 <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
                 <div class="col-sm-6">
-                    <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
+                    <input type="text" disabled class="form-control choice_row" name="choice_row" placeholder="<?= $choice; ?>">
                 </div>
                 <div class="form-check col-sm-1">
-                    <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
+                    <input class="form-check-input answers" type="checkbox" name="answers" value="<?= $choice; ?>">
                 </div>
             </div>
         <? $i++;
@@ -101,7 +101,7 @@
                 client_name = msg.client_name;
                 question_index = msg.question_id;
                 role = msg.role;
-                if(msg.question_instance_id != null) {
+                if (msg.question_instance_id != null) {
                     question_instance_id = msg.question_instance_id;
                 }
                 targeted_time = msg.targeted_time;
@@ -139,7 +139,7 @@
                                     animate_time_up(0, duration, $(`#progress_bar`))
                                 }
 
-                                $('#status').html(`Status: ${cmd}`);
+                                $('#status').html(`Status: Running`);
                                 $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
                                 // update question choices
                                 // arr_choices = response.result.choices.split(",");
@@ -165,8 +165,9 @@
                 } else if (cmd == "timeout") {
                     //disable the interface
                     console.log('timeout')
-                    $('.submit').addClass('disabled');
-                    $('button[name=choice]').addClass('disabled');
+                    $('#status').html(`Status: Timeout`);
+                    $('.submit').attr('disabled', 'disabled');
+                    $('button[name=choice]').attr('disabled', 'disabled');
 
                 } else if (cmd == "close") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
@@ -178,14 +179,46 @@
                     action = "pause";
                     if (msg.question_status == "pause_answerable") {
                         // do nothing
+                        $('#status').html(`Status: Pause(Answerable)`);
                     } else if (msg.question_status == "pause_disable") {
-                        $('.submit').addClass('disabled');
-                        $('button[name=choice]').addClass('disabled');
+                        $('#status').html(`Status: Pause(Disabled)`);
+                        $('.submit').attr('disabled', 'disabled');
+                        $('button[name=choice]').attr('disabled', 'disabled');
                     }
                 } else if (cmd == "resume") {
                     action = "resume";
-                    $('.submit').removeClass('disabled');
-                    $('button[name=choice]').removeClass('disabled');
+                    $('#status').html(`Status: Running`);
+                    $('.submit').attr('disabled', '');
+                    $('button[name=choice]').attr('disabled', '');
+                } else if (cmd == "display_answer") {
+                    $('#status').html(`Status: Displaying Answer`);
+                    $('.submit').attr('disabled', 'disabled');
+                    $('button[name=choice]').attr('disabled', 'disabled');
+                    answers = msg.answers;
+                    arr_answers = answers.split(",");
+                    for (i = 0; i < arr_answers.length; i++) {
+                        arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
+                    }
+
+                    var student_answers = [];
+                    i = 0;
+                    $(`button[name=choice]`).each(function() {
+                        content = $(this).html();
+                        console.log(arr_answers.includes(content))
+                        // if ($(this).hasClass('active') && arr_answers.includes(content)) {
+                        //     $(this).addClass('btn-success');
+                        //     student_answers.push($(this).html());
+                        if ($(this).hasClass('active') && !arr_answers.includes(content)) {
+                            $(this).addClass('btn-danger');
+                        } else if (arr_answers.includes(content)) {
+                            $(this).addClass('bg-success');
+                        }
+                    });
+                    console.log(student_answers)
+
+
+                    // console.log(arr)
+                    // console.log(student_answers)
                 }
             }
 
@@ -195,6 +228,11 @@
 
             websocket.onclose = function(event) {
                 console.log('websocket Connection Closed. ');
+                $('.question_on').removeClass("visible").addClass("invisible");
+                $('.question_off').addClass("visible").removeClass("invisible");
+                $('.options').empty(); //remove options
+                $('.progress').empty(); //remove timer progress bar
+                $('.choice_row').parent().empty(); //remove choices
             }
         }
 

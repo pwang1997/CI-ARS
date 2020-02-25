@@ -80,6 +80,7 @@ class Questions extends CI_Controller
         $data['title'] = "summary of question instance " . $question_instance_id;
         $data['question_instance_id'] = $question_instance_id;
         $data['question'] = $this->question_model->get_question($question_id);
+        $data['question_id'] = $question_id;
         $this->load->view('templates/header');
         $this->load->view('questions/summary', $data);
         $this->load->view('templates/footer');
