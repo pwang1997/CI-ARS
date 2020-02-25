@@ -31,6 +31,8 @@
         <div class="col-4">
             <br>
             <div class="d-flex flex-column">
+                <div class="p-2" id="status">Status:</div>
+                <div class="p-2" id="targeted_time">Targeted Time: </div>
                 <div class="p-2">
                     <p id="duration">
                     </p>
@@ -72,7 +74,7 @@
             theme: 'snow' // or 'bubble'
         });
         quill.enable(false);
-        
+
         // var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
         var wsurl = 'ws://127.0.0.1:8080/server/server.php';
         var websocket, cmd, message, client_name, question_index, role, question_instance_id;
@@ -99,7 +101,10 @@
                 client_name = msg.client_name;
                 question_index = msg.question_id;
                 role = msg.role;
-                question_instance_id = msg.question_instance_id;
+                if(msg.question_instance_id != null) {
+                    question_instance_id = msg.question_instance_id;
+                }
+                targeted_time = msg.targeted_time;
 
                 console.log(msg);
                 if (cmd == "start") {
@@ -133,6 +138,9 @@
                                     $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
                                     animate_time_up(0, duration, $(`#progress_bar`))
                                 }
+
+                                $('#status').html(`Status: ${cmd}`);
+                                $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
                                 // update question choices
                                 // arr_choices = response.result.choices.split(",");
                                 var arr = JSON.parse("[" + response.result.choices + "]")[0];
@@ -166,8 +174,18 @@
                     $('.options').empty(); //remove options
                     $('.progress').empty(); //remove timer progress bar
                     $('.choice_row').parent().empty(); //remove choices
-                } else {
-                    action = cmd;
+                } else if (cmd == "pause") {
+                    action = "pause";
+                    if (msg.question_status == "pause_answerable") {
+                        // do nothing
+                    } else if (msg.question_status == "pause_disable") {
+                        $('.submit').addClass('disabled');
+                        $('button[name=choice]').addClass('disabled');
+                    }
+                } else if (cmd == "resume") {
+                    action = "resume";
+                    $('.submit').removeClass('disabled');
+                    $('button[name=choice]').removeClass('disabled');
                 }
             }
 
@@ -180,7 +198,13 @@
             }
         }
 
-        function sendAnswers() {
+        $('.submit').click(function(e) {
+            e.preventDefault();
+            console.log(question_instance_id);
+            sendAnswers(question_instance_id);
+        });
+
+        function sendAnswers(question_instance_id) {
             answers = [];
             //get all values of choices
             $('button[name=choice]').each(function() {
@@ -189,7 +213,7 @@
                 }
             });
             answers = answers.filter(Boolean);
-            console.log(answers)
+            // console.log(answers)
             $.ajax({
                 url: "<?php echo base_url(); ?>questions/submit_student_response",
                 type: "POST",
@@ -208,7 +232,7 @@
                             "username": <?php echo "'" . $this->session->username . "'"; ?>,
                             "role": <?php echo "'" . $this->session->role . "'"; ?>,
                             "question_id": null,
-                            "question_instance_id": response.question_instance_id
+                            "question_instance_id": question_instance_id
                         }
                         console.log(msg)
                         websocket.send(JSON.stringify(msg));
@@ -221,11 +245,6 @@
                 }
             })
         }
-
-        $('.submit').click(function(e) {
-            e.preventDefault();
-            sendAnswers();
-        });
 
         var action = "",
             timer_type = "",
@@ -271,7 +290,7 @@
                             "role": <?php echo "'" . $this->session->role . "'"; ?>,
                         }
                         websocket.send(JSON.stringify(msg));
-                        sendAnswers();
+                        sendAnswers(question_instance_id);
                         $element.removeClass('bg-danger');
                         return false;
                     }
@@ -306,11 +325,12 @@
                 } else if (action == "close") {
                     $element.removeClass('bg-danger');
                     return false;
-                } else {
+                } else if (action == "pause") {
                     animate_time_up(init_progress, max_progress, $element);
+                    // return;
                 }
             }, 1000);
         };
-        
+
     });
 </script>
