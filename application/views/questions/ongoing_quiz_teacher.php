@@ -74,7 +74,15 @@
                                         </div>
 
                                         <div class="col-md-3">
-                                            <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary pause dropdown-toggle" id="pause_<?php echo $question['id']; ?>" type="button" id="dropdown_pause" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Pause
+                                                </button>
+                                                <div class="dropdown-menu" id="dropdown_menu_<?php echo $question['id']; ?>" aria-labelledby="dropdown_pause">
+                                                    <button class="dropdown-item pause_answerable" id="pause_answerable_<?php echo $question['id']; ?>">Answerable</button>
+                                                    <button class="dropdown-item pause_disable" id="pause_disable_<?php echo $question['id']; ?>">Disable</button>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="col-md-3">
@@ -114,8 +122,8 @@
                         </div>
                     </div>
                     <br><br>
-                    <button class="btn btn-primary prev <?php if($index==1) echo "disabled";?>"  type="button" id="prev_<?= $question['id']; ?>">Previous</button>
-                    <button class="btn btn-primary next <?php if($index == count($question_list)) echo "disabled";?>"  type="button" id="next_<?= $question['id']; ?>">Next</button>
+                    <button class="btn btn-primary prev <?php if ($index == 1) echo "disabled"; ?>" type="button" id="prev_<?= $question['id']; ?>">Previous</button>
+                    <button class="btn btn-primary next <?php if ($index == count($question_list)) echo "disabled"; ?>" type="button" id="next_<?= $question['id']; ?>">Next</button>
                     <div class="border-top my-3 d-block"></div>
                     <?php $index++; ?>
                 </div>
@@ -228,7 +236,8 @@
                                     "username": <?php echo "'" . $this->session->username . "'"; ?>,
                                     "role": <?php echo "'" . $this->session->role . "'"; ?>,
                                     "question_id": question_id,
-                                    "question_instance_id": response.question_instance_id
+                                    "question_instance_id": response.question_instance_id,
+                                    "targeted_time": $(`#progress_bar_${question_id}`).attr('aria-valuemax'),
                                 }
                                 websocket.send(JSON.stringify(msg));
                                 time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
@@ -255,24 +264,13 @@
             $(this).addClass('disabled');
         });
 
-        $('.pause').click(function() {
-            if (action == "start") {
-                action = "pause";
-                $(this).html("Resume");
-            } else if (action == "resume") {
-                action = "pause";
-                $(this).html("Resume");
-            } else if (action == "pause") {
-                action = "resume";
-                $(this).html("Pause");
-            }
-
-            question_id = (this.id).split("_")[1];
+        function sendPauseMessage(question_id, action, status, timer_type) {
             var msg = {
                 "cmd": action,
                 "username": <?php echo "'" . $this->session->username . "'"; ?>,
                 "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                "question_id": question_id
+                "question_id": question_id,
+                "question_status": status
             }
             //restore pause/resume state
             init = $(`#progress_bar_${question_id}`).attr('aria-valuenow');
@@ -288,20 +286,54 @@
             } catch (ex) {
                 console.log(ex);
             }
+        }
+
+        $(".pause_answerable").click(function() {
+            console.log("PAUSE ANSWERABLE")
+            question_id = (this.id).split("_")[2];
+            $(`#pause_${question_id}`).html("Resume");
+            action = "pause";
+            sendPauseMessage(question_id, action, "pause_answerable", timer_type)
+
+        })
+
+        $(".pause_disable").click(function() {
+            console.log("PAUSE DISABLE")
+            question_id = (this.id).split("_")[2];
+            $(`#pause_${question_id}`).html("Resume");
+            action="pause";
+            sendPauseMessage(question_id, action, "pause_disable", timer_type)
+
+        })
+
+        $('.pause').click(function() {
+            question_id = (this.id).split("_")[1];
+            var current_state = $(this).html();
+
+            if (current_state == "Pause") {
+                action = "pause";
+                $(this).html("Resume");
+                $(this).addClass("dropdown-toggle");
+            } else {
+                action = "resume";
+                $(this).html("Pause");
+                $(this).removeClass("dropdown-toggle");
+                sendPauseMessage(question_id, action, "resume", timer_type)
+            }
         });
 
         $('.next').click(function() {
             question_id = (this.id).split("_")[1];
             temp = $(`#list-question_${question_id}`);
             temp.next().tab('show')
-            window.scrollTo(0,0);
+            window.scrollTo(0, 0);
         });
 
         $('.prev').click(function() {
             question_id = (this.id).split("_")[1];
             temp = $(`#list-question_${question_id}`);
             temp.prev().tab('show')
-            window.scrollTo(0,0);
+            window.scrollTo(0, 0);
         });
 
         //reset question timer
@@ -336,7 +368,7 @@
             if ($(`#start_${question_id}`).hasClass('disabled')) {
                 $(`#start_${question_id}`).removeClass('disabled');
             }
-            
+
         });
 
         $(`.btn-summary`).click(function() {
@@ -416,8 +448,9 @@
                 } else if (action == "close") {
                     $element.removeClass('bg-danger');
                     return false;
-                } else {
-                    animate_time_up(init_progress, max_progress, $element);
+                } else if(action == "pause"){
+                    // animate_time_up(init_progress, max_progress, $element);
+                    return;
                 }
             }, 1000);
         };
