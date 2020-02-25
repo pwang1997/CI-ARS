@@ -3,103 +3,126 @@
 <?php elseif (empty($this->session->username)) : ?>
     <?php redirect('users/login'); ?>
 <?php endif; ?>
-<h3>Number of Online Students: <span id="num_online_students">0</span></h3>
-<h3>Number of Answered Students: <span id="num_students_answered" name="">0</span></h3>
-<?php foreach ($question_list as $question) : ?>
-    <div id="question_<?= $question['id'] ?>">
-        <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
-        <!-- content + buttons  -->
-        <div class="row">
-            <div class="col-8">
-                <br>
-                <div class="form-group row" style="position:relative;">
-                    <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
-                        <div class="editor" id="editor_<?= $question['id']; ?>" style="min-height:100%; height:auto;"><?= $question['content']; ?></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <br>
-                <div class="d-flex flex-column">
-                    <div class="p-2">
-                        <p id="timerType_<?php echo $question['id']; ?>">Timer Type: <span><?php echo $question['timer_type']; ?></span></p>
-                    </div>
+</div>
+<!-- <h3>Number of Online Students: <span id="num_online_students">0</span></h3>
+<h3>Number of Answered Students: <span id="num_students_answered" name="">0</span></h3> -->
 
-                    <div class="p-2">
-                        <p id="difficulty_<?php echo $question['id']; ?>">Difficulty: <span><?php echo $question['difficulty']; ?></span></p>
-                    </div>
 
-                    <div class="p-2">
-                        <p id="category_<?php echo $question['id']; ?>">Category: <span><?php echo $question['category']; ?></span></p>
-                    </div>
-
-                    <div class="p-2">
-                        <p id="duration_<?php echo $question['id']; ?>">
-                            <?php if ($question['timer_type'] == 'timedown') : ?>
-                                Remaining Time:<?php echo $question['duration']; ?> seconds
-                            <?php else : ?>
-                                Time:<?php echo $question['duration']; ?> seconds
-                            <? endif; ?>
-                        </p>
-                        <div class="progress">
-                            <?php if ($question['timer_type'] == 'timedown') : ?>
-                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:100%" aria-valuenow="<?= $question['duration'] ?>" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
-                            <?php else : ?>
-                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
-                            <?php endif; ?>
-
-                        </div>
-                    </div>
-                    <div class="row p-2">
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
-                        </div>
-
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
-                        </div>
-
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
-                        </div>
-                    </div>
-
-                    <div class="p-2">
-                        <button type="button" class="btn btn-primary btn-summary" id="summary_<?php echo $question['id']; ?>">Summary</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <br><br>
-        <!-- answer heading -->
-        <div class="form-group row">
-            <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
-        </div>
-        <!-- answer/choices -->
-        <div id="option_row<?= $question['id']; ?>">
-            <?php $choices = (json_decode($question['choices']));
-            $answers = json_decode($question['answer']);
-            $i = 1;
-            foreach ($choices as $choice) : ?>
-                <div class="form-group row choice_row">
-                    <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
-                    <div class="col-sm-6">
-                        <input type="text" disabled class="form-control" name="choice<?= $i; ?>" autocomplete="on" placeholder="<?php echo $choice; ?>">
-                    </div>
-                    <div class="form-check col-sm-1">
-                        <input class="form-check-input" disabled type="checkbox" name="choice_row_<?php echo $question['id']; ?>" value="<?= $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
-                    </div>
-                </div>
-            <? $i++;
-            endforeach; ?>
+<div class="row">
+    <div class="col-2">
+        <div class="list-group overflow-auto" id="list-tab" role="tablist" style="height:20em">
+            <?php
+            $index = 1;
+            foreach ($question_list as $question) : ?>
+                <a class="list-group-item list-group-item-action <?php if ($index == 1) echo 'active'; ?> bg-primary" id="list-question_<?= $question['id']; ?>" data-toggle="list" href="#list-<?= $question['id']; ?>" role="tab" aria-controls="<?= $index; ?>">Question <?= $index++; ?></a>
+            <?php endforeach; ?>
         </div>
     </div>
-    <br><br>
-    <div class="border-top my-3 d-block"></div>
+    <div class="col-10">
+        <div class="tab-content" id="nav-tabContent">
+            <?php $index = 1;
+            foreach ($question_list as $question) : ?>
+                <div class="tab-pane fade <?php if ($index == 1) echo "show active"; ?>" id="list-<?= $question['id']; ?>" role="tabpanel" aria-labelledby="list-question_<?= $question['id']; ?>">
+                    <h5>Quesation <?= $index; ?></h5>
+                    <div id="question_<?= $question['id'] ?>">
+                        <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?>>
+                        <!-- content + buttons  -->
+                        <div class="row">
+                            <div class="col-8">
+                                <br>
+                                <div class="form-group row" style="position:relative;">
+                                    <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
+                                        <div class="editor" id="editor_<?= $question['id']; ?>" style="min-height:100%; height:auto;"><?= $question['content']; ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <br>
+                                <div class="d-flex flex-column">
+                                    <div class="p-2">
+                                        <p id="timerType_<?php echo $question['id']; ?>">Timer Type: <span><?php echo $question['timer_type']; ?></span></p>
+                                    </div>
 
-<?php endforeach; //end question_list 
-?>
+                                    <div class="p-2">
+                                        <p id="difficulty_<?php echo $question['id']; ?>">Difficulty: <span><?php echo $question['difficulty']; ?></span></p>
+                                    </div>
+
+                                    <div class="p-2">
+                                        <p id="category_<?php echo $question['id']; ?>">Category: <span><?php echo $question['category']; ?></span></p>
+                                    </div>
+
+                                    <div class="p-2">
+                                        <p id="duration_<?php echo $question['id']; ?>">
+                                            <?php if ($question['timer_type'] == 'timedown') : ?>
+                                                Remaining Time:<?php echo $question['duration']; ?> seconds
+                                            <?php else : ?>
+                                                Time:<?php echo $question['duration']; ?> seconds
+                                            <? endif; ?>
+                                        </p>
+                                        <div class="progress">
+                                            <?php if ($question['timer_type'] == 'timedown') : ?>
+                                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:100%" aria-valuenow="<?= $question['duration'] ?>" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
+                                            <?php else : ?>
+                                                <div class="progress-bar" id="progress_bar_<?= $question['id']; ?>" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="<?= $question['duration'] ?>"></div>
+                                            <?php endif; ?>
+
+                                        </div>
+                                    </div>
+                                    <div class="row p-2">
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-primary start" id="start_<?php echo $question['id']; ?>">Start</button>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-primary pause" id="pause_<?php echo $question['id']; ?>">Pause</button>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-primary btn-close" id="close_<?php echo $question['id']; ?>">Close</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-2">
+                                        <button type="button" class="btn btn-primary btn-summary" id="summary_<?php echo $question['id']; ?>">Summary</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <!-- answer heading -->
+                        <div class="form-group row">
+                            <div class="col-sm-2 offset-sm-8" style="padding-left: 0px;">Answer</div>
+                        </div>
+                        <!-- answer/choices -->
+                        <div id="option_row<?= $question['id']; ?>">
+                            <?php $choices = (json_decode($question['choices']));
+                            $answers = json_decode($question['answer']);
+                            $i = 1;
+                            foreach ($choices as $choice) : ?>
+                                <div class="form-group row choice_row">
+                                    <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
+                                    <div class="col-sm-6">
+                                        <input type="text" disabled class="form-control" name="choice<?= $i; ?>" autocomplete="on" placeholder="<?php echo $choice; ?>">
+                                    </div>
+                                    <div class="form-check col-sm-1">
+                                        <input class="form-check-input" disabled type="checkbox" name="choice_row_<?php echo $question['id']; ?>" value="<?= $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
+                                    </div>
+                                </div>
+                            <? $i++;
+                            endforeach; ?>
+                        </div>
+                    </div>
+                    <br><br>
+                    <button class="btn btn-primary prev <?php if($index==1) echo "disabled";?>"  type="button" id="prev_<?= $question['id']; ?>">Previous</button>
+                    <button class="btn btn-primary next <?php if($index == count($question_list)) echo "disabled";?>"  type="button" id="next_<?= $question['id']; ?>">Next</button>
+                    <div class="border-top my-3 d-block"></div>
+                    <?php $index++; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(() => {
@@ -188,6 +211,7 @@
         $(".start").click(function() {
             if (!$(this).hasClass('disabled')) {
                 question_id = (this.id).split("_")[1];
+                $(`#list-question_${question_id}`).removeClass('bg-success').addClass('bg-primary');
                 try {
                     $.ajax({
                         url: "<?php echo base_url(); ?>questions/add_question_instance",
@@ -265,9 +289,25 @@
                 console.log(ex);
             }
         });
+
+        $('.next').click(function() {
+            question_id = (this.id).split("_")[1];
+            temp = $(`#list-question_${question_id}`);
+            temp.next().tab('show')
+            window.scrollTo(0,0);
+        });
+
+        $('.prev').click(function() {
+            question_id = (this.id).split("_")[1];
+            temp = $(`#list-question_${question_id}`);
+            temp.prev().tab('show')
+            window.scrollTo(0,0);
+        });
+
         //reset question timer
         $('.btn-close').click(function() {
             question_id = (this.id).split("_")[1];
+            $(`#list-question_${question_id}`).removeClass('bg-primary').addClass('bg-success');
             var msg = {
                 "cmd": "close",
                 "username": <?php echo "'" . $this->session->username . "'"; ?>,
@@ -296,13 +336,14 @@
             if ($(`#start_${question_id}`).hasClass('disabled')) {
                 $(`#start_${question_id}`).removeClass('disabled');
             }
+            
         });
 
         $(`.btn-summary`).click(function() {
             question_id = (this.id).split("_")[1];
             console.log(question_id);
             question_instance_id = $('#num_students_answered').attr('name');
-            window.open(<?php echo "'".base_url()."questions/summary/'"; ?> + question_id + "/"+ question_instance_id)
+            window.open(<?php echo "'" . base_url() . "questions/summary/'"; ?> + question_id + "/" + question_instance_id)
         });
 
         //DOM variables
