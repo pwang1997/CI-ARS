@@ -17,3 +17,17 @@ media-body a:visited {
 .btn {
     border-radius: 0.5em;
 }
+
+.card-student-course {
+    background-color: #3B3F45 !important;
+    width: 100px;
+    height: 200px;
+}
+
+.card-student-course a {
+    color: white !important;
+}
+
+.card-student-course a:hover {
+    text-decoration: none;
+}
