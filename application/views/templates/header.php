@@ -15,13 +15,13 @@
   <!-- Customized js and css  -->
   <script src="<?= base_url(); ?>js/global.js"></script>
   <script src="<?= base_url(); ?>js/get_session.js"></script>
+  <link href="<?= base_url(); ?>/css/global.css" rel="stylesheet">
   <link href="<?= base_url(); ?>/css/overlay.css" rel="stylesheet">
 </head>
 
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="./">Navbar</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

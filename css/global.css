@@ -1,0 +1,19 @@
+.square {
+    height: 50px;
+    width: 50px;
+    margin-right: 1em;
+    border-radius: 0.5em;
+}
+
+media-body a {
+    color: #1a0dab !important;
+}
+
+media-body a:visited {
+    color: #609 !important;
+    font-style: italic !important;
+}
+
+.btn {
+    border-radius: 0.5em;
+}
