@@ -96,7 +96,7 @@
   </div>
 
 
-  <div class="container">
+  <div class="container-sm">
     <!-- Flash message -->
     <?php if ($this->session->flashdata('user_registered')) : ?>
       <?php echo '<div class="alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>' . $this->session->flashdata('user_registered') . '</div>'; ?>
