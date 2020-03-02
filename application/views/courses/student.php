@@ -1,58 +1,75 @@
 </div><!-- end of container -->
-
-<div class="row">
-    <div class="col-2">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action active" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="lab">Course Detail</a>
-            <a class="list-group-item list-group-item-action" id="list-quiz-list" data-toggle="list" href="#list-quiz" role="tab" aria-controls="quiz">Quizs</a>
-            <a class="list-group-item list-group-item-action" id="list-grade-list" data-toggle="list" href="#list-grade" role="tab" aria-controls="grade">Grade</a>
-
-        </div>
-    </div>
-    <div class="col-10">
-        <div class="tab-content" id="nav-tabContent">
-            <!-- course detail  -->
-            <div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
-                <h2><?= $title; ?></h2>
-                <p><strong>Course Name: </strong> <?php echo $course_info['course_name']; ?></p>
-                <p><strong>Course Code: </strong> <?php echo $course_info['course_code']; ?></p>
-                <p><strong>Section Number: </strong> <?php echo $course_info['section_id']; ?></p>
-                <p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
+<div class="container-fluid">
+    <div class="row" style="height: 100%">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="course">Course Detail
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="list-quiz-list" data-toggle="list" href="#list-quiz" role="tab" aria-controls="quiz">Quizs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="list-student-list" data-toggle="list" href="#list-student" role="tab" aria-controls="student">Grade
+                        </a>
+                    </li>
+                </ul>
             </div>
+        </nav>
 
-            <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
-                <div class="card-groups">
+        <div class="col-10">
+            <div class="tab-content" id="nav-tabContent">
+                <!-- course detail  -->
+                <div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
+                    <h3><?= $title; ?></h3>
+                    <hr>
+                    <p><strong>Course Name: </strong> <?php echo $course_info['course_name']; ?></p>
+                    <p><strong>Course Code: </strong> <?php echo $course_info['course_code']; ?></p>
+                    <p><strong>Section Number: </strong> <?php echo $course_info['section_id']; ?></p>
+                    <p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
+                </div>
+
+                <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
+                    <h3>Quiz List</h3>
+                    <hr>
+
                     <?php
                     for ($i = 0; $i < sizeof($quizs); $i++) {
-                        if ($i % 3 == 0) {
-                    ?>
-                            <div class="row">
-                                <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
-                                <div class="col-md-1"></div>
-                            <?php } elseif ($i % 3 == 2) {
-                            ?>
-                                <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
-                            </div>
-                        <?php } else { ?>
-                            <?php addedCard($i + 1, $quizs[$i]['quiz_index']); ?>
-                            <div class="col-md-1"></div>
-                    <?php }
+                        if ($i % 3 == 0) :
+                            echo '<div class="row">';
+                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                        elseif ($i % 3 == 2) :
+                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                            echo '</div>';
+                        else :
+                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                        endif;
                     }
-                    ?>
-                    <?php if (sizeof($quizs) % 3 != 0) : ?>
-                    <?php endif; ?>
-                    <?php
-                    function addedCard($index, $quiz_id)
-                    {
-                        $base_url = base_url();
-                        echo "<div class='card bg-outline-primary mb-3 col-md-3' id='card_$quiz_id'>
-		                        <div class='card-body'>
-		                            <h5 class='card-title'><a href=' {$base_url}questions/student/$quiz_id' class='text-secondary'>Quiz $index</a></h5>
-		                        </div>
-	                        </div>";
-                    }
+                    if (sizeof($quizs) % 3 != 0) :
+                        echo '</div>';
+                    endif;
                     ?>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<?php
+function addedCard($index, $quiz_id)
+{
+    $base_url = base_url();
+    echo "
+    <div class='col-sm-3 py-2 ml-2'>
+        <div class='card bg-outline-primary mb-3' id='card_$quiz_id'>
+            <div class='card-student-course'>
+                <div class='card-body'>
+                    <h6 class='card-text text-center pt-5'><a href=' {$base_url}questions/student/$quiz_id' class='text-secondary'>Quiz $index</a></h6>
+                </div>
+            </div>
+        </div>
+    </div>";
+}
+?>
