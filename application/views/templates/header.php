@@ -4,7 +4,9 @@
   <title>ARS</title>
   <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <!-- <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css"> -->
   <!-- Theme included stylesheets -->
   <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <!-- Customized css  -->
@@ -17,8 +19,7 @@
 
 <body>
   <header>
-    <!--navbar navbar-expand-lg   navbar-light bg-light -->
-    <nav class="navbar navbar-expand-lg" id="nav-header">
+    <nav class="navbar navbar-expand-lg  navbar-light bg-light" id="nav-header">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -93,7 +94,7 @@
   </div>
 
 
-  <div class="container-sm">
+  <div class="container">
     <!-- Flash message -->
     <?php if ($this->session->flashdata('user_registered')) : ?>
       <?php echo '<div class="alert alert-dismissible alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>' . $this->session->flashdata('user_registered') . '</div>'; ?>
