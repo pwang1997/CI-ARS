@@ -8,7 +8,8 @@
 
 <div class="container-fluid">
 	<div class="row" style="height: 100%">
-		<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+		<!-- d-none d-md-block bg-light sidebar -->
+		<nav class="col-md-2 nav flex-column nav-pills bg-light  sidebar pr-0" style="min-height:100px" aria-orientation="vertical">
 			<div class="sidebar-sticky">
 				<ul class="nav flex-column">
 					<li class="nav-item">
@@ -27,7 +28,7 @@
 			</div>
 		</nav>
 
-		<div class="col-10">
+		<div class="col-md-10">
 			<div class="tab-content" id="nav-tabContent">
 				<!-- course detail -->
 				<div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
@@ -57,8 +58,14 @@
 									<th><?php echo $j++; ?></th>
 									<th scope="row"><?php echo $student['username']; ?></th>
 									<th>
-										<button type="button" class="btn btn-outline-primary btn_remove_student" id="<?php echo "btn_" . $student['username']; ?>">Remove</button>
-										<button type="button" class="btn btn-outline-primary btn_modify_student" id="<?php echo "btn_" . $student['username'] . "2"; ?>">Edit</button>
+										<div class="row">
+											<div class="col-md-6 pb-1">
+												<button style="width:100%" type="button" class="btn btn-outline-danger btn_remove_student" id="<?php echo "btn_" . $student['username']; ?>">Remove</button>
+											</div>
+											<div class="col-md-6">
+												<button style="width:100%" type="button" class="btn btn-outline-primary btn_modify_student" id="<?php echo "btn_" . $student['username'] . "2"; ?>">Edit</button>
+											</div>
+										</div>
 									</th>
 								</tr>
 							<?php endforeach; ?>
@@ -145,7 +152,7 @@ function addedCard($index, $quiz_id, $created_at, $num_questions)
 							</div>
 							<div class='card-footer'>
 								<div class=row>
-									<div class=col-sm-6>
+									<div class='col-sm-6 pb-2'	>
 										<button type='button' class='btn btn-primary btn-block start' id=st_{$quiz_id}>start</button>
 									</div>
 									<div class=col-sm-6>
