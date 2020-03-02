@@ -169,17 +169,16 @@
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
-            websocket.onopen = function(evevt) {
-                console.log("Connected to WebSocket server.");
-                msg = {
-                    'cmd': "connect",
-                    'from_id': <?php echo "'" . $this->session->id . "'"; ?>,
-                    'username': <?php echo "'" . $this->session->username . "'"; ?>,
-                    'role': <?php echo "'" . $this->session->role . "'"; ?>
-                };
-
-                websocket.send(JSON.stringify(msg));
-            }
+                websocket.onopen = function(evevt) {
+                    msg = {
+                        'cmd': "connect",
+                        'from_id': <?php echo "'" . $this->session->id . "'"; ?>,
+                        'username': <?php echo "'" . $this->session->username . "'"; ?>,
+                        'role': <?php echo "'" . $this->session->role . "'"; ?>
+                    };
+                    websocket.send(JSON.stringify(msg));
+                    console.log("Connected to WebSocket server.");
+                }
             //receive message
             websocket.onmessage = function(event) {
                 var msg = JSON.parse(event.data);
@@ -213,9 +212,20 @@
                 console.log("Connected to WebSocket server error");
             }
 
-            websocket.onclose = function(event) {
-                console.log('websocket Connection Closed. ');
-            }
+            window.onbeforeunload = function() {
+                $msg = {
+                    cmd: "closing_connection"
+                }
+                websocket.send(JSON.stringify($msg));
+
+                websocket.onclose = function(event) {
+                    console.log('websocket Connection Closed. ', event);
+                }; // disable onclose handler first
+                // websocket.close();
+            };
+            // websocket.onclose = function(event) {
+            //     console.log('websocket Connection Closed. ');
+            // }
         }
 
         $(".btn-display_answer").click(function() {
