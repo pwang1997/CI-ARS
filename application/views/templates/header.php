@@ -2,26 +2,23 @@
 
 <head>
   <title>ARS</title>
-  <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css">
   <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js" integrity="sha256-T9tvV3x+/vCnCoFciKNZwbaJ46q9lh6iZjD0ZjD95lE=" crossorigin="anonymous"></script>
-  <!-- Main Quill library -->
-  <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css">
   <!-- Theme included stylesheets -->
   <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <!-- Customized js and css  -->
-  <script src="<?= base_url(); ?>js/global.js"></script>
-  <script src="<?= base_url(); ?>js/get_session.js"></script>
+  <!-- Customized css  -->
   <link href="<?= base_url(); ?>/css/global.css" rel="stylesheet">
   <link href="<?= base_url(); ?>/css/overlay.css" rel="stylesheet">
+  <!-- Customized js   -->
+  <script src="<?= base_url(); ?>js/global.js"></script>
+  <script src="<?= base_url(); ?>js/get_session.js"></script>
 </head>
 
 <body>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!--navbar navbar-expand-lg   navbar-light bg-light -->
+    <nav class="navbar navbar-expand-lg" id="nav-header">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

@@ -1,3 +1,7 @@
+/* .header .navbar {
+    background-color: black;
+} */
+
 .square {
     height: 50px;
     width: 50px;
@@ -5,11 +9,11 @@
     border-radius: 0.5em;
 }
 
-media-body a {
+.media-body a {
     color: #1a0dab !important;
 }
 
-media-body a:visited {
+.media-body a:visited {
     color: #609 !important;
     font-style: italic !important;
 }
@@ -50,16 +54,30 @@ media-body a:visited {
     }
 } */
 
-.card-student-course {
+.card-student-course, .card-teacher-course {
     background-color: #3B3F45 !important;
     min-width: 100px;
     min-height: 150px;
 }
 
-.card-student-course a {
+.card-student-course a, .card-teacher-course a {
     color: white !important;
 }
 
-.card-student-course a:hover {
+.card-student-course a:hover, .card-teacher-course a:hover {
     text-decoration: none;
+}
+
+.sidebar a {
+    color: black;
+    font-size: medium;
+    font-weight: bold;
+}
+
+#nav-header {
+    background-color: #3B3F45 !important;
+}
+
+#nav-header a {
+    color: white !important
 }
