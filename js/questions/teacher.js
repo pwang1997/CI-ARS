@@ -5,7 +5,6 @@ $(document).ready(() => {
         arr_ids.push((ids[i]).id.substring(9));
     };
 
-    quills = [];
     for (i = 0; i < ids.length; i++) {
         id = "#editor_" + arr_ids[i];
         // console.log(id);

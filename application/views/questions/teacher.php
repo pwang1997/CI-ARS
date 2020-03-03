@@ -130,8 +130,7 @@
                 <button style="width:100%" type="button" class="btn btn-outline-primary offset-md-8 update" name="update_question_<?php echo $question['id']; ?>" id="<?php echo $question['id']; ?>">Update</button>
             </div>
         </div>
-    <?php endforeach; //end question_list 
-    ?>
     </div>
-    <div class="border-top my-3 d-block"></div>
-    <button type="button" class="btn btn-outline-primary" id="new_question">New Question</button>
+<?php endforeach; ?>
+<div class="border-top my-3 d-block"></div>
+<button type="button" class="btn btn-outline-primary" id="new_question">New Question</button>
