@@ -106,8 +106,8 @@ $(document).ready(() => {
                     //disable the interface
                     console.log('timeout')
                     $('#status').html(`Status: Timeout`);
-                    $('.submit').attr('disabled', 'disabled');
-                    $('button[name=choice]').attr('disabled', 'disabled');
+                    $('.submit').prop('disabled', true);
+                    $('button[name=choice]').prop('disabled', true);
 
                 } else if (cmd == "close") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
@@ -130,14 +130,14 @@ $(document).ready(() => {
                         $('#status').html(`Status: Pause(Answerable)`);
                     } else if (msg.question_status == "pause_disable") {
                         $('#status').html(`Status: Pause(Disabled)`);
-                        $('.submit').attr('disabled', 'disabled');
-                        $('button[name=choice]').attr('disabled', 'disabled');
+                        $('.submit').prop('disabled', true);
+                        $('button[name=choice]').prop('disabled', true);
                     }
                 } else if (cmd == "resume") {
                     action = "resume";
                     $('#status').html(`Status: Running`);
-                    $('.submit').attr('disabled', '');
-                    $('button[name=choice]').attr('disabled', '');
+                    $('.submit').prop('disabled', false);
+                    $('button[name=choice]').prop('disabled', false);
                     init_progress = remaining_time;
                     if (timer_type == "timeup") {
                         $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
@@ -148,8 +148,8 @@ $(document).ready(() => {
 
                 } else if (cmd == "display_answer") {
                     $('#status').html(`Status: Displaying Answer`);
-                    $('.submit').attr('disabled', 'disabled');
-                    $('button[name=choice]').attr('disabled', 'disabled');
+                    $('.submit').prop('disabled', true);
+                    $('button[name=choice]').prop('disabled', true);
                     answers = msg.answers;
                     arr_answers = answers.split(",");
                     for (i = 0; i < arr_answers.length; i++) {
@@ -211,7 +211,7 @@ $(document).ready(() => {
             answers = answers.filter(Boolean);
             // console.log(answers)
             $.ajax({
-                url: `${base_url}questions/submit_student_response`,
+                url: `${base_url}/questions/submit_student_response`,
                 type: "POST",
                 dataType: "JSON",
                 data: {
