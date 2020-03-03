@@ -42,7 +42,7 @@
                     <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
                 </div>
             </div>
-        <? $i++;
+        <?php $i++;
         endforeach; ?>
     </div>
     <div class="options"></div>
@@ -108,11 +108,11 @@
             }
         })
 
-        $("#stat").click(function (){
-                $('html, body').animate({
-                    scrollTop: $("#chart").offset().top
-                }, 2000);
-            });
+        $("#stat").click(function() {
+            $('html, body').animate({
+                scrollTop: $("#chart").offset().top
+            }, 2000);
+        });
 
         function animate_time_down(init_progress, max_progress, $element) {
             setTimeout(function() {
@@ -181,7 +181,7 @@
         };
 
         var wsurl = 'ws://127.0.0.1:8080/server/server.php';
-        var websocket, cmd, message, client_name, question_index, role, question_instance_id,action;
+        var websocket, cmd, message, client_name, question_index, role, question_instance_id, action;
 
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);

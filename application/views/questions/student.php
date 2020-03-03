@@ -17,6 +17,7 @@
         </div>
     </div>
 </div>
+
 <div class="question_on invisible">
     <!-- content + buttons  -->
     <div class="row">
@@ -59,8 +60,10 @@
                     <input class="form-check-input answers" type="checkbox" name="answers" value="<?= $choice; ?>">
                 </div>
             </div>
-        <? $i++;
-        endforeach; ?>
+            <?php $i++; ?>
+        <?php
+        endforeach;
+        ?>
     </div>
     <div class="options"></div>
 </div>
