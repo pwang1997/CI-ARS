@@ -34,9 +34,9 @@
                         <a href="<?php echo base_url(); ?>questions/view/<?php echo $row['question_index']; ?>">
                             <?php echo $row['question_index']; ?>
                         </a>
-                    <? else : ?>
+                    <?php else : ?>
                         <?php echo $row['question_index']; ?>
-                    <? endif; ?>
+                    <?php endif; ?>
                 </td>
                 <td><?php echo $row['category']; ?></td>
                 <td><?php echo $row['difficulty']; ?></td>
