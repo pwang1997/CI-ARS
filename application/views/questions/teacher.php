@@ -19,32 +19,30 @@
         <input type="hidden" id="quiz_index_<?php echo $question['id']; ?>" value=<?php echo $quiz_index; ?> />
 
         <!-- timer type  -->
-        <div class="row">
-            <div class="form-group">
-                <label for="timerType_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Timer Type</label>
-                <div class="col-sm-10">
-                    <div class="btn-group btn-group-toggle" data-toggle="buttons" id="timerType_<?php echo $question['id']; ?>">
-                        <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timeup") echo "focus active"; ?>">
-                            <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timeup" autocomplete="off"> Time Up
-                        </label>
+        <div class="form-group row">
+            <label for="timer_types_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Timer Type</label>
+            <div class="col-sm-10">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons" id="timer_types_<?php echo $question['id']; ?>">
+                    <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timeup") echo " active"; ?>">
+                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timeup" autocomplete="off"> Time Up
+                    </label>
 
-                        <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timedown") echo "focus active"; ?>">
-                            <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timedown" autocomplete="off"> Time Down
-                        </label>
-                    </div>
+                    <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timedown") echo " active"; ?>">
+                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timedown" autocomplete="off"> Time Down
+                    </label>
                 </div>
             </div>
         </div>
 
         <!-- public access of the question -->
         <div class="form-group row">
-            <label for="isPublic_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Access</label>
+            <label for="accesses_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Access</label>
             <div class="col-sm-10">
-                <div class="btn-group btn-group-toggle" data-toggle="buttons" id="isPublic">
-                    <label class="btn btn-outline-primary <?php if ($question['is_public'] == "false") echo "focus active"; ?>">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons" id="accesses_<?php echo $question['id']; ?>">
+                    <label class="btn btn-outline-primary <?php if ($question['is_public'] == "false") echo " active"; ?>">
                         <input type="radio" name="accesses_<?= $question['id']; ?>" value="false" autocomplete="off"> Private
                     </label>
-                    <label class="btn btn-outline-primary <?php if ($question['is_public'] == "true") echo "focus active"; ?>">
+                    <label class="btn btn-outline-primary <?php if ($question['is_public'] == "true") echo " active"; ?>">
                         <input type="radio" name="accesses_<?= $question['id']; ?>" value="true" autocomplete="off"> Public
                     </label>
                 </div>
@@ -53,16 +51,16 @@
 
         <!-- difficulty of the question  -->
         <div class="form-group row">
-            <label for="difficulty_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Difficulty</label>
+            <label for="difficulties_<?php echo $question['id']; ?>" class="col-sm-6 col-form-label">Difficulty</label>
             <div class="col-sm-10">
-                <div class="btn-group btn-group-toggle" data-toggle="buttons" id="difficulty">
-                    <label class="btn btn-outline-primary <?php if ($question['difficulty'] == "easy") echo "focus active"; ?>">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons" id="difficulties_<?php echo $question['id']; ?>">
+                    <label class="btn btn-outline-primary <?php if ($question['difficulty'] == "easy") echo " active"; ?>">
                         <input type="radio" name="difficulties_<?= $question['id']; ?>" value="easy" autocomplete="off"> Easy
                     </label>
-                    <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "medium") echo "focus active"; ?>">
+                    <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "medium") echo " active"; ?>">
                         <input type="radio" name="difficulties_<?= $question['id']; ?>" value="medium" autocomplete="off"> Medium
                     </label>
-                    <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "hard") echo "focus active"; ?>">
+                    <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "hard") echo " active"; ?>">
                         <input type="radio" name="difficulties_<?= $question['id']; ?>" value="hard" autocomplete="off"> Hard
                     </label>
                 </div>
