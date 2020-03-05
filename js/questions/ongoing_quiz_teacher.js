@@ -90,18 +90,30 @@ $(document).ready(() => {
 
         $(".btn-display_answer").click(function () {
             question_id = (this.id).split("_")[2];
-            var answers = [];
-            $.each($(`input[name=choice_row_${question_id}]:checked`), function () {
-                answers.push($(this).val());
-            });
-            answers = JSON.stringify(answers)
-            console.log(answers);
-            msg = {
-                'cmd': "display_answer",
-                'question_id': question_id,
-                'answers': answers
+            content_display_answer = $(`#display_answer_${question_id}`).html();
+            //display answer
+            if (content_display_answer == "Display Answer") {
+                var answers = [];
+                $.each($(`input[name=choice_row_${question_id}]:checked`), function () {
+                    answers.push($(this).val());
+                });
+                answers = JSON.stringify(answers)
+                console.log(answers);
+                msg = {
+                    'cmd': "display_answer",
+                    'question_id': question_id,
+                    'answers': answers
+                }
+                $(`#display_answer_${question_id}`).html("Hide Answer")
+            } else if (content_display_answer == "Hide Answer") { //hide answer
+                msg = {
+                    'cmd': "hide_answer",
+                    'question_id': question_id
+                }
+                $(`#display_answer_${question_id}`).html("Display Answer")
             }
             websocket.send(JSON.stringify(msg));
+
         });
 
         $(".start").click(function () {

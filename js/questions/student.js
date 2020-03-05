@@ -162,15 +162,26 @@ $(document).ready(() => {
                     i = 0;
                     $(`button[name=choice]`).each(function () {
                         content = $(this).html();
-                        console.log(arr_answers.includes(content))
+                        // console.log(arr_answers.includes(content))
+                        if ($(this).hasClass('active')) { //add trace for student's answer
+                            $(this).addClass('student_answers');
+                        }
                         if ($(this).hasClass('active') && !arr_answers.includes(content)) {
-                            $(this).addClass('btn-danger');
+                            $(this).addClass('bg-danger');
+                            $(this).addClass('teacher_answers')// teacher's answer
                         } else if (arr_answers.includes(content)) {
                             $(this).addClass('bg-success');
+                            $(this).addClass('teacher_answers')
                         }
                     });
                     console.log(student_answers)
-
+                } else if (cmd == "hide_answer") {
+                    $('#status').html(`Status: Running`);
+                    $('.submit').prop('disabled', false);
+                    $('button[name=choice]').prop('disabled', false);
+                    $(`button[name=choice]`).each(function () {
+                        $(this).removeClass('bg-success').removeClass('bg-danger') //negate display_answer
+                    });
                 } else if (cmd == "update_remaining_time" && remaining_time != null) {
                     init_progress = remaining_time;
                     if (timer_type == "timeup") {
