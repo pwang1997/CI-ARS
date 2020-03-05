@@ -40,11 +40,11 @@
                                 foreach ($choices as $choice) : ?>
                                     <div class="form-group row choice_row">
                                         <div class="custom-control custom-checkbox ml-4">
-                                            <input type="checkbox" disabled class="custom-control-input " id="customCheck_<?= $i; ?>_<?= $question['id']; ?>" name="choice_row_<?php echo $question['id']; ?>" value="<?php echo $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
+                                            <input type="checkbox" disabled="true" class="custom-control-input " id="customCheck_<?= $i; ?>_<?= $question['id']; ?>" name="choice_row_<?php echo $question['id']; ?>" value="<?php echo $choice ?>" <?php if (in_array($choice, $answers)) echo "checked"; ?>>
                                             <label class="custom-control-label" for="customCheck_<?= $i; ?>_<?= $question['id']; ?>"></label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <input type="text" disabled class="form-control" name="choice<?= $i; ?>" id="<?php echo $question['id'] . "_" . $i ?>" autocomplete="on" value="<?php echo $choice; ?>">
+                                            <input type="text" disabled="true" class="form-control" name="choice<?= $i; ?>" id="<?php echo $question['id'] . "_" . $i ?>" autocomplete="on" value="<?php echo $choice; ?>">
                                         </div>
                                     </div>
                                 <?php $i++;
@@ -108,10 +108,13 @@
 
                         <div class="row">
                             <div class="col-sm-2 pb-2">
-                                <button style="width:100%" class="btn btn-primary prev <?php if ($index == 1) echo "disabled"; ?>" type="button" id="prev_<?= $question['id']; ?>">Previous</button>
+                                <button style="width:100%" class="btn btn-primary prev" <?php if ($index == 1) echo "disabled=true"; ?> type="button" id="prev_<?= $question['id']; ?>">Previous</button>
                             </div>
-                            <div class="offset-sm-2 col-sm-2 pb-2">
-                                <button style="width:100%" class="btn btn-primary next <?php if ($index == count($question_list)) echo "disabled"; ?>" type="button" id="next_<?= $question['id']; ?>">Next</button>
+                            <div class="col-sm-2 pb-2">
+                                <button style="width:100%" class="btn btn-primary next" <?php if ($index == count($question_list)) echo "disabled=true"; ?>type="button" id="next_<?= $question['id']; ?>">Next</button>
+                            </div>
+                            <div class="col-sm-2 pb-2">
+                                <button style="width:100%" class="btn btn-danger exit" type="button" id="exit_<?= $question['id']; ?>">Exit</button>
                             </div>
                         </div>
                         <div class="border-top my-3 d-block"></div>

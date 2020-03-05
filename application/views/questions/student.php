@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="row">
-            <strong>Please prepare for quiz</strong>
+            <strong id="quiz_status">Please prepare for quiz</strong>
         </div>
     </div>
 </div>

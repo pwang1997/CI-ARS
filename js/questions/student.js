@@ -1,14 +1,4 @@
 $(document).ready(() => {
-    // var quill = new Quill('#editor', {
-    //     modules: {
-    //         "toolbar": false
-    //     },
-    //     theme: 'snow' // or 'bubble'
-    // });
-    // quill.enable(false);
-
-    // var wsurl = 'ws://127.0.0.1:9505/websocket/server.php';
-
     get_session().then((user) => {
         user = JSON.parse(user);
         action = null;
@@ -107,7 +97,7 @@ $(document).ready(() => {
                     $('.submit').prop('disabled', true);
                     $('button[name=choice]').prop('disabled', true);
 
-                } else if (cmd == "close") { //remove question contents
+                } else if (cmd == "close" || cmd == "closing_connection") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
                     $('.options').empty(); //remove options
@@ -117,6 +107,11 @@ $(document).ready(() => {
                     $('#targeted_time').empty(); //remove timer progress bar
                     $('.choice_row').parent().empty(); //remove choices
                     $('.submit').prop('disabled', false);
+                    if (cmd == "close") {
+                        $(`#quiz_status`).html("Please prepare for quiz");
+                    } else {
+                        $(`#quiz_status`).html("Quiz is not available at the moment");
+                    }
                 } else if (cmd == "pause") {
                     action = "pause";
                     init_progress = remaining_time;
@@ -339,7 +334,4 @@ $(document).ready(() => {
             }, 1000);
         };
     });
-
-
-
 });
