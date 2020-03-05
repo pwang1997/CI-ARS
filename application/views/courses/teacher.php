@@ -122,7 +122,7 @@
 					?>
 					<!-- add new quiz -->
 					<div class="row">
-						<div class="col-sm-3 py-2 ml-2">
+						<div class="col-lg-3 py-2 ml-2">
 							<div class='card bg-outline-primary'>
 								<div class='card-teacher-course'>
 									<div class='card-body'>
@@ -142,7 +142,7 @@
 function addedCard($index, $quiz_id, $created_at, $num_questions)
 {
 	echo "
-				<div class='col-sm-3 py-2 ml-2'>
+				<div class='col-lg-3 py-2 ml-2'>
 					<div class='card bg-outline-primary mb-3' id='card_{$quiz_id}'>
 						<div class='card-teacher-course'>
 							<div class='card-body'>
