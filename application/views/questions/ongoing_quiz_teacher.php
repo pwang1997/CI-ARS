@@ -118,6 +118,45 @@
                             </div>
                         </div>
                         <div class="border-top my-3 d-block"></div>
+                        <h3>Stat</h3>
+                        <div class="accordion" id="accordion_<?= $question['id']; ?>">
+                            <?php foreach ($question_instance_list[$question['id']] as $question_instance) : ?>
+                                <div class="card">
+                                    <div class="card-header" id="heading_<?= $question_instance['question_instance_id']; ?>">
+                                        <h2 class="mb-0">
+                                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse_<?= $question_instance['question_instance_id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question_instance['question_instance_id']; ?>">
+                                                <h6><?= $question_instance['time_created']; ?></h6>
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapse_<?= $question_instance['question_instance_id']; ?>" class="collapse" aria-labelledby="heading_<?= $question_instance['question_instance_id']; ?>" data-parent="#accordion_<?= $question_instance['question_instance_id']; ?>">
+                                        <div class="card-body table-responsive">
+                                            <table id="table_<?= $question_instance['question_instance_id']; ?>" class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Index</th>
+                                                        <th scope="col">Student Id</th>
+                                                        <th scope="col">Response</th>
+                                                        <th scope="col">Time Answered</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php $i = 1; ?>
+
+                                                    <tr>
+                                                        <th scope="row"><?php echo $i++; ?></td>
+                                                        <td><?php echo $question_instance['student_id']; ?></td>
+                                                        <td><?php echo $question_instance['answer']; ?></td>
+                                                        <td><?php echo $question_instance['time_answered']; ?></td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                         <?php $index++; ?>
                     </div>
                 <?php endforeach; ?>
