@@ -1,7 +1,8 @@
 </div><!-- end of container -->
 <div class="container-fluid">
     <div class="row" style="height: 100%">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <!-- <nav class="col-md-2 d-none d-md-block bg-light sidebar"> -->
+        <nav class="col-md-2 nav flex-column nav-pills bg-light  sidebar pr-0" style="min-height:100px" aria-orientation="vertical">
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
                     <li class="nav-item">
