@@ -1,6 +1,6 @@
 $(document).ready(() => {
     //move question forward
-    $('.next').click(function(e) {
+    $('.next').click(function (e) {
         question_id = (this.id).split("_")[1];
         temp = $(`#list-question_${question_id}`).parent().next().children().first();
         console.log(temp)
@@ -8,7 +8,7 @@ $(document).ready(() => {
         window.scrollTo(0, 0);
     });
     //move question backward
-    $('.prev').click(function() {
+    $('.prev').click(function () {
         question_id = (this.id).split("_")[1];
         temp = $(`#list-question_${question_id}`).parent().prev().children().first();
         temp.tab('show')
@@ -25,18 +25,18 @@ $(document).ready(() => {
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
-            websocket.onopen = function(evevt) {
-                    msg = {
-                        'cmd': "connect",
-                        'from_id': user.id,
-                        'username': user.username,
-                        'role': user.role
-                    };
-                    websocket.send(JSON.stringify(msg));
-                    console.log("Connected to WebSocket server.");
-                }
-                //receive message
-            websocket.onmessage = function(event) {
+            websocket.onopen = function (evevt) {
+                msg = {
+                    'cmd': "connect",
+                    'from_id': user.id,
+                    'username': user.username,
+                    'role': user.role
+                };
+                websocket.send(JSON.stringify(msg));
+                console.log("Connected to WebSocket server.");
+            }
+            //receive message
+            websocket.onmessage = function (event) {
                 var msg = JSON.parse(event.data);
 
                 var type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
@@ -56,7 +56,7 @@ $(document).ready(() => {
                         data: {
                             'question_instance_id': msg.question_instance_id
                         },
-                        success: function(response) {
+                        success: function (response) {
                             $('#num_students_answered').html(response.num_students_answered);
                             $('#num_students_answered').attr('name', msg.question_instance_id)
                         }
@@ -64,23 +64,23 @@ $(document).ready(() => {
                 }
             }
 
-            websocket.onerror = function(event) {
+            websocket.onerror = function (event) {
                 console.log("Connected to WebSocket server error");
             }
 
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function () {
                 $msg = {
                     cmd: "closing_connection"
                 }
                 websocket.send(JSON.stringify($msg));
 
-                websocket.onclose = function(event) {
+                websocket.onclose = function (event) {
                     console.log('websocket Connection Closed. ', event);
                 }; // disable onclose handler first
             };
         }
 
-        $(`.btn-summary`).click(function() {
+        $(`.btn-summary`).click(function () {
             question_id = (this.id).split("_")[1];
             console.log(question_id);
             var popup = window.open(`${base_url}/questions/summary/${question_id}/${question_instance_id}`);
@@ -88,10 +88,10 @@ $(document).ready(() => {
             window.focus();
         });
 
-        $(".btn-display_answer").click(function() {
+        $(".btn-display_answer").click(function () {
             question_id = (this.id).split("_")[2];
             var answers = [];
-            $.each($(`input[name=choice_row_${question_id}]:checked`), function() {
+            $.each($(`input[name=choice_row_${question_id}]:checked`), function () {
                 answers.push($(this).val());
             });
             answers = JSON.stringify(answers)
@@ -104,7 +104,7 @@ $(document).ready(() => {
             websocket.send(JSON.stringify(msg));
         });
 
-        $(".start").click(function() {
+        $(".start").click(function () {
             if (!$(this).hasClass('disabled')) {
                 question_id = (this.id).split("_")[1];
                 $(`#list- question_${question_id}`).removeClass('bg-success').addClass('bg-primary');
@@ -116,7 +116,7 @@ $(document).ready(() => {
                         data: {
                             'question_meta_id': question_id,
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.success) {
                                 console.log(response);
                                 var msg = {
@@ -145,7 +145,7 @@ $(document).ready(() => {
                                 alert("failed to insert question1");
                             }
                         },
-                        fail: function() {
+                        fail: function () {
                             alert("failed to insert question2");
                         }
                     })
@@ -156,7 +156,7 @@ $(document).ready(() => {
             $(this).addClass('disabled');
         });
 
-        $(".pause_answerable").click(function() {
+        $(".pause_answerable").click(function () {
             console.log("PAUSE ANSWERABLE")
             question_id = (this.id).split("_")[2];
             $(`#pause_${question_id}`).html("Resume");
@@ -164,7 +164,7 @@ $(document).ready(() => {
             sendPauseMessage(question_id, action, "pause_answerable", timer_type, websocket)
         })
 
-        $(".pause_disable").click(function() {
+        $(".pause_disable").click(function () {
             console.log("PAUSE DISABLE")
             question_id = (this.id).split("_")[2];
             $(`#pause_${question_id}`).html("Resume");
@@ -172,7 +172,7 @@ $(document).ready(() => {
             sendPauseMessage(question_id, action, "pause_disable", timer_type, websocket)
         })
 
-        $('.pause').click(function() {
+        $('.pause').click(function () {
             question_id = (this.id).split("_")[1];
             var current_state = $(this).html();
 
@@ -189,7 +189,7 @@ $(document).ready(() => {
         });
 
         //reset question timer
-        $('.btn-close').click(function() {
+        $('.btn-close').click(function () {
             question_id = (this.id).split("_")[1];
             $(`#list-question_${question_id}`).removeClass('bg-primary').addClass('bg-success');
             var msg = {
@@ -252,7 +252,7 @@ $(document).ready(() => {
         };
 
         function animate_time_down(max_progress, $element, websocket) {
-            setTimeout(function() {
+            setTimeout(function () {
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
@@ -295,14 +295,15 @@ $(document).ready(() => {
                     $element.removeClass('bg-danger');
                     return false;
                 } else {
-                    animate_time_down(max_progress, $element, websocket);
+                    return;
+                    // animate_time_down(max_progress, $element, websocket);
                 }
                 // console.log(action);
             }, 1000);
         };
 
         function animate_time_up(max_progress, $element, websocket) {
-            setTimeout(function() {
+            setTimeout(function () {
                 if (action == "start" || action == "resume") {
                     init_progress++;
                     if (init_progress <= max_progress) {

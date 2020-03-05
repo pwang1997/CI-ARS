@@ -33,7 +33,7 @@
             </div>
         </div>
     </div>
-    <h6 class="ml-2" id="editor"></h6>
+    <h6 class="ml-2" id="content"></h6>
     <!-- answer/choices -->
     <div class="options"></div>
     <div class="row">
