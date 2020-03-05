@@ -21,6 +21,7 @@
 
 <div class="question_on invisible">
     <!-- content + buttons  -->
+
     <div class="row">
         <div class="p-2 col-sm-3" id="status">Status:</div>
         <div class="p-2 col-sm-3" id="targeted_time">Targeted Time: </div>
@@ -29,7 +30,7 @@
         <div class="p-2 col-sm-12">
             <p id="duration">
             </p>
-            <div class="progress">
+            <div class="progress col-sm-6 p-0">
             </div>
         </div>
     </div>
