@@ -24,11 +24,11 @@
             <div class="col-sm-10">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" id="timer_types_<?php echo $question['id']; ?>">
                     <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timeup") echo " active"; ?>">
-                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timeup" autocomplete="off"> Time Up
+                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timeup" <?php if ($question['timer_type'] == "timeup") echo " checked"; ?> autocomplete="off"> Time Up
                     </label>
 
                     <label class="btn btn-outline-primary <?php if ($question['timer_type'] == "timedown") echo " active"; ?>">
-                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timedown" autocomplete="off"> Time Down
+                        <input type="radio" name="timer_types_<?= $question['id']; ?>" value="timedown" <?php if ($question['timer_type'] == "timedown") echo " checked"; ?> autocomplete="off"> Time Down
                     </label>
                 </div>
             </div>
@@ -40,10 +40,10 @@
             <div class="col-sm-10">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" id="accesses_<?php echo $question['id']; ?>">
                     <label class="btn btn-outline-primary <?php if ($question['is_public'] == "false") echo " active"; ?>">
-                        <input type="radio" name="accesses_<?= $question['id']; ?>" value="false" autocomplete="off"> Private
+                        <input type="radio" name="accesses_<?= $question['id']; ?>" value="false" <?php if ($question['is_public'] == "false") echo " checked"; ?> autocomplete="off"> Private
                     </label>
                     <label class="btn btn-outline-primary <?php if ($question['is_public'] == "true") echo " active"; ?>">
-                        <input type="radio" name="accesses_<?= $question['id']; ?>" value="true" autocomplete="off"> Public
+                        <input type="radio" name="accesses_<?= $question['id']; ?>" value="true" <?php if ($question['is_public'] == "true") echo " checked"; ?> autocomplete="off"> Public
                     </label>
                 </div>
             </div>
@@ -55,13 +55,13 @@
             <div class="col-sm-10">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons" id="difficulties_<?php echo $question['id']; ?>">
                     <label class="btn btn-outline-primary <?php if ($question['difficulty'] == "easy") echo " active"; ?>">
-                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="easy" autocomplete="off"> Easy
+                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="easy" <?php if ($question['difficulty'] == "easy") echo " checked"; ?> autocomplete="off"> Easy
                     </label>
                     <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "medium") echo " active"; ?>">
-                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="medium" autocomplete="off"> Medium
+                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="medium" <?php if ($question['difficulty'] == "medium") echo " checked"; ?> autocomplete="off"> Medium
                     </label>
                     <label class="btn btn-outline-primary  <?php if ($question['difficulty'] == "hard") echo " active"; ?>">
-                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="hard" autocomplete="off"> Hard
+                        <input type="radio" name="difficulties_<?= $question['id']; ?>" value="hard" <?php if ($question['difficulty'] == "hard") echo " checked"; ?> autocomplete="off"> Hard
                     </label>
                 </div>
             </div>

@@ -26,18 +26,17 @@ $(document).ready(() => {
     }
 
     arr_param = get_url_params(window.location.href)
-    console.log(arr_param)
     $('#new_question').click((e) => {
         location.replace(`${base_url}/questions/create/${arr_param[arr_param.length - 1]}`);
     })
 
-    $("button").click(function () {
+    $("button").click(function() {
         //update question
         if ($(this).hasClass('update')) {
             choices = [];
             answers = [];
             //get all values of choices
-            $(`input[name=choice_row_${this.id}]`).each(function () {
+            $(`input[name=choice_row_${this.id}]`).each(function() {
                 temp = $(this).parent().prev().children().first().val();
                 if ($(this).is(':checked')) {
                     answers.push(temp);
@@ -47,15 +46,6 @@ $(document).ready(() => {
 
             choices = choices.filter(Boolean);
 
-            content = quill.root.innerHTML.trim();
-            category = $(`input[name=category_${this.id}]`).val();
-            duration = $(`input[name=duration_${this.id}]`).val();
-            duration = duration.split(' ')[0];
-            timer_type = $(`input[name=timer_types_${this.id}]:checked`).val();
-            accesses = $(`input[name=accesses_${this.id}]:checked`).val();
-            difficulties = $(`input[name=difficulties_${this.id}]:checked`).val();
-
-            // console.log("updated info: " + [content, category, duration, timer_type, accesses, difficulties])
             $.ajax({
                 url: `${base_url}/questions/update_question`,
                 type: "POST",
@@ -63,26 +53,26 @@ $(document).ready(() => {
                 data: {
                     'id': this.id,
                     'quiz_index': $(`#quiz_index_${this.id}`).val(),
-                    'timer_type': timer_type,
-                    'duration': duration,
-                    'content': content,
-                    'isPublic': accesses,
-                    'difficulty': difficulties,
-                    'category': category,
+                    'timer_type': $(`input[name=timer_types_${this.id}]:checked`).val(),
+                    'duration': $(`input[name=duration_${this.id}]`).val().split(' ')[0],
+                    'content': quill.root.innerHTML.trim(),
+                    'isPublic': $(`input[name=accesses_${this.id}]:checked`).val(),
+                    'difficulty': $(`input[name=difficulties_${this.id}]:checked`).val(),
+                    'category': $(`input[name=category_${this.id}]`).val(),
                     'choices': JSON.stringify(choices),
                     'answer': JSON.stringify(answers)
                 },
-                success: function (response) {
+                success: function(response) {
                     if (response.success) {
                         alert("success");
                     } else {
                         alert("failed to insert question1");
                     }
                 },
-                fail: function () {
+                fail: function() {
                     alert("failed to insert question2");
                 }
-            })
+            });
         } else if ($(this).hasClass('add')) {
             question_index = this.id.substring(4);
             //number of current options in the question
