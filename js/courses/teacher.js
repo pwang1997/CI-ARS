@@ -100,8 +100,8 @@ $(document).ready(() => {
                 arr_questions = [];
                 //export question
                 for (let question of questions) {
-                    choices = question.choices.split('"').join("").split(',').join(";");
-                    answer = question.answer.split('"').join("").split(',').join(";");;
+                    let choices = question.choices.split('"').join("").split(',').join(";");
+                    let answer = question.answer.split('"').join("").split(',').join(";");;
                     arr_questions.push({
                         question_id: question.id,
                         quiz_id: question.quiz_id,
@@ -116,7 +116,7 @@ $(document).ready(() => {
                 let headers_question = {
                     question_id: "question id",
                     quiz_id: "quiz id",
-                    content: "contetn",
+                    content: "content",
                     choices: "choices",
                     answer: "answer",
                     time_created: "time created"
@@ -125,17 +125,19 @@ $(document).ready(() => {
                 //export student record
                 students = response.result.student;
                 arr_students = [];
+                console.log(arr_questions)
                 for (let i = 0; i < arr_questions.length; i++) {
-                    student = students[arr_questions[i].question_id][0];
-                    // console.log(student.id);
-
-                    answer = student.answer.split('"').join("").split(',').join(";");;
-                    arr_students.push({
-                        question_id: student.question_instance_id,
-                        student_name: student.username,
-                        answer: answer,
-                        time_answered: student.time_answered
-                    });
+                    let student = students[arr_questions[i].question_id][0];
+                    console.log(student);
+                    if (student != null) {
+                        let answer = student.answer.split('"').join("").split(',').join(";");
+                        arr_students.push({
+                            question_id: student.question_instance_id,
+                            student_name: student.username,
+                            answer: answer,
+                            time_answered: student.time_answered
+                        });
+                    }
                 }
                 // let object_student = JSON.stringify(arr_students);
                 let headers_student = {
