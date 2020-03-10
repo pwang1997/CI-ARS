@@ -1,9 +1,9 @@
 <script src="<?= base_url(); ?>js/users/dashboard.js"></script>
 
 <?php if (strcmp($this->session->role, 'teacher') == 0) : ?>
-  <?php redirect('home'); ?>
+    <?php redirect('home'); ?>
 <?php elseif (empty($this->session->username)) : ?>
-  <?php redirect('users/login'); ?>
+    <?php redirect('users/login'); ?>
 <?php endif; ?>
 </div><!-- end of container -->
 <div class="container-fluid">
@@ -21,7 +21,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="list-student-list" data-toggle="list" href="#list-student" role="tab" aria-controls="student">Grade
+                        <a class="nav-link" id="list-grade-list" data-toggle="list" href="#list-grade" role="tab" aria-controls="student">Grade
                         </a>
                     </li>
                 </ul>
@@ -65,9 +65,74 @@
                     // endif;
                     ?>
                 </div>
+                <div class="tab-pane fade" id="list-grade" role="tabpanel" aria-labelledby="list-grade-list">
+
+                    <?php foreach ($questions as $question) : ?>
+                        <?php $i = 1; ?>
+                        <?php if (count($question) > 0) : ?>
+                            <?php if (count($question[$i - 1]) > 0) : ?>
+                                <div class="accordion" id="accordion_<?= $question[$i - 1]['id']; ?>">
+                                    <div class="card">
+                                        <div class="card-header" id="heading_<?= $question[$i - 1]['id']; ?>">
+                                            <h6 class="mb-0 row">
+                                                <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $question[$i - 1]['id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question[$i - 1]['id']; ?>">
+                                                    <?php echo "Date: {$question[$i - 1]['time_created']}" ?>
+                                                </button>
+                                                <p class="offset-md-5 col-md-4 mb-0">
+                                                Score: 
+                                                <?php
+                                                    $count = 0;
+                                                    $total_question = count($question);
+                                                    foreach ($question as $q) {
+                                                        if ($student_responses[$q['id']][0]['answer'] === $q['answer']) {
+                                                            $count++;
+                                                        }
+                                                    }
+                                                    echo "{$count}/{$total_question}";
+                                                ?>
+                                                </p>
+                                            </h6>
+                                        </div>
+                                        <div id="collapse_<?= $question[$i - 1]['id']; ?>" class="collapse" aria-labelledby="heading_<?= $question[$i - 1]['id']; ?>" data-parent="#accordion_<?= $question[$i - 1]['id']; ?>">
+                                            <div class="card-body table-responsive">
+                                                <?php if (count($question) > 0) : ?>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Question</th>
+                                                                <th scope="col">Content</th>
+                                                                <th scope="col">Your Choice</th>
+                                                                <th scope="col">Answer</th>
+                                                                <th scope="col">Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach ($question as $q) : ?>
+                                                                <tr class=<?php if ($student_responses[$q['id']][0]['answer'] !== $q['answer']) echo "table-danger";
+                                                                            else echo "table-success"; ?>>
+                                                                    <th scope="row" id="<?= $q['id']; ?>"><?= $i++; ?></th>
+                                                                    <td><?= $q['content']; ?></td>
+                                                                    <td><?= $student_responses[$q['id']][0]['answer']; ?></td>
+                                                                    <td><?= $q['answer']; ?></td>
+                                                                    <td><?= $q['time_created']; ?></td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                    </table>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 <?php
 function addedCard($index, $quiz_id)

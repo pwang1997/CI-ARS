@@ -78,8 +78,9 @@ class Courses extends CI_Controller
 
     $data['course_info'] = $this->course_model->get_teacher_course($course_id, $classroom_id);
     $data['quizs'] = $this->course_model->get_quizs_for_student($course_id, $classroom_id);
-    $data['num_of_questions'] = $this->course_model->get_number_of_questions_for_student($data['quizs']);
 
+    $data['questions'] = $this->course_model->get_questions_for_student($data['quizs']);
+    $data['student_responses'] = $this->course_model->get_student_response($data['questions']);
     $this->load->view('templates/header');
     $this->load->view('courses/student', $data);
     $this->load->view('templates/footer');
