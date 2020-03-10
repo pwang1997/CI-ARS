@@ -1,4 +1,4 @@
-<script src="<?= base_url(); ?>js/users/teacher.js"></script>
+<script src="<?= base_url(); ?>js/users/dashboard.js"></script>
 <?php if (strcmp($this->session->role, 'student') == 0) : ?>
   <?php redirect('home'); ?>
 <?php elseif (empty($this->session->username)) : ?>
@@ -23,6 +23,8 @@
       <strong class="d-block text-gray-dark">Add Course</strong>
     </button>
   </div>
+
+</div>
 
   <?php
   function addMeida($course_name, $course_id, $classroom_id, $section)

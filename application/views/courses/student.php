@@ -1,3 +1,10 @@
+<script src="<?= base_url(); ?>js/users/dashboard.js"></script>
+
+<?php if (strcmp($this->session->role, 'teacher') == 0) : ?>
+  <?php redirect('home'); ?>
+<?php elseif (empty($this->session->username)) : ?>
+  <?php redirect('users/login'); ?>
+<?php endif; ?>
 </div><!-- end of container -->
 <div class="container-fluid">
     <div class="row" style="height: 100%">
@@ -34,24 +41,28 @@
                 </div>
 
                 <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
-                    <h3>Quiz List</h3>
-                    <hr>
-
+                    <div class="my-3 p-3 bg-white rounded shadow-sm">
+                        <h6 class="border-bottom border-gray pb-2 mb-0">Quiz list</h6>
+                        <?php
+                        for ($i = 0; $i < sizeof($quizs); $i++)
+                            addMeida($i + 1, $quizs[$i]['quiz_index']);
+                        ?>
+                    </div>
                     <?php
-                    for ($i = 0; $i < sizeof($quizs); $i++) {
-                        if ($i % 3 == 0) :
-                            echo '<div class="row">';
-                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
-                        elseif ($i % 3 == 2) :
-                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
-                            echo '</div>';
-                        else :
-                            addedCard($i + 1, $quizs[$i]['quiz_index']);;
-                        endif;
-                    }
-                    if (sizeof($quizs) % 3 != 0) :
-                        echo '</div>';
-                    endif;
+                    // for ($i = 0; $i < sizeof($quizs); $i++) {
+                    //     if ($i % 3 == 0) :
+                    //         echo '<div class="row">';
+                    //         addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                    //     elseif ($i % 3 == 2) :
+                    //         addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                    //         echo '</div>';
+                    //     else :
+                    //         addedCard($i + 1, $quizs[$i]['quiz_index']);;
+                    //     endif;
+                    // }
+                    // if (sizeof($quizs) % 3 != 0) :
+                    //     echo '</div>';
+                    // endif;
                     ?>
                 </div>
             </div>
@@ -72,5 +83,18 @@ function addedCard($index, $quiz_id)
             </div>
         </div>
     </div>";
+}
+?>
+
+<?php
+function addMeida($index, $quiz_id)
+{
+    $base_url = base_url();
+    echo  " <div class='media text-muted pt-3'>
+    <a href='{$base_url}questions/student/{$quiz_id}'><div class='square'></div></a>
+    <p class='media-body pb-3 mb-0 small lh-125 border-bottom border-gray'>
+      <a href='{$base_url}questions/student/{$quiz_id}'><strong class='h5 d-block text-gray-dark'>Quiz {$index}</strong></a>
+    </p>
+  </div>";
 }
 ?>

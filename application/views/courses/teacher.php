@@ -123,7 +123,7 @@
 					<!-- add new quiz -->
 					<div class="row">
 						<div class="col-lg-3 py-2 ml-2">
-							<div class='card bg-outline-primary'>
+							<div class='card text-white bg-dark'>
 								<div class='card-teacher-course'>
 									<div class='card-body'>
 										<h5 class='card-title'><a href='#' id="add_quiz" class='text-secondary'>New Quiz</a></h5>
@@ -143,24 +143,29 @@ function addedCard($index, $quiz_id, $created_at, $num_questions)
 {
 	echo "
 				<div class='col-lg-3 py-2 ml-2'>
-					<div class='card bg-outline-primary mb-3' id='card_{$quiz_id}'>
+					<div class='card text-white bg-dark mb-3' id='card_{$quiz_id}'>
 						<div class='card-teacher-course'>
 							<div class='card-body'>
 								<h5 class='card-title'><a href='" . base_url() . "questions/teacher/{$quiz_id}' class='text-secondary'>Quiz {$index}</a></h5>
 								<p class='card-text'><a href='" . base_url() . "questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
-								<small class='text-muted'>created at ${created_at}</small>
-							</div>
-							<div class='card-footer'>
 								<div class=row>
-									<div class='col-sm-6 pb-2'	>
-										<button type='button' class='btn btn-primary btn-block start' id=st_{$quiz_id}>start</button>
-									</div>
-									<div class=col-sm-6>
-										<button type='button' class='btn btn-danger btn-block remove' id=rm_{$quiz_id}>remove</button>
-									</div>
+								<div class='col-sm-6 col-lg-12 pb-2'>
+									<button style='width:100%' type='button' class='btn btn-primary btn-block start' id=st_{$quiz_id}>start</button>
+								</div>
+								<div class='col-sm-6 col-lg-12 pb-2'>
+									<button style='width:100%' type='button' class='btn btn-danger btn-block remove' id=rm_{$quiz_id}>remove</button>
+								</div>
+							</div>
+							<div class='row'>
+								<div class='col-sm-12'>
+									<button style='width:100%' type='button' class='btn btn-primary btn-block export' id=export_{$quiz_id}>Download Stat</button>
 								</div>
 							</div>
 							</div>
+							<div class='card-footer'>
+								<small class='text-muted'>created at ${created_at}</small>
+							</div>
+						</div>
 					</div>
 				</div>";
 }
