@@ -142,8 +142,12 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php $i = 1; ?>
-
-                                                    <tr>
+                                                    <?php
+                                                    $student_answer = explode(",", $question_instance['answer']);
+                                                    $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
+                                                    ?>
+                                                    <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
+                                                                else echo "bg-success"; ?>>
                                                         <th scope="row"><?php echo $i++; ?></td>
                                                         <td><?php echo $question_instance['student_id']; ?></td>
                                                         <td><?php echo $question_instance['answer']; ?></td>
@@ -164,3 +168,8 @@
         </div>
     </div>
 </div>
+
+<?php
+
+
+?>
