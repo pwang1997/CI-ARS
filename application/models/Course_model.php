@@ -104,10 +104,11 @@ class Course_model extends CI_Model
     return array('success' => $this->db->insert('quizs', array("classroom_id" => $classroom_id)), 'quiz_index' => $this->db->insert_id());
   }
 
-  public function remove_quiz_from_classroom() {
+  public function remove_quiz_from_classroom()
+  {
     $quiz_id = $this->input->post('quiz_id');
     // return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
-    return $this->db->delete('quizs', array('id'=>$quiz_id));
+    return $this->db->delete('quizs', array('id' => $quiz_id));
   }
   public function get_number_of_questions_for_teacher($arr_quiz)
   {
@@ -195,5 +196,39 @@ class Course_model extends CI_Model
       'enrolledStudents.classroom_id' => $classroom_id
     ))->join('quizs', 'quizs.classroom_id = enrolledStudents.classroom_id')
       ->get()->result_array();
+  }
+
+  public function export_student_stat($quiz_id)
+  {
+    $result_questions = $this->db->select('*')->from('questions')
+      ->where(array('quiz_id' => $quiz_id))->join('questionInstance', 'questions.id = questionInstance.question_meta_id')
+      ->get()->result_array();
+    $result_student_response = [];
+    foreach ($result_questions as $instance) {
+      $result_student_response[$instance['id']] = $this->db->select('*')->from('studentResponse')
+        ->where(array('question_instance_id' => $instance['id']))->join('users', 'users.id = studentResponse.student_id')->get()->result_array();
+    }
+    $result['question'] = $result_questions;
+    $result['student'] = $result_student_response;
+    return $result;
+  }
+  public function get_questions_for_student($quizs)
+  {
+    foreach ($quizs as $quiz) {
+      $result[$quiz['quiz_index']] = $this->db->select('questionInstance.id as id, quiz_id, answer, content, time_created')->from('questions')->where(array('quiz_id' => $quiz['quiz_index']))
+        ->join('questionInstance', 'questionInstance.question_meta_id = questions.id')->get()->result_array();
+    }
+    return $result;
+  }
+
+  public function get_student_response($questions)
+  {
+    foreach($questions as $question) {
+      for($i = 0; $i < count($question); $i++) {
+        $result[$question[$i]['id']] = $this->db->select('answer')->from('studentResponse')->where(array('question_instance_id'=>$question[$i]['id']))
+        ->get()->result_array();
+      }
+    }
+    return $result;
   }
 }

@@ -8,7 +8,7 @@ class Questions extends CI_Controller
         $lab_index = $this->uri->segment(3);
         $data['lab_index'] = $lab_index;
 
-        
+
         $this->load->view('templates/header');
         $this->load->view('questions/create', $data);
         $this->load->view('templates/footer');
@@ -23,7 +23,7 @@ class Questions extends CI_Controller
         $data['categories'] = $this->question_model->get_categories($quiz_index);
         $data['title'] = 'Quiz ';
         $data['hasQuestion'] = $this->question_model->has_question_in_quiz($quiz_index);
-        $data['question_list'] =$this->question_model->getQuestions($quiz_index);
+        $data['question_list'] = $this->question_model->getQuestions($quiz_index);
         $data['quiz_index'] = $quiz_index;
 
         $this->load->view('templates/header');
@@ -37,15 +37,16 @@ class Questions extends CI_Controller
 
         $quiz_index = $this->uri->segment(3);
         $data['quiz_index'] = $quiz_index;
-        
+
         $this->load->view('templates/header');
         $this->load->view('questions/student', $data);
         $this->load->view('templates/footer');
     }
 
-    public function question_base() {
+    public function question_base()
+    {
         $data['title'] = 'Question Base';
-        
+
         $data['result'] = $this->question_model->get_question_base();
 
         $this->load->view('templates/header');
@@ -53,9 +54,10 @@ class Questions extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    public function view() {
+    public function view()
+    {
         $question_index = $this->uri->segment(3);
-        $data['question'] =$this->question_model->get_question($question_index);
+        $data['question'] = $this->question_model->get_question($question_index);
         $data['courses'] = $this->question_model->get_all_courses();
         $data['quizs'] = $this->question_model->get_all_quizs();
 
@@ -64,44 +66,51 @@ class Questions extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    public function ongoing_quiz_teacher() {
+    public function ongoing_quiz_teacher()
+    {
         $quiz_index = $this->uri->segment(3);
         $data['quiz_index'] = $quiz_index;
-        $data['question_list'] =$this->question_model->getQuestions($quiz_index);
-        
+        $data['question_list'] = $this->question_model->getQuestions($quiz_index);
+        $data['question_instance_list'] = $this->question_model->get_question_instance_list($data['question_list']);
         $this->load->view('templates/header');
         $this->load->view('questions/ongoing_quiz_teacher', $data);
         $this->load->view('templates/footer');
     }
-    
-    public function summary() {
+
+    public function summary()
+    {
         $question_id = $this->uri->segment(3);
         $question_instance_id = $this->uri->segment(4);
         $data['title'] = "summary of question instance " . $question_instance_id;
         $data['question_instance_id'] = $question_instance_id;
         $data['question'] = $this->question_model->get_question($question_id);
+        $data['question_id'] = $question_id;
         $this->load->view('templates/header');
         $this->load->view('questions/summary', $data);
         $this->load->view('templates/footer');
     }
-    public function create_question() {
+    public function create_question()
+    {
         $lab_index = $this->input->post('quiz_index');
         $msg['success'] = $this->question_model->create($lab_index);
         echo json_encode($msg);
     }
 
-    public function student_response() {
+    public function student_response()
+    {
         $msg['success'] = $this->question_model->student_response();
         echo json_encode($msg);
     }
 
-    public function update_question() {
+    public function update_question()
+    {
         $quiz_index = $this->input->post('quiz_index');
         $msg['success'] = $this->question_model->update_question($quiz_index);
         echo json_encode($msg);
     }
 
-    public function add_question_instance() {
+    public function add_question_instance()
+    {
         $question_index = $this->input->post('question_meta_id');
         $result = $this->question_model->add_question_instance($question_index);
         $msg['success'] = $result['success'];
@@ -109,13 +118,15 @@ class Questions extends CI_Controller
         echo json_encode($msg);
     }
 
-    public function get_question_for_student() {
+    public function get_question_for_student()
+    {
         $question_index = $this->input->post('question_index');
         $msg['result'] = $this->question_model->get_question($question_index);
         echo json_encode($msg);
     }
 
-    public function submit_student_response() {
+    public function submit_student_response()
+    {
         $msg['success'] = $this->question_model->submit_student_response();
         $msg['cmd'] = "submit";
         $msg['msg'] = $this->input->post('answer');
@@ -123,16 +134,18 @@ class Questions extends CI_Controller
         echo json_encode($msg);
     }
 
-    public function get_num_students_answered() {
+    public function get_num_students_answered()
+    {
         $msg['num_students_answered'] = $this->question_model->get_num_students_answered();
         echo json_encode($msg);
     }
 
-    public function get_answered_question_instance() {
+    public function get_answered_question_instance()
+    {
         $question_instance_id = $this->uri->segment(3);
         $msg['data'] = $this->question_model->get_answered_question_instance($question_instance_id);
         $msg['dataset'] = array();
-        foreach($msg['data'] as $data) {
+        foreach ($msg['data'] as $data) {
             $data = str_replace('"', "'", $data['answer']);
             array_push($msg['dataset'], $data);
         }
