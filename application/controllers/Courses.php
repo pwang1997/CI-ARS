@@ -85,4 +85,10 @@ class Courses extends CI_Controller
     $this->load->view('templates/footer');
 
   }
+
+  public function export_student_stat() {
+    $result = $this->course_model->export_student_stat($this->input->post('quiz_id'));
+    $msg['result'] = $result;
+    echo json_encode($msg);
+  }
 }

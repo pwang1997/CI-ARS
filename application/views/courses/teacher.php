@@ -54,16 +54,16 @@
 						<tbody>
 							<?php $j = 1; ?>
 							<?php foreach ($enrolledStudents as $student) : ?>
-								<tr class="table-light">
+								<tr class="table-light" id="<?php echo "{$student['username']}"; ?>">
 									<th><?php echo $j++; ?></th>
 									<th scope="row"><?php echo $student['username']; ?></th>
 									<th>
 										<div class="row">
 											<div class="col-md-6 pb-1">
-												<button style="width:100%" type="button" class="btn btn-outline-danger btn_remove_student" id="<?php echo "btn_" . $student['username']; ?>">Remove</button>
+												<button style="width:100%" type="button" class="btn btn-outline-danger btn_remove_student" id="<?php echo "btn_{$student['username']}"; ?>">Remove</button>
 											</div>
 											<div class="col-md-6">
-												<button style="width:100%" type="button" class="btn btn-outline-primary btn_modify_student" id="<?php echo "btn_" . $student['username'] . "2"; ?>">Edit</button>
+												<button style="width:100%" type="button" class="btn btn-outline-primary btn_modify_student" id="<?php echo "btn_{$student['username']}_2"; ?>">Edit</button>
 											</div>
 										</div>
 									</th>

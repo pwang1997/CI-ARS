@@ -196,4 +196,18 @@ class Course_model extends CI_Model
     ))->join('quizs', 'quizs.classroom_id = enrolledStudents.classroom_id')
       ->get()->result_array();
   }
+
+  public function export_student_stat($quiz_id) {
+    $result_questions = $this->db->select('*')->from('questions')
+    ->where(array('quiz_id'=>$quiz_id))->join('questionInstance', 'questions.id = questionInstance.question_meta_id')
+    ->get()->result_array();
+    $result_student_response = [];
+    foreach($result_questions as $instance) {
+      $result_student_response[$instance['id']] = $this->db->select('*')->from('studentResponse')
+      ->where(array('question_instance_id'=>$instance['id']))->join('users', 'users.id = studentResponse.student_id')->get()->result_array();
+    }
+    $result['question'] = $result_questions;
+    $result['student'] =$result_student_response;
+    return $result;
+  }
 }
