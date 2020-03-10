@@ -66,7 +66,8 @@
                     ?>
                 </div>
                 <div class="tab-pane fade" id="list-grade" role="tabpanel" aria-labelledby="list-grade-list">
-
+                    <h3 class=" border-gray pb-2 mb-0">Grade list</h3>
+                    <hr>
                     <?php foreach ($questions as $question) : ?>
                         <?php $i = 1; ?>
                         <?php if (count($question) > 0) : ?>
@@ -79,8 +80,8 @@
                                                     <?php echo "Date: {$question[$i - 1]['time_created']}" ?>
                                                 </button>
                                                 <p class="offset-md-5 col-md-4 mb-0">
-                                                Score: 
-                                                <?php
+                                                    Score:
+                                                    <?php
                                                     $count = 0;
                                                     $total_question = count($question);
                                                     foreach ($question as $q) {
@@ -89,7 +90,7 @@
                                                         }
                                                     }
                                                     echo "{$count}/{$total_question}";
-                                                ?>
+                                                    ?>
                                                 </p>
                                             </h6>
                                         </div>
