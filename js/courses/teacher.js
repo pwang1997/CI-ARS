@@ -5,7 +5,7 @@ $(document).ready(() => {
         e.preventDefault();
         let sname = $("#username");
         $.ajax({
-            url: `${base_url}/courses/add_student_from_classroom`,
+            url: `${base_url}/add_student_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -40,7 +40,7 @@ $(document).ready(() => {
         let target = e.target.id;
         sname = target.split('_')[1];
         $.ajax({
-            url: `${base_url}/courses/remove_student_from_classroom`,
+            url: `${base_url}/remove_student_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
