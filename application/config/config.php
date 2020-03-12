@@ -23,7 +23,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://ubco-2020-ars-project.herokuapp.com/';
+$config['base_url'] = 'https://ubco-2020-ars-project.herokuapp.com/';
 // 'http://192.168.64.2/ars';
 
 /*
