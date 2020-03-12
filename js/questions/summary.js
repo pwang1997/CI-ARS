@@ -3,7 +3,7 @@ $(document).ready(() => {
     let question_index = arr_param[6];
 
     $.ajax({
-        url: `${base_url}/questions/get_question_for_student`,
+        url: `${base_url}/get_question_for_student`,
         type: "POST",
         dataType: "JSON",
         data: {
