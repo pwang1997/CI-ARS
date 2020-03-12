@@ -1,9 +1,8 @@
 <?php
 
 namespace EchoBot;
-// echo __DIR__;
-require_once '/app/server/vendor/autoload.php';
-require_once '/app/server/src/User.php';
+require dirname(__FILE__).'/../vendor/autoload.php';
+// require dirname(__DIR__) . '/src/User.php';
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
