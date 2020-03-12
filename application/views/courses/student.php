@@ -68,6 +68,7 @@
                 <div class="tab-pane fade" id="list-grade" role="tabpanel" aria-labelledby="list-grade-list">
                     <h3 class=" border-gray pb-2 mb-0">Grade list</h3>
                     <hr>
+
                     <?php foreach ($questions as $question) : ?>
                         <?php $i = 1; ?>
                         <?php if (count($question) > 0) : ?>
@@ -85,7 +86,7 @@
                                                     $count = 0;
                                                     $total_question = count($question);
                                                     foreach ($question as $q) {
-                                                        if ($student_responses[$q['id']][0]['answer'] === $q['answer']) {
+                                                        if (count($student_responses[$q['id']]) > 0 && $student_responses[$q['id']][0]['answer'] === $q['answer']) {
                                                             $count++;
                                                         }
                                                     }
@@ -109,11 +110,12 @@
                                                         </thead>
                                                         <tbody>
                                                             <?php foreach ($question as $q) : ?>
-                                                                <tr class=<?php if ($student_responses[$q['id']][0]['answer'] !== $q['answer']) echo "table-danger";
-                                                                            else echo "table-success"; ?>>
+                                                                <tr class=<?php if (count($student_responses[$q['id']]) == 0 || $student_responses[$q['id']][0]['answer'] !== $q['answer']) echo "table-danger";
+                                                                            elseif(count($student_responses[$q['id']]) > 0 && $student_responses[$q['id']][0]['answer'] === $q['answer'])  echo "table-success"; ?>>
                                                                     <th scope="row" id="<?= $q['id']; ?>"><?= $i++; ?></th>
                                                                     <td><?= $q['content']; ?></td>
-                                                                    <td><?= $student_responses[$q['id']][0]['answer']; ?></td>
+                                                                    <td><?php if(!empty($student_responses[$q['id']][0]['answer'])) echo  $student_responses[$q['id']][0]['answer'];
+                                                                    else echo "[]"; ?></td>
                                                                     <td><?= $q['answer']; ?></td>
                                                                     <td><?= $q['time_created']; ?></td>
                                                                 </tr>

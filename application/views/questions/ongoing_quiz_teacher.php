@@ -123,11 +123,24 @@
                             <?php foreach ($question_instance_list[$question['id']] as $question_instance) : ?>
                                 <div class="card">
                                     <div class="card-header" id="heading_<?= $question_instance['question_instance_id']; ?>">
-                                        <h2 class="mb-0">
-                                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapse_<?= $question_instance['question_instance_id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question_instance['question_instance_id']; ?>">
-                                                <h6><?= $question_instance['time_created']; ?></h6>
+                                        <h6 class="mb-0 row">
+                                            <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $question_instance['question_instance_id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question_instance['question_instance_id']; ?>">
+                                                <?= $question_instance['time_created']; ?>
                                             </button>
-                                        </h2>
+                                            <p class="offset-md-5 col-md-4 mb-0">Correct:
+                                                <?php
+                                                $correct_counter = 0;
+                                                $total = count($question_instance_list[$question['id']]);
+                                                $student_answer = explode(",", $question_instance['answer']);
+                                                $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
+                                                if (count(array_diff($answers, $student_answer)) === 0) {
+                                                    $correct_counter++;
+                                                }
+                                                echo "{$correct_counter}/{$total}</p>";
+                                                ?>
+                                        </h6>
+
+
                                     </div>
                                     <div id="collapse_<?= $question_instance['question_instance_id']; ?>" class="collapse" aria-labelledby="heading_<?= $question_instance['question_instance_id']; ?>" data-parent="#accordion_<?= $question_instance['question_instance_id']; ?>">
                                         <div class="card-body table-responsive">
@@ -142,10 +155,6 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php $i = 1; ?>
-                                                    <?php
-                                                    $student_answer = explode(",", $question_instance['answer']);
-                                                    $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
-                                                    ?>
                                                     <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
                                                                 else echo "bg-success"; ?>>
                                                         <th scope="row"><?php echo $i++; ?></td>
