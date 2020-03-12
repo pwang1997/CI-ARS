@@ -63,7 +63,7 @@ $(document).ready(() => {
     $('#add_quiz').click((e) => {
         e.preventDefault();
         $.ajax({
-            url: `${base_url}/courses/add_quiz_from_classroom`,
+            url: `${base_url}/add_quiz_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -72,7 +72,7 @@ $(document).ready(() => {
             success: function(response) {
                 if (response.success) {
                     quiz_index = response.quiz_index;
-                    location.replace(`${base_url}/questions/create/${quiz_index}`);
+                    location.replace(`${base_url}/../questions/create/${quiz_index}`);
                 } else {
                     alert("failed ")
                 }
@@ -89,7 +89,7 @@ $(document).ready(() => {
         let quiz_id = target.split('_')[1];
 
         $.ajax({
-            url: `${base_url}/courses/export_student_stat`,
+            url: `${base_url}/export_student_stat`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -159,11 +159,11 @@ $(document).ready(() => {
     $('button').click(function() {
         quiz_index = this.id.substring(3);
         if ($(this).hasClass('start')) {
-            head = `${base_url}/questions/ongoing_quiz_teacher/${quiz_index}`;
+            head = `${base_url}/../questions/ongoing_quiz_teacher/${quiz_index}`;
             location.replace(head);
         } else if ($(this).hasClass('remove')) {
             $.ajax({
-                url: `${base_url}/courses/remove_quiz_from_classroom`,
+                url: `${base_url}/remove_quiz_from_classroom`,
                 type: "POST",
                 dataType: "JSON",
                 data: {

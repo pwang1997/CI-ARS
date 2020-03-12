@@ -21,5 +21,6 @@ $(document).ready(() => {
     $(".close").click(function() {
         $('#overlay').hide();
     });
+    console.log('Debug: ' + get_url_params(window.location.href));
     //end of toast
 })
