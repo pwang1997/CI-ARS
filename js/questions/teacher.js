@@ -27,7 +27,7 @@ $(document).ready(() => {
 
     arr_param = get_url_params(window.location.href)
     $('#new_question').click((e) => {
-        location.replace(`${base_url}/questions/create/${arr_param[arr_param.length - 1]}`);
+        location.replace(`${base_url}/create/${arr_param[arr_param.length - 1]}`);
     })
 
     $("button").click(function() {
@@ -47,7 +47,7 @@ $(document).ready(() => {
             choices = choices.filter(Boolean);
 
             $.ajax({
-                url: `${base_url}/questions/update_question`,
+                url: `${base_url}/update_question`,
                 type: "POST",
                 dataType: "JSON",
                 data: {

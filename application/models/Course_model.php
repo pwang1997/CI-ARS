@@ -214,6 +214,7 @@ class Course_model extends CI_Model
   }
   public function get_questions_for_student($quizs)
   {
+    $result = array();
     foreach ($quizs as $quiz) {
       $result[$quiz['quiz_index']] = $this->db->select('questionInstance.id as id, quiz_id, answer, content, time_created')->from('questions')->where(array('quiz_id' => $quiz['quiz_index']))
         ->join('questionInstance', 'questionInstance.question_meta_id = questions.id')->get()->result_array();
@@ -223,6 +224,7 @@ class Course_model extends CI_Model
 
   public function get_student_response($questions)
   {
+    $result = array();
     foreach($questions as $question) {
       for($i = 0; $i < count($question); $i++) {
         $result[$question[$i]['id']] = $this->db->select('answer')->from('studentResponse')->where(array('question_instance_id'=>$question[$i]['id']))

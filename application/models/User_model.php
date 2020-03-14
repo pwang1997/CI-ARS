@@ -64,7 +64,7 @@ class User_model extends CI_Model
   }
 
   public function get_username($course_list) {
-    $result['username'] =[];
+    $result['username'] = array();
     foreach($course_list as $course) {
       $this->db->select('username');
       $result[$course['taught_by']] = $this->db->get_where('users', array('id'=>$course['taught_by']))->result_array();
@@ -73,6 +73,7 @@ class User_model extends CI_Model
   }
 
   public function get_section_list($course_list) {
+    $result = array();
     foreach($course_list as $course) {
       $result[] = $this->db->select('section_id')->from('classrooms')->where(array('course_id'=>$course['course_id']))->get()->result_array()[0];
     }
