@@ -44,10 +44,10 @@ class Course_model extends CI_Model
     return $this->db->get_where('classrooms', $where)->result_array()[0];
   }
 
-  public function get_enrolledStudents_for_teacher($classroom_id)
+  public function get_enrolled_students_for_teacher($classroom_id)
   {
-    $this->db->join('users', 'users.id = enrolledStudents.student_id');
-    return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id))->result_array();
+    $this->db->join('users', 'users.id = enrolled_students.student_id');
+    return $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id))->result_array();
   }
 
   public function get_quizs_for_teacher($classroom_id)
@@ -65,11 +65,11 @@ class Course_model extends CI_Model
   {
     $this->db->select('quizs.id as quiz_index, users.username as username');
     $this->db->from('users');
-    $this->db->join('enrolledStudents', 'users.id = enrolledStudents.student_id');
-    $this->db->join('classrooms', 'enrolledStudents.classroom_id = classrooms.id');
+    $this->db->join('', 'users.id = enrolled_students.student_id');
+    $this->db->join('classrooms', 'enrolled_students.classroom_id = classrooms.id');
     $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
     $this->db->group_by('quizs.id');
-    $this->db->where(array('enrolledStudents.classroom_id' => $classroom_id));
+    $this->db->where(array('enrolled_students.classroom_id' => $classroom_id));
     return $this->db->get()->result_array();
   }
 
@@ -84,14 +84,14 @@ class Course_model extends CI_Model
     $student_id = $this->check_username_exists($sname);
 
     //if the student is already enrolled, return false
-    $is_enrolled = $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->num_rows();
+    $is_enrolled = $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->num_rows();
 
     if ($student_id !== FALSE && $is_enrolled == FALSE) {
       $data = array(
         'classroom_id' => $classroom_id,
         'student_id' => $student_id
       );
-      $this->db->insert('enrolledStudents', $data);
+      $this->db->insert('enrolled_students', $data);
       return  $this->db->affected_rows() > 0;
     } else {
       return false;
@@ -107,7 +107,6 @@ class Course_model extends CI_Model
   public function remove_quiz_from_classroom()
   {
     $quiz_id = $this->input->post('quiz_id');
-    // return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
     return $this->db->delete('quizs', array('id' => $quiz_id));
   }
   public function get_number_of_questions_for_teacher($arr_quiz)
@@ -151,7 +150,7 @@ class Course_model extends CI_Model
     $username = $this->input->post('username');
     $student_id = $this->check_username_exists($username);
     $classroom_id = $this->input->post('classroom_id');
-    return $this->db->delete('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
+    return $this->db->delete('enrolled_students', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
   }
 
   /**
@@ -175,12 +174,12 @@ class Course_model extends CI_Model
   public function get_enrolledStudent($classroom_id, $student_username)
   {
     $student_id = $this->check_username_exists($student_username);
-    $query = $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
+    $query = $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id, 'student_id' => $student_id));
 
     if (empty($query->row_array())) {
       return false;
     } else {
-      return $this->db->get_where('enrolledStudents', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->result_array()[0];
+      return $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id, 'student_id' => $student_id))->result_array()[0];
     }
   }
 
@@ -191,17 +190,17 @@ class Course_model extends CI_Model
   public function get_quizs_for_user($classroom_id)
   {
     $user_id = $this->session->id;
-    return $this->db->select('*')->from('enrolledStudents')->where(array(
-      'enrolledStudents.student_id' => $user_id,
-      'enrolledStudents.classroom_id' => $classroom_id
-    ))->join('quizs', 'quizs.classroom_id = enrolledStudents.classroom_id')
+    return $this->db->select('*')->from('enrolled_students')->where(array(
+      'enrolled_students.student_id' => $user_id,
+      'enrolled_students.classroom_id' => $classroom_id
+    ))->join('quizs', 'quizs.classroom_id = enrolled_students.classroom_id')
       ->get()->result_array();
   }
 
   public function export_student_stat($quiz_id)
   {
     $result_questions = $this->db->select('*')->from('questions')
-      ->where(array('quiz_id' => $quiz_id))->join('questionInstance', 'questions.id = questionInstance.question_meta_id')
+      ->where(array('quiz_id' => $quiz_id))->join('question_instances', 'questions.id = question_instances.question_meta_id')
       ->get()->result_array();
     $result_student_response = [];
     foreach ($result_questions as $instance) {
@@ -215,18 +214,18 @@ class Course_model extends CI_Model
   public function get_questions_for_student($quizs)
   {
     foreach ($quizs as $quiz) {
-      $result[$quiz['quiz_index']] = $this->db->select('questionInstance.id as id, quiz_id, answer, content, time_created')->from('questions')->where(array('quiz_id' => $quiz['quiz_index']))
-        ->join('questionInstance', 'questionInstance.question_meta_id = questions.id')->get()->result_array();
+      $result[$quiz['quiz_index']] = $this->db->select('question_instances.id as id, quiz_id, answer, content, time_created')->from('questions')->where(array('quiz_id' => $quiz['quiz_index']))
+        ->join('question_instances', 'question_instances.question_meta_id = questions.id')->get()->result_array();
     }
     return $result;
   }
 
   public function get_student_response($questions)
   {
-    foreach($questions as $question) {
-      for($i = 0; $i < count($question); $i++) {
-        $result[$question[$i]['id']] = $this->db->select('answer')->from('studentResponse')->where(array('question_instance_id'=>$question[$i]['id']))
-        ->get()->result_array();
+    foreach ($questions as $question) {
+      for ($i = 0; $i < count($question); $i++) {
+        $result[$question[$i]['id']] = $this->db->select('answer')->from('studentResponse')->where(array('question_instance_id' => $question[$i]['id']))
+          ->get()->result_array();
       }
     }
     return $result;

@@ -53,7 +53,7 @@ class Question_model extends CI_Model
       'answer' => $this->input->post('answer')
     );
 
-    return $this->db->insert('studentResponse', $data);
+    return $this->db->insert('student_responses', $data);
   }
 
   public function get_question_base()
@@ -120,7 +120,7 @@ class Question_model extends CI_Model
   public function add_question_instance($question_index)
   {
     return array(
-      'success' => $this->db->insert('questionInstance', array('question_meta_id' => $question_index)),
+      'success' => $this->db->insert('question_instances', array('question_meta_id' => $question_index)),
       'question_instance_id' => $this->db->insert_id()
     );
   }
@@ -132,7 +132,7 @@ class Question_model extends CI_Model
       'student_id' => $this->input->post('student_id'),
       'answer' => $this->input->post('answer')
     );
-    return $this->db->insert('studentResponse', $data);
+    return $this->db->insert('student_responses', $data);
   }
 
   public function get_num_question($quiz_index)
@@ -154,17 +154,17 @@ class Question_model extends CI_Model
   public function get_num_students_answered()
   {
     $question_instance_id = $this->input->post('question_instance_id');
-    return $this->db->select('count(distinct student_id) as num')->from('studentResponse')->where(array('question_instance_id' => $question_instance_id))
+    return $this->db->select('count(distinct student_id) as num')->from('student_responses')->where(array('question_instance_id' => $question_instance_id))
       ->group_by('student_id')->get()->result_array()[0]['num'];
   }
 
   public function get_answered_question_instance($question_instance_id)
   {
     $subquery = "SELECT MAX(id)
-                FROM studentResponse
+                FROM student_responses
                 GROUP BY student_id";
 
-    return $this->db->select("answer")->from("studentResponse")->where(array('question_instance_id' => $question_instance_id))
+    return $this->db->select("answer")->from("student_responses")->where(array('question_instance_id' => $question_instance_id))
       ->where("id IN ($subquery)", null, FALSE)->get()->result_array();
   }
 
@@ -172,9 +172,9 @@ class Question_model extends CI_Model
   {
 
     foreach ($question_list as $question) {
-      $this->db->select("studentResponse.question_instance_id, questionInstance.time_created as time_created, studentResponse.student_id as student_id, studentResponse.answer as answer, studentResponse.time_answered as time_answered")->from("studentResponse");
-      $this->db->join('questionInstance', 'studentResponse.question_instance_id = questionInstance.id')->where(array('questionInstance.question_meta_id' => $question['id']));
-      $this->db->group_by('studentResponse.question_instance_id')->order_by('time_answered', 'DESC');
+      $this->db->select("student_responses.question_instance_id, question_instances.time_created as time_created, student_responses.student_id as student_id, student_responses.answer as answer, student_responses.time_answered as time_answered")->from("student_responses");
+      $this->db->join('question_instances', 'student_responses.question_instance_id = question_instances.id')->where(array('question_instances.question_meta_id' => $question['id']));
+      $this->db->group_by('student_responses.question_instance_id')->order_by('time_answered', 'DESC');
       $result = $this->db->get()->result_array();
       $row[$question['id']] = $result;
     }

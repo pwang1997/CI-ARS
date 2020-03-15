@@ -53,7 +53,7 @@
 						</thead>
 						<tbody>
 							<?php $j = 1; ?>
-							<?php foreach ($enrolledStudents as $student) : ?>
+							<?php foreach ($enrolled_students as $student) : ?>
 								<tr class="table-light" id="<?php echo "{$student['username']}"; ?>">
 									<th><?php echo $j++; ?></th>
 									<th scope="row"><?php echo $student['username']; ?></th>

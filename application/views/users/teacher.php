@@ -26,15 +26,15 @@
 
 </div>
 
-  <?php
-  function addMeida($course_name, $course_id, $classroom_id, $section)
-  {
-    echo  ' <div class="media text-muted pt-3">
+<?php
+function addMeida($course_name, $course_id, $classroom_id, $section)
+{
+  echo  ' <div class="media text-muted pt-3">
     <a href="../courses/teacher/' . $course_id . '/' . $classroom_id . '"><div class="square"></div></a>
     <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
       <a href="../courses/teacher/' . $course_id . '/' . $classroom_id . '"><strong class="d-block text-gray-dark">' . $course_name . '</strong>
       Section ' . $section . '</a>
     </p>
   </div>';
-  }
-  ?>
+}
+?>

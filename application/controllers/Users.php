@@ -17,7 +17,7 @@ class Users extends CI_Controller
     } else {
       //encrypt password
       $enc_password = md5($this->input->post('password'));
-      $this->user_model->register($enc_password, $this->input->post('role'));
+      $this->user->register($enc_password, $this->input->post('role'));
 
       //set message
       $this->session->set_flashdata('user_registered', 'You are now registered and can log in');
@@ -30,7 +30,7 @@ class Users extends CI_Controller
   {
     $this->form_validation->set_message('check_username_exists', 'The username is taken, please choose a different one');
 
-    if ($this->user_model->check_username_exists($username)) {
+    if ($this->user->check_username_exists($username)) {
       return true;
     } else {
       return false;
@@ -53,7 +53,7 @@ class Users extends CI_Controller
       $enc_password = md5($this->input->post('password'));
 
       //login user
-      $user_data = $this->user_model->login($username, $enc_password);
+      $user_data = $this->user->login($username, $enc_password);
       print_r($user_data);
       if ($user_data['id'] === false || empty($user_data)) {
         $this->session->set_flashdata('login_failed', 'The password or username is incorrect');
@@ -85,9 +85,9 @@ class Users extends CI_Controller
   {
     $data['title'] = 'Teacher\'s page';
 
-    $course_list = $this->user_model->get_courses_for_teachers($this->session->id);
+    $course_list = $this->user->get_courses_for_teachers($this->session->id);
     $data['course_list'] = $course_list;
-    $data['section_list'] = $this->user_model->get_section_list($course_list);
+    $data['section_list'] = $this->user->get_section_list($course_list);
     // print_r($data['course_list']);
 
     $this->load->view('templates/header');
@@ -99,20 +99,21 @@ class Users extends CI_Controller
   {
     $data['title'] = 'Student\'s page';
 
-    $course_list = $this->user_model->get_courses_for_students($this->session->id);
+    $course_list = $this->user->get_courses_for_students($this->session->id);
     $data['course_list'] = $course_list;
-    $data['teacher_list'] = $this->user_model->get_username($course_list);
+    $data['teacher_list'] = $this->user->get_username($course_list);
 
     $this->load->view('templates/header');
     $this->load->view('users/student', $data);
     $this->load->view('templates/footer');
   }
 
-  public function get_course_for_teacher() {
+  public function get_course_for_teacher()
+  {
     $course_id = $this->uri->segment(3);
     $classroom_id = $this->uri->segment(4);
 
-    $course_data = $this->user_model->get_course_data($course_id, $classroom_id);
+    $course_data = $this->user->get_course_data($course_id, $classroom_id);
     $data['course_data'] = $course_data;
     // print_r($data['course_list']);
 
@@ -121,7 +122,8 @@ class Users extends CI_Controller
     $this->load->view('templates/footer');
   }
 
-  public function get_session() {
+  public function get_session()
+  {
     $msg['id'] = $this->session->id;
     $msg['username'] = $this->session->username;
     $msg['role'] = $this->session->role;
