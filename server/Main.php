@@ -1,7 +1,7 @@
 <?php
 
 namespace EchoBot;
-require dirname(__FILE__).'/../vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload.php';
 // require dirname(__DIR__) . '/src/User.php';
 
 use Ratchet\MessageComponentInterface;
@@ -37,10 +37,12 @@ class EchoBot implements MessageComponentInterface
         $response_text = "";
 
         $decoded_msg = json_decode($msg);
-        // print_r($decoded_msg);
 
         //ENUM: [connect,start, pause, resume, close, submit]
         $cmd = $decoded_msg->cmd;
+        if($cmd == "connect") {
+            $this->onConnect($from, $decoded_msg);
+        }
         // if ($cmd == "connect") {
         //     $this->onConnect($from, $decoded_msg);
         // } else if ($cmd == "start") {
@@ -58,21 +60,21 @@ class EchoBot implements MessageComponentInterface
         // }
 
         // echo $cmd;
-        $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
-    "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
-"question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
+//         $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
+//     "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
+// "question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
 
-        $response_text = json_encode($response_text);
+//         $response_text = json_encode($response_text);
 
-        echo sprintf(
-            'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
-            $from->resourceId,
-            $response_text,
-            $numRecv,
-            $numRecv == 1 ? '' : 's'
-        );
+//         echo sprintf(
+//             'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
+//             $from->resourceId,
+//             $response_text,
+//             $numRecv,
+//             $numRecv == 1 ? '' : 's'
+//         );
 
-        $this->broadcast($from, $response_text);
+//         $this->broadcast($from, $response_text);
     }
 
     /**
@@ -85,7 +87,6 @@ class EchoBot implements MessageComponentInterface
         $role = $msg->role;
         $resource_id = $from->resourceId;
         //initialize chambers[teacher's resource id]
-        echo"1";
         if (strcmp($role, "teacher") == 0 && empty($this->clients[$resource_id])) {
             $this->clients[$resource_id] = array();
             $this->clients[$resource_id]['teacher']->attach($from);

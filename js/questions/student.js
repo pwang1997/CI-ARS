@@ -3,8 +3,8 @@ $(document).ready(() => {
         user = JSON.parse(user);
         action = null;
 
-        var websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
-        var action, timer_type;
+        let websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
+        let action, timer_type;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
@@ -20,7 +20,7 @@ $(document).ready(() => {
                 websocket.send(JSON.stringify(msg));
             }
             websocket.onmessage = function(event) {
-                var msg = JSON.parse(event.data);
+                let msg = JSON.parse(event.data);
 
                 cmd = msg.cmd;
                 message = msg.message;
@@ -72,7 +72,7 @@ $(document).ready(() => {
                                 $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
                                     // update question choices
                                     // arr_choices = response.result.choices.split(",");
-                                var arr = JSON.parse("[" + response.result.choices + "]")[0];
+                                let arr = JSON.parse("[" + response.result.choices + "]")[0];
                                 for (i = 0; i < arr.length; i++) {
                                     newContent = `<div class="form-group row choice_row">
                                                     <div class="col-sm-6">
@@ -153,7 +153,7 @@ $(document).ready(() => {
                         arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
                     }
 
-                    var student_answers = [];
+                    let student_answers = [];
                     i = 0;
                     $(`button[name=choice]`).each(function() {
                         content = $(this).html();

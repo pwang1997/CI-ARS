@@ -2,7 +2,7 @@
 async function get_session() {
     try {
         result = await $.ajax({
-            url: `${base_url}/users/get_session`,
+            url: `${getUrl.protocol}//${getUrl.host}/${getUrl.pathname.split('/')[1]}/users/get_session`,
             type: "POST",
             done: (response) => {
                 return response;

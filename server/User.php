@@ -15,7 +15,12 @@ class User
     }
 
     public function __destruct()
-    {}
+    {
+        $this->resource_id = null;
+        $this->user_error = null;
+        $this->username = null;
+        $this->role = null;
+    }
 
     
     public function importUserInfo($user_id, $username, $role)

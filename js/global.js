@@ -1,6 +1,6 @@
 //global variable 
 var getUrl = window.location;
-const base_url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+const base_url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/" + getUrl.pathname.split('/')[2];
 const wsurl = 'ws://127.0.0.1:8080/server/server.php';
 
 function get_url_params(url) {
@@ -21,6 +21,5 @@ $(document).ready(() => {
     $(".close").click(function() {
         $('#overlay').hide();
     });
-    console.log('Debug: ' + get_url_params(window.location.href));
     //end of toast
 })
