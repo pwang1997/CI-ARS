@@ -65,7 +65,7 @@ class Course_model extends CI_Model
   {
     $this->db->select('quizs.id as quiz_index, users.username as username');
     $this->db->from('users');
-    $this->db->join('', 'users.id = enrolled_students.student_id');
+    $this->db->join('enrolled_students', 'users.id = enrolled_students.student_id');
     $this->db->join('classrooms', 'enrolled_students.classroom_id = classrooms.id');
     $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
     $this->db->group_by('quizs.id');
@@ -223,6 +223,7 @@ class Course_model extends CI_Model
 
   public function get_student_response($questions)
   {
+    $result = [];
     foreach ($questions as $question) {
       for ($i = 0; $i < count($question); $i++) {
         $result[$question[$i]['id']] = $this->db->select('answer')->from('student_responses')->where(array('question_instance_id' => $question[$i]['id']))
