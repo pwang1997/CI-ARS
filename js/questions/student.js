@@ -8,7 +8,7 @@ $(document).ready(() => {
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
-            websocket.onopen = function (evevt) {
+            websocket.onopen = function(evevt) {
                 console.log("Connected to WebSocket server.");
                 msg = {
                     'cmd': "connect",
@@ -19,7 +19,7 @@ $(document).ready(() => {
 
                 websocket.send(JSON.stringify(msg));
             }
-            websocket.onmessage = function (event) {
+            websocket.onmessage = function(event) {
                 var msg = JSON.parse(event.data);
 
                 cmd = msg.cmd;
@@ -40,17 +40,17 @@ $(document).ready(() => {
                     $('.question_off').addClass("invisible").removeClass("visible");
 
                     $.ajax({
-                        url: `${base_url}/questions/get_question_for_student`,
+                        url: `${base_url}/get_question_for_student`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
                             'question_index': question_index,
                         },
-                        success: function (response) {
+                        success: function(response) {
                             if (response.result != null) {
                                 console.log(response);
                                 $('#content').html(response.result.content)
-                                // $('#editor').html(response.result.content)
+                                    // $('#editor').html(response.result.content)
                                 timer_type = response.result.timer_type;
                                 choices = response.result.choices;
                                 duration = response.result.duration;
@@ -70,8 +70,8 @@ $(document).ready(() => {
 
                                 $('#status').html(`Status: Running`);
                                 $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
-                                // update question choices
-                                // arr_choices = response.result.choices.split(",");
+                                    // update question choices
+                                    // arr_choices = response.result.choices.split(",");
                                 var arr = JSON.parse("[" + response.result.choices + "]")[0];
                                 for (i = 0; i < arr.length; i++) {
                                     newContent = `<div class="form-group row choice_row">
@@ -86,7 +86,7 @@ $(document).ready(() => {
                                 alert("failed to insert question1");
                             }
                         },
-                        fail: function () {
+                        fail: function() {
                             alert("failed to insert question2");
                         }
                     })
@@ -155,7 +155,7 @@ $(document).ready(() => {
 
                     var student_answers = [];
                     i = 0;
-                    $(`button[name=choice]`).each(function () {
+                    $(`button[name=choice]`).each(function() {
                         content = $(this).html();
                         // console.log(arr_answers.includes(content))
                         if ($(this).hasClass('active')) { //add trace for student's answer
@@ -163,7 +163,7 @@ $(document).ready(() => {
                         }
                         if ($(this).hasClass('active') && !arr_answers.includes(content)) {
                             $(this).addClass('bg-danger');
-                            $(this).addClass('teacher_answers')// teacher's answer
+                            $(this).addClass('teacher_answers') // teacher's answer
                         } else if (arr_answers.includes(content)) {
                             $(this).addClass('bg-success');
                             $(this).addClass('teacher_answers')
@@ -174,7 +174,7 @@ $(document).ready(() => {
                     $('#status').html(`Status: Running`);
                     $('.submit').prop('disabled', false);
                     $('button[name=choice]').prop('disabled', false);
-                    $(`button[name=choice]`).each(function () {
+                    $(`button[name=choice]`).each(function() {
                         $(this).removeClass('bg-success').removeClass('bg-danger') //negate display_answer
                     });
                 } else if (cmd == "update_remaining_time" && remaining_time != null) {
@@ -188,11 +188,11 @@ $(document).ready(() => {
                 }
             }
 
-            websocket.onerror = function (event) {
+            websocket.onerror = function(event) {
                 console.log("Connected to WebSocket server error");
             }
 
-            websocket.onclose = function (event) {
+            websocket.onclose = function(event) {
                 console.log('websocket Connection Closed. ');
                 $('.question_on').removeClass("visible").addClass("invisible");
                 $('.question_off').addClass("visible").removeClass("invisible");
@@ -202,7 +202,7 @@ $(document).ready(() => {
             }
         }
 
-        $('.submit').click(function (e) {
+        $('.submit').click(function(e) {
             e.preventDefault();
             console.log(question_instance_id);
             sendAnswers(question_instance_id);
@@ -211,7 +211,7 @@ $(document).ready(() => {
         function sendAnswers(question_instance_id) {
             answers = [];
             //get all values of choices
-            $('button[name=choice]').each(function () {
+            $('button[name=choice]').each(function() {
                 if ($(this).hasClass('active')) {
                     answers.push($(this)[0].innerHTML);
                 }
@@ -219,7 +219,7 @@ $(document).ready(() => {
             answers = answers.filter(Boolean);
             // console.log(answers)
             $.ajax({
-                url: `${base_url}/questions/submit_student_response`,
+                url: `${base_url}/submit_student_response`,
                 type: "POST",
                 dataType: "JSON",
                 data: {
@@ -227,7 +227,7 @@ $(document).ready(() => {
                     'answer': JSON.stringify(answers),
                     'question_instance_id': question_instance_id
                 },
-                success: function (response) {
+                success: function(response) {
                     if (response.success) {
                         console.log(response);
                         msg = {
@@ -245,7 +245,7 @@ $(document).ready(() => {
                         alert("Error: 1");
                     }
                 },
-                fail: function () {
+                fail: function() {
                     alert("Error: 2");
                 }
             })
@@ -253,9 +253,9 @@ $(document).ready(() => {
 
         //toggle choice buttons with 'active'
         function toggleActive() {
-            $('button[name=choice]').each(function () {
+            $('button[name=choice]').each(function() {
                 btn_id = $(this)[0].id;
-                $(`#${btn_id}`).on('click', function () {
+                $(`#${btn_id}`).on('click', function() {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active')
                         $(this).removeClass('btn-primary').addClass('btn-outline-secondary');
@@ -268,7 +268,7 @@ $(document).ready(() => {
         }
 
         function animate_time_down(max_progress, $element) {
-            setTimeout(function () {
+            setTimeout(function() {
                 if (action == "start" || action == "resume") {
                     init_progress -= 1;
                     if (init_progress >= 0) {
@@ -306,7 +306,7 @@ $(document).ready(() => {
         };
 
         function animate_time_up(max_progress, $element) {
-            setTimeout(function () {
+            setTimeout(function() {
                 if (action == "start" || action == "resume") {
                     init_progress++;
                     if (init_progress <= max_progress) {

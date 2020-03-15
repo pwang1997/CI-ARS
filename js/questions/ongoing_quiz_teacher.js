@@ -50,7 +50,7 @@ $(document).ready(() => {
                     $('#num_online_students').html(num_clients - 1);
                 } else if (type == "submit") { //update number of students answered the question
                     $.ajax({
-                        url: `${base_url}/questions/get_num_students_answered`,
+                        url: `${base_url}/get_num_students_answered`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
@@ -86,7 +86,7 @@ $(document).ready(() => {
             $('.exit').click(function () {
                 close_connection();
                 alert('Quiz Closed');
-                window.location.replace(`${base_url}/users/teacher`);
+                window.location.replace(`${base_url}/../users/teacher`);
             });
 
             $(`.btn-summary`).click(function () {

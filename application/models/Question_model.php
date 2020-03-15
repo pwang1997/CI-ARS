@@ -145,6 +145,7 @@ class Question_model extends CI_Model
     $result = $this->db->select('category')->from('questions')->where(array('quiz_id' => $quiz_index))
       ->group_by('category')->get()->result_array();
 
+    $row = array();
     foreach ($result as $key => $val) {
       $row[$key] = $val['category'];
     }
@@ -171,6 +172,7 @@ class Question_model extends CI_Model
   public function get_question_instance_list($question_list)
   {
 
+    $row = array();
     foreach ($question_list as $question) {
       $this->db->select("student_responses.question_instance_id, question_instances.time_created as time_created, student_responses.student_id as student_id, student_responses.answer as answer, student_responses.time_answered as time_answered")->from("student_responses");
       $this->db->join('question_instances', 'student_responses.question_instance_id = question_instances.id')->where(array('question_instances.question_meta_id' => $question['id']));
