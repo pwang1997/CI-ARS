@@ -15,7 +15,7 @@ $(document).ready(() => {
         window.scrollTo(0, 0);
     });
 
-    var action = "",
+    let action = "",
         timer_type = "",
         default_duration = "";
     get_session().then((user) => {
@@ -37,12 +37,12 @@ $(document).ready(() => {
             }
             //receive message
             websocket.onmessage = function (event) {
-                var msg = JSON.parse(event.data);
+                let msg = JSON.parse(event.data);
 
-                var type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
-                var uname = msg.username;
-                var role = msg.role;
-                var num_clients = msg.num_online_students;
+                let type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
+                let uname = msg.username;
+                let role = msg.role;
+                let num_clients = msg.num_online_students;
 
                 // console.log(`${type} : ${uname} `)
                 console.log(msg);
@@ -92,7 +92,7 @@ $(document).ready(() => {
             $(`.btn-summary`).click(function () {
                 question_id = (this.id).split("_")[1];
                 console.log(question_id);
-                var popup = window.open(`${base_url}/questions/summary/${question_id}/${question_instance_id}`);
+                let popup = window.open(`${base_url}/questions/summary/${question_id}/${question_instance_id}`);
                 popup.blur();
                 window.focus();
             });
@@ -102,7 +102,7 @@ $(document).ready(() => {
                 content_display_answer = $(`#display_answer_${question_id}`).html();
                 //display answer
                 if (content_display_answer == "Display Answer") {
-                    var answers = [];
+                    let answers = [];
                     $.each($(`input[name=choice_row_${question_id}]:checked`), function () {
                         answers.push($(this).val());
                     });
@@ -126,55 +126,59 @@ $(document).ready(() => {
             });
 
             $(".start").click(function () {
-                if (!$(this).hasClass('disabled')) {
-                    question_id = (this.id).split("_")[1];
-                    $(`#list- question_${question_id}`).removeClass('bg-success').addClass('bg-primary');
-                    try {
-                        $.ajax({
-                            url: `${base_url}/questions/add_question_instance`,
-                            type: "POST",
-                            dataType: "JSON",
-                            data: {
-                                'question_meta_id': question_id,
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    console.log(response);
-                                    var msg = {
-                                        "cmd": "start",
-                                        "username": user.username,
-                                        "role": user.role,
-                                        "question_id": question_id,
-                                        "question_instance_id": response.question_instance_id,
-                                        "targeted_time": $(`#progress_bar_${question_id}`).attr('aria-valuemax'),
-                                    }
+                if (websocket.readState == WebSocket.OPEN) {
+                    if (!$(this).hasClass('disabled')) {
+                        question_id = (this.id).split("_")[1];
+                        $(`#list- question_${question_id}`).removeClass('bg-success').addClass('bg-primary');
+                        try {
+                            $.ajax({
+                                url: `${base_url}/questions/add_question_instance`,
+                                type: "POST",
+                                dataType: "JSON",
+                                data: {
+                                    'question_meta_id': question_id,
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        console.log(response);
+                                        let msg = {
+                                            "cmd": "start",
+                                            "username": user.username,
+                                            "role": user.role,
+                                            "question_id": question_id,
+                                            "question_instance_id": response.question_instance_id,
+                                            "targeted_time": $(`#progress_bar_${question_id}`).attr('aria-valuemax'),
+                                        }
 
-                                    time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
-                                    default_duration = time_remain;
-                                    timer_type = $(`#timerType_${question_id} > span`).html()
-                                    action = "start";
-                                    window.open(`${base_url}/questions/summary/${question_id}/${response.question_instance_id}`)
-                                    websocket.send(JSON.stringify(msg));
-                                    if (timer_type == "timedown") {
-                                        init_progress = default_duration;
-                                        animate_time_down(default_duration, $(`#progress_bar_${question_id}`), websocket)
-                                    } else if (timer_type == "timeup") {
-                                        init_progress = 0;
-                                        animate_time_up(default_duration, $(`#progress_bar_${question_id}`), websocket)
+                                        time_remain = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
+                                        default_duration = time_remain;
+                                        timer_type = $(`#timerType_${question_id} > span`).html()
+                                        action = "start";
+                                        window.open(`${base_url}/questions/summary/${question_id}/${response.question_instance_id}`)
+                                        websocket.send(JSON.stringify(msg));
+                                        if (timer_type == "timedown") {
+                                            init_progress = default_duration;
+                                            animate_time_down(default_duration, $(`#progress_bar_${question_id}`), websocket)
+                                        } else if (timer_type == "timeup") {
+                                            init_progress = 0;
+                                            animate_time_up(default_duration, $(`#progress_bar_${question_id}`), websocket)
+                                        }
+                                    } else {
+                                        alert("failed to insert question1");
                                     }
-                                } else {
-                                    alert("failed to insert question1");
+                                },
+                                fail: function () {
+                                    alert("failed to insert question2");
                                 }
-                            },
-                            fail: function () {
-                                alert("failed to insert question2");
-                            }
-                        })
-                    } catch (ex) {
-                        console.log(ex);
+                            })
+                        } catch (ex) {
+                            console.log(ex);
+                        }
                     }
+                    $(this).addClass('disabled');
+                } else {
+                    alert('Cannot connect to the server');
                 }
-                $(this).addClass('disabled');
             });
 
             $(".pause_answerable").click(function () {
@@ -195,7 +199,7 @@ $(document).ready(() => {
 
             $('.pause').click(function () {
                 question_id = (this.id).split("_")[1];
-                var current_state = $(this).html();
+                let current_state = $(this).html();
 
                 if (current_state == "Pause") {
                     // action = "pause";
@@ -213,7 +217,7 @@ $(document).ready(() => {
             $('.btn-close').click(function () {
                 question_id = (this.id).split("_")[1];
                 $(`#list-question_${question_id}`).removeClass('bg-primary').addClass('bg-success');
-                var msg = {
+                let msg = {
                     "cmd": "close",
                     "username": user.username,
                     "role": user.role,
@@ -245,7 +249,7 @@ $(document).ready(() => {
             });
 
             function sendPauseMessage(question_id, action, status, timer_type, websocket) {
-                var msg = {
+                let msg = {
                     "cmd": action,
                     "username": user.username,
                     "role": user.role,
