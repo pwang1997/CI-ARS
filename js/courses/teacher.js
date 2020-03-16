@@ -1,3 +1,5 @@
+"use strict";
+
 $(document).ready(() => {
     let classroom_id = $("#classroom_id");
 
@@ -157,9 +159,9 @@ $(document).ready(() => {
     });
     //jump to question(ongoing) view
     $('button').click(function() {
-        quiz_index = this.id.substring(3);
+        let quiz_index = this.id.substring(3);
         if ($(this).hasClass('start')) {
-            head = `${base_url}/../questions/ongoing_quiz_teacher/${quiz_index}`;
+            let head = `${base_url}/../questions/ongoing_quiz_teacher/${quiz_index}`;
             location.replace(head);
         } else if ($(this).hasClass('remove')) {
             $.ajax({

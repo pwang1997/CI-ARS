@@ -1,3 +1,5 @@
+"use strict";
+
 $(document).ready(() => {
     ids = $("[id^=question_]");
     arr_ids = [];

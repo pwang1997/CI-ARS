@@ -1,3 +1,5 @@
+"use strict";
+
 $(document).ready(() => {
     var quill = new Quill('#editor', {
         modules: {

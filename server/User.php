@@ -34,4 +34,8 @@ class User
     {
         return array(['resource_id'=>$this->resource_id, 'user_id' => $this->user_id, 'username' => $this->username, 'role' => $this->role]);
     }
+
+    public function get_resource_id() {
+        return $this->resource_id;
+    }
 }

@@ -182,4 +182,18 @@ class Question_model extends CI_Model
     }
     return $row;
   }
+
+  public function get_all_students($quiz_index) {
+    $row = [];
+
+    $results = $this->db->select('users.id')->from('users')
+    ->join('enrolled_students', 'enrolled_students.student_id=users.id')
+    ->join('quizs','quizs.classroom_id=enrolled_students.classroom_id')
+    ->where(array('quizs.id'=>$quiz_index))->get()->result_array();
+
+    foreach($results as $result ) {
+      $row[$result['id']] = $result['id'];
+    }
+    return $row;
+  }
 }

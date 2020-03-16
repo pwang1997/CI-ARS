@@ -1,81 +1,92 @@
+"use strict";
+
 $(document).ready(() => {
-    var action = "",
-        timer_type = "",
-        default_duration = "";
     get_session().then((user) => {
         user = JSON.parse(user);
-        action = null;
-
+        let current_site = getUrl.pathname.split('/');
+        current_site = `${current_site[current_site.length - 3]}/${current_site[current_site.length - 2]}`;
+        console.log(current_site);
+        let websocket, cmd, message,
+            client_name, question_index,
+            role, question_instance_id, init_progress = null;
+        let action, timer_type;
+        let msg = null, duration = null;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
-            // sessionStorage.setItem("ws_instance", websocket);
 
-            websocket.onopen = function(evevt) {
+            websocket.onopen = () => {
                 console.log("Connected to WebSocket server.");
                 msg = {
                     'cmd': "connect",
                     'from_id': user.id,
                     'username': user.username,
-                    'role': user.role
+                    'role': user.role,
+                    'current_site': current_site
                 };
+
                 websocket.send(JSON.stringify(msg));
             }
+            websocket.onmessage = function (event) {
+                msg = JSON.parse(event.data);
+                console.log(msg);
 
-            websocket.onmessage = function(event) {
-                var msg = JSON.parse(event.data);
                 cmd = msg.cmd;
                 message = msg.message;
                 client_name = msg.client_name;
-                question_status = msg.question_status; //open, pause_answerable, pause_disable and close
                 question_index = msg.question_id;
                 role = msg.role;
-                question_instance_id = msg.question_instance_id;
-                resource_id = msg.resource_id;
+                let remaining_time = msg.remaining_time;
 
-                console.log(msg);
-                //question starts
-                if (cmd == "start") {
-                    action = cmd;
+                if (msg.question_instance_id != null) {
+                    question_instance_id = msg.question_instance_id;
+                }
+                let targeted_time = msg.targeted_time;
+
+                if (cmd == "notification") {
+                    location.replace(`${base_url}/../questions/student/${msg.quiz_id}`);
+                } else if (cmd == "start") {
                     $('.question_on').removeClass("invisible").addClass("visible");
                     $('.question_off').addClass("invisible").removeClass("visible");
 
                     $.ajax({
-                        url: `${base_url}/questions/get_question_for_student`,
+                        url: `${base_url}/get_question_for_student`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
                             'question_index': question_index,
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.result != null) {
                                 console.log(response);
-                                $('#content').val(response.result.content)
-                                $('#editor').html(response.result.content)
+                                $('#content').html(response.result.content)
+                                // $('#editor').html(response.result.content)
                                 timer_type = response.result.timer_type;
-                                choices = response.result.choices;
                                 duration = response.result.duration;
-                                default_duration = duration;
                                 // console.log(timer_type)
                                 action = "start";
                                 if (timer_type == "timedown") {
                                     $(`#duration`).html(`Remaining Time: ${duration} seconds`);
                                     $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:100%" aria-valuenow="${duration}" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
-                                    animate_time_down(duration, duration, $(`#progress_bar`), id, user.username, user.role)
+                                    init_progress = duration;
+                                    animate_time_down(duration, $(`#progress_bar`))
                                 } else if (timer_type == "timeup") {
                                     $(`#duration`).html(`Time: 0 seconds`);
                                     $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
-                                    animate_time_up(0, duration, $(`#progress_bar`), user.id, user.username, user.role)
+                                    init_progress = 0;
+                                    animate_time_up(duration, $(`#progress_bar`))
                                 }
+
+                                $('#status').html(`Status: Running`);
+                                $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
                                 // update question choices
                                 // arr_choices = response.result.choices.split(",");
-                                var arr = JSON.parse("[" + response.result.choices + "]")[0];
-                                for (i = 0; i < arr.length; i++) {
-                                    newContent = `<div class="form-group row choice_row">
-                                                        <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i + 1}</label>
-                                                        <div class="col-sm-6">
-                                                            <button type="button" class="btn btn-outline-primary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
-                                                        </div>
-                                                    </div>`;
+                                let arr = JSON.parse("[" + response.result.choices + "]")[0];
+                                for (let i = 0; i < arr.length; i++) {
+                                    let newContent = `<div class="form-group row choice_row">
+                                                    <div class="col-sm-6">
+                                                        <button type="button" class="btn btn-outline-secondary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
+                                                    </div>
+                                                </div>`;
                                     $('.options').append(newContent);
                                 }
                                 toggleActive();
@@ -83,91 +94,193 @@ $(document).ready(() => {
                                 alert("failed to insert question1");
                             }
                         },
-                        fail: function() {
+                        fail: function () {
                             alert("failed to insert question2");
                         }
                     })
-                } else if (cmd == "timeout") { // question time out
+                } else if (cmd == "timeout") {
+                    //disable the interface
                     console.log('timeout')
-                    $('.submit').addClass('disabled');
-                    $('button[name=choice]').addClass('disabled');
-                } else if (cmd == "close") { //remove question contents
+                    $('#status').html(`Status: Timeout`);
+                    $('.submit').prop('disabled', true);
+                    $('button[name=choice]').prop('disabled', true);
+
+                } else if (cmd == "close" || cmd == "closing_connection") { //remove question contents
+                    $('.question_on').removeClass("visible").addClass("invisible");
+                    $('.question_off').addClass("visible").removeClass("invisible");
+                    $('.options').empty(); //remove options
+                    $('.progress').empty(); //remove timer progress bar
+                    $('#duration').empty(); //remove timer progress bar
+                    $('#status').empty(); //remove timer progress bar
+                    $('#targeted_time').empty(); //remove timer progress bar
+                    $('.choice_row').parent().empty(); //remove choices
+                    $('.submit').prop('disabled', false);
+
+                    action = "close";
+                    if (cmd == "close") {
+                        $(`#quiz_status`).html("Please prepare for quiz");
+                    } else {
+                        $(`#quiz_status`).html("Quiz is not available at the moment");
+                    }
+                } else if (cmd == "pause") {
+                    action = "pause";
+                    init_progress = remaining_time;
+                    console.log(`remaining time: ${remaining_time}`)
+                    if (timer_type == "timeup") {
+                        $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+                        animate_time_up(duration, $(`#progress_bar`))
+                    } else if (timer_type == "timedown") {
+                        $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        animate_time_down(duration, $(`#progress_bar`))
+                    }
+                    if (msg.question_status == "pause_answerable") {
+                        // do nothing
+                        $('#status').html(`Status: Pause(Answerable)`);
+                    } else if (msg.question_status == "pause_disable") {
+                        $('#status').html(`Status: Pause(Disabled)`);
+                        $('.submit').prop('disabled', true);
+                        $('button[name=choice]').prop('disabled', true);
+                    }
+                } else if (cmd == "resume") {
+                    action = "resume";
+                    $('#status').html(`Status: Running`);
+                    $('.submit').prop('disabled', false);
+                    $('button[name=choice]').prop('disabled', false);
+                    init_progress = remaining_time;
+                    if (timer_type == "timeup") {
+                        $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+                        animate_time_up(duration, $(`#progress_bar`))
+                    } else if (timer_type == "timedown") {
+                        $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        animate_time_down(duration, $(`#progress_bar`))
+                    }
+
+                } else if (cmd == "display_answer") {
+                    $('#status').html(`Status: Displaying Answer`);
+                    $('.submit').prop('disabled', true);
+                    $('button[name=choice]').prop('disabled', true);
+                    let answers = msg.answers;
+                    let arr_answers = answers.split(",");
+                    for (let i = 0; i < arr_answers.length; i++) {
+                        arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
+                    }
+
+                    let student_answers = [];
+                    $(`button[name=choice]`).each(function () {
+                        content = $(this).html();
+                        // console.log(arr_answers.includes(content))
+                        if ($(this).hasClass('active')) { //add trace for student's answer
+                            $(this).addClass('student_answers');
+                        }
+                        if ($(this).hasClass('active') && !arr_answers.includes(content)) {
+                            $(this).addClass('bg-danger');
+                            $(this).addClass('teacher_answers') // teacher's answer
+                        } else if (arr_answers.includes(content)) {
+                            $(this).addClass('bg-success');
+                            $(this).addClass('teacher_answers')
+                        }
+                    });
+                    console.log(student_answers)
+                } else if (cmd == "hide_answer") {
+                    $('#status').html(`Status: Running`);
+                    $('.submit').prop('disabled', false);
+                    $('button[name=choice]').prop('disabled', false);
+                    $(`button[name=choice]`).each(function () {
+                        $(this).removeClass('bg-success').removeClass('bg-danger') //negate display_answer
+                    });
+                } else if (cmd == "update_remaining_time") {
+                    init_progress = remaining_time;
+                    if (timer_type == "timeup") {
+                        $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+                    } else if (timer_type == "timedown") {
+                        $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                    }
+                }
+            }
+
+            websocket.onerror = function (event) {
+                console.log("Connected to WebSocket server error");
+            }
+
+
+            let close_connection = function () {
+                let msg = {
+                    cmd: "closing_connection",
+                    from_id :user.id,
+                    role: user.role,
+                    quiz_id: quiz_id
+                }
+                websocket.send(JSON.stringify(msg));
+
+                websocket.onclose = function (event) {
+                    console.log('websocket Connection Closed. ');
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
                     $('.options').empty(); //remove options
                     $('.progress').empty(); //remove timer progress bar
                     $('.choice_row').parent().empty(); //remove choices
-                } else if (cmd == "pause") { //question pauses
+                }; // disable onclose handler first
+            };
 
-                } else if (cmd == "resume") { //question resumes
-
-                } else {
-                    action = cmd;
-                }
+            window.onbeforeunload = function () {
+                close_connection();
             }
-
-            websocket.onerror = function(event) {
-                console.log("Connected to WebSocket server error");
-            }
-
-            websocket.onclose = function(event) {
-                console.log('websocket Connection Closed. ');
-            }
-
-            function sendAnswers() {
-                answers = [];
-                //get all values of choices
-                $('button[name=choice]').each(function() {
-                    if ($(this).hasClass('active')) {
-                        answers.push($(this)[0].innerHTML);
-                    }
-                });
-                answers = answers.filter(Boolean);
-                console.log(answers)
-                $.ajax({
-                    url: `${base_url}/questions/submit_student_response`,
-                    type: "POST",
-                    dataType: "JSON",
-                    data: {
-                        'student_id': user.id,
-                        'answer': JSON.stringify(answers),
-                        'question_instance_id': question_instance_id
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            console.log(response);
-                            msg = {
-                                "cmd": response.cmd,
-                                "answers": response.msg,
-                                "username": user.username,
-                                "role": user.role,
-                                "question_id": null,
-                                "question_instance_id": response.question_instance_id
-                            }
-                            console.log(msg)
-                            websocket.send(JSON.stringify(msg));
-                        } else {
-                            alert("failed to insert question1");
-                        }
-                    },
-                    fail: function() {
-                        alert("failed to insert question2");
-                    }
-                })
-            }
-
-            $('.submit').click(function(e) {
-                e.preventDefault();
-                sendAnswers();
-            });
-        } else {
-            alert('this browser does not support websocket, please use Google Chrome or FireFox');
         }
 
+        $('.submit').click(function (e) {
+            e.preventDefault();
+            console.log(question_instance_id);
+            sendAnswers(question_instance_id);
+        });
+
+        function sendAnswers(question_instance_id) {
+            let answers = [];
+            //get all values of choices
+            $('button[name=choice]').each(function () {
+                if ($(this).hasClass('active')) {
+                    answers.push($(this)[0].innerHTML);
+                }
+            });
+            answers = answers.filter(Boolean);
+            // console.log(answers)
+            $.ajax({
+                url: `${base_url}/submit_student_response`,
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    'student_id': user.id,
+                    'answer': JSON.stringify(answers),
+                    'question_instance_id': question_instance_id
+                },
+                success: function (response) {
+                    if (response.success) {
+                        console.log(response);
+                        let msg = {
+                            "cmd": response.cmd,
+                            "answers": response.msg,
+                            "username": user.username,
+                            "role": user.role,
+                            "question_id": null,
+                            "question_instance_id": question_instance_id
+                        }
+                        console.log(msg)
+                        websocket.send(JSON.stringify(msg));
+                        alert('success')
+                    } else {
+                        alert("Error: 1");
+                    }
+                },
+                fail: function () {
+                    alert("Error: 2");
+                }
+            })
+        }
+
+        //toggle choice buttons with 'active'
         function toggleActive() {
-            $('button[name=choice]').each(function() {
-                btn_id = $(this)[0].id;
-                $(`#${btn_id}`).on('click', function() {
+            $('button[name=choice]').each(function () {
+                let btn_id = $(this)[0].id;
+                $(`#${btn_id}`).on('click', function () {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active')
                         $(this).removeClass('btn-primary').addClass('btn-outline-secondary');
@@ -179,13 +292,13 @@ $(document).ready(() => {
             })
         }
 
-        function animate_time_down(init_progress, max_progress, $element) {
-            setTimeout(function() {
+        function animate_time_down(max_progress, $element) {
+            setTimeout(function () {
                 if (action == "start" || action == "resume") {
-                    init_progress -= 1;
+                    init_progress = init_progress - 1;
                     if (init_progress >= 0) {
                         $element.attr('aria-valuenow', init_progress);
-                        percentage = init_progress / max_progress;
+                        let percentage = init_progress / max_progress;
                         $element.css('width', percentage * 100 + "%");
                         if (percentage <= 0.5) {
                             $element.addClass('bg-warning');
@@ -195,34 +308,34 @@ $(document).ready(() => {
                             $element.addClass('bg-danger');
                         }
                         $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
-                        animate_time_down(init_progress, max_progress, $element);
+                        animate_time_down(max_progress, $element);
                     } else {
-                        msg = {
+                        let msg = {
                             "cmd": "timeout",
-                            "username": username,
-                            "role": role,
+                            "username": user.username,
+                            "role": user.role,
                         }
                         websocket.send(JSON.stringify(msg));
-                        sendAnswers();
+                        sendAnswers(question_instance_id);
                         $element.removeClass('bg-danger');
                         return false;
                     }
                 } else if (action == "close") {
-                    return false;
+                    $element.removeClass('bg-danger');
+                    return;
                 } else if (action == "pause") {
-                    console.log("quiz has been paused")
-                    animate_time_down(init_progress, max_progress, $element);
+                    return;
                 }
             }, 1000);
         };
 
-        function animate_time_up(init_progress, max_progress, $element) {
-            setTimeout(function() {
+        function animate_time_up(max_progress, $element) {
+            setTimeout(function () {
                 if (action == "start" || action == "resume") {
-                    init_progress++;
+                    init_progress = init_progress + 1;
                     if (init_progress <= max_progress) {
                         $element.attr('aria-valuenow', init_progress);
-                        percentage = init_progress / max_progress;
+                        let percentage = init_progress / max_progress;
                         $element.css('width', percentage * 100 + "%");
                         if (percentage >= 0.5) {
                             $element.addClass('bg-warning');
@@ -234,14 +347,14 @@ $(document).ready(() => {
                     }
                     //update timer
                     $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                    animate_time_up(init_progress, max_progress, $element);
+                    animate_time_up(max_progress, $element);
                 } else if (action == "close") {
                     $element.removeClass('bg-danger');
-                    return false;
-                } else {
-                    animate_time_up(init_progress, max_progress, $element);
+                    return;
+                } else if (action == "pause") {
+                    return;
                 }
             }, 1000);
         };
     });
-})
+});

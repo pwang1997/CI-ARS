@@ -154,4 +154,9 @@ class Questions extends CI_Controller
         // print_r($msg['dataset']);
         echo json_encode($msg);
     }
+
+    public function get_all_students() {
+        $list_of_students = $this->question->get_all_students($this->input->post('quiz_id'));
+        print_r(json_encode($list_of_students));
+    }
 }

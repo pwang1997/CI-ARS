@@ -1,10 +1,12 @@
+"use strict";
+
 $(document).ready(() => {
     get_session().then((user) => {
         user = JSON.parse(user);
-        action = null;
 
         let websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
         let action, timer_type;
+        let msg = null;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
@@ -12,15 +14,15 @@ $(document).ready(() => {
                 console.log("Connected to WebSocket server.");
                 msg = {
                     'cmd': "connect",
-                    'from': user.id,
+                    'from_id': user.id,
                     'username': user.username,
-                    'role': user.role,
+                    'role': user.role
                 };
 
                 websocket.send(JSON.stringify(msg));
             }
             websocket.onmessage = function(event) {
-                let msg = JSON.parse(event.data);
+                msg = JSON.parse(event.data);
 
                 cmd = msg.cmd;
                 message = msg.message;

@@ -1,3 +1,5 @@
+"use strict";
+
 $(document).ready(() => {
     let arr_param = get_url_params(window.location.href);
     let question_index = arr_param[6];
