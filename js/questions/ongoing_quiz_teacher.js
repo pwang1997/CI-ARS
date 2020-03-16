@@ -20,15 +20,44 @@ $(document).ready(() => {
         temp.tab('show')
         window.scrollTo(0, 0);
     });
-
+    /**
+     * update each question status based on current quiz instance
+     */
+    function update_question_status(quiz_id, teacher_id) {
+        $.ajax({
+            url: `${base_url}/update_question_instance_status_tab_list`,
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                quiz_id: quiz_id,
+                from_id: teacher_id
+            },
+            success: (response) => {
+                // console.log(`${response}`);
+                for(let i = 0; i < response.length; i++) {
+                    question_id = response[i].question_id;
+                    status = response[i].status;
+                    if(status == "complete") {
+                        $(`#list-question_${question_id}`).removeClass('bg-primary').addClass('bg-success');
+                    }
+                }
+            },
+            fail: () => {
+                alert('failed to connect with the database');
+            }
+        });
+    }
     get_session().then((user) => {
         user = JSON.parse(user);
+
         let action = null;
         let init_progress = null;
         let websocket = null;
         let msg = null;
         get_all_students(quiz_id).then((list_of_students) => {
             console.log(`list of students: ${list_of_students}`);
+            //update question instances' status(tab list)
+            update_question_status(quiz_id, user.id);
 
             if (window.WebSocket) {
                 websocket = new WebSocket(wsurl);
@@ -63,18 +92,29 @@ $(document).ready(() => {
                     console.log("Connected to WebSocket server error");
                 }
 
-                let close_connection = function () {
+                let close_connection = async function () {
                     let msg = {
                         cmd: "closing_connection",
-                        from_id :user.id,
+                        from_id: user.id,
                         role: user.role,
                         quiz_id: quiz_id
                     }
                     websocket.send(JSON.stringify(msg));
 
-                    websocket.onclose = function (event) {
-                        console.log('websocket Connection Closed. ', event);
-                    }; // disable onclose handler first
+                    await $.ajax({
+                        url: `${base_url}/update_quiz_instance`,
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            'from_id': user.id,
+                            'quiz_id': quiz_id
+                        }
+                    }).then(() => {
+                        websocket.onclose = function (event) {
+                            console.log('websocket Connection Closed. ', event);
+                        }; // disable onclose handler first
+                    })
+
                 };
 
                 window.onbeforeunload = function () {
@@ -84,7 +124,7 @@ $(document).ready(() => {
                 $('.exit').click(function () {
                     close_connection();
                     alert('Quiz Closed');
-                    window.location.replace(`${base_url}/../users/teacher`);
+                    window.location.replace(document.referrer);
                 });
 
                 $(`.btn-summary`).click(function () {
@@ -139,6 +179,8 @@ $(document).ready(() => {
                                     dataType: "JSON",
                                     data: {
                                         'question_meta_id': question_id,
+                                        'from_id': user.id,
+                                        'quiz_id': quiz_id
                                     },
                                     success: function (response) {
                                         if (response.success) {
@@ -146,6 +188,7 @@ $(document).ready(() => {
                                             let msg = {
                                                 "cmd": "start",
                                                 "username": user.username,
+                                                "from_id": user.id,
                                                 "role": user.role,
                                                 "quiz_id": quiz_id,
                                                 "question_id": question_id,
@@ -207,6 +250,17 @@ $(document).ready(() => {
                     if (current_state == "Pause") {
                         // action = "pause";
                         $(this).html("Resume");
+                        //update question instance to new from pause
+                        $.ajax({
+                            url: `${base_url}/resume_question_instance`,
+                            type: "POST",
+                            dataType: "JSON",
+                            data: {
+                                'question_meta_id': question_id,
+                                'from_id': user.id,
+                                'quiz_id': quiz_id
+                            }
+                        })
                         // $(this).addClass("dropdown-toggle");
                     } else if (current_state == "Resume") {
                         action = "resume";
@@ -227,6 +281,18 @@ $(document).ready(() => {
                         "question_id": question_id,
                         'quiz_id': quiz_id
                     }
+                    //update question instance status to complete
+                    $.ajax({
+                        url: `${base_url}/complete_question_instance`,
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            'question_meta_id': question_id,
+                            'from_id': user.id,
+                            'quiz_id': quiz_id
+                        }
+                    });
+
                     try {
                         action = "close";
                         let element = null;
@@ -262,17 +328,26 @@ $(document).ready(() => {
                         "question_status": status,
                         "remaining_time": init_progress,
                         'quiz_id': quiz_id
-                    }
+                    };
+
+                    $.ajax({
+                        url: `${base_url}/pause_question_instance`,
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            'question_meta_id': question_id,
+                            'from_id': user.id,
+                            'quiz_id': quiz_id
+                        }
+                    })
 
                     //restore pause/resume state
                     let init = $(`#progress_bar_${question_id}`).attr('aria-valuenow');
                     let duration = $(`#progress_bar_${question_id}`).attr('aria-valuemax');
                     if (timer_type == "timeup") {
                         init = ($(`#duration_${question_id}`).html().split(' '))[1];
-                        let init_progress = init;
                         animate_time_up(duration, $(`#progress_bar_${question_id}`), websocket);
                     } else if (timer_type == "timedown") {
-                        let init_progress = init;
                         animate_time_down(duration, $(`#progress_bar_${question_id}`), websocket);
                     }
                     try {
@@ -357,7 +432,7 @@ $(document).ready(() => {
                             msg = {
                                 "cmd": "update_remaining_time",
                                 "remaining_time": init_progress,
-                                "role" : user.role,
+                                "role": user.role,
                                 'quiz_id': quiz_id
                             }
 

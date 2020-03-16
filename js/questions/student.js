@@ -113,6 +113,7 @@ $(document).ready(() => {
                         $(`#quiz_status`).html("Please prepare for quiz");
                     } else {
                         $(`#quiz_status`).html("Quiz is not available at the moment");
+                        websocket.close();
                     }
                 } else if (cmd == "pause") {
                     action = "pause";
@@ -211,7 +212,7 @@ $(document).ready(() => {
         });
 
         function sendAnswers(question_instance_id) {
-            answers = [];
+            let answers = [];
             //get all values of choices
             $('button[name=choice]').each(function() {
                 if ($(this).hasClass('active')) {
@@ -256,7 +257,7 @@ $(document).ready(() => {
         //toggle choice buttons with 'active'
         function toggleActive() {
             $('button[name=choice]').each(function() {
-                btn_id = $(this)[0].id;
+                let btn_id = $(this)[0].id;
                 $(`#${btn_id}`).on('click', function() {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active')

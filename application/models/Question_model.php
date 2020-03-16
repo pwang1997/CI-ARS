@@ -117,12 +117,74 @@ class Question_model extends CI_Model
     $teacher_id = $this->session->id;
   }
 
-  public function add_question_instance($question_index)
+  public function add_question_instance($question_index, $last_quiz_instance_id)
   {
-    return array(
-      'success' => $this->db->insert('question_instances', array('question_meta_id' => $question_index)),
-      'question_instance_id' => $this->db->insert_id()
-    );
+    //get new or paused question instances
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $result = $this->db->get_where('question_instances', array(
+      'question_meta_id' => $question_index,
+      'quiz_instance_id' => $last_quiz_instance_id, 'status !=' => 'complete'
+    ))->result_array();
+    $question_instance_id = null;
+
+    if (!empty($result)) {
+      // retrive last question instance 
+      $question_instance_id = $result[0]['id'];
+    } else {
+      //create new question instance
+      $data = [
+        'question_meta_id' => $question_index,
+        'quiz_instance_id' => $last_quiz_instance_id,
+        'status' => 'new'
+      ];
+      $this->db->insert('question_instances', $data);
+      $question_instance_id = $this->db->insert_id();
+    }
+    return ['success' => true, 'question_instance_id' => $question_instance_id];
+  }
+
+  public function pause_question_instance($question_index, $last_quiz_instance_id)
+  {
+    $data = [
+      'status' => 'pause'
+    ];
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $this->db->set($data)->where(
+      array(
+        'question_meta_id' => $question_index,
+        'quiz_instance_id' => $last_quiz_instance_id
+      )
+    )->update('question_instances');
+  }
+
+  public function resume_question_instance($question_index, $last_quiz_instance_id)
+  {
+    $data = [
+      'status' => 'new'
+    ];
+
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $this->db->set($data)->where(
+      array(
+        'question_meta_id' => $question_index,
+        'quiz_instance_id' => $last_quiz_instance_id
+      )
+    )->update('question_instances');
+  }
+
+  public function complete_question_instance($question_index, $last_quiz_instance_id)
+  {
+    $data = [
+      'status' => 'complete'
+    ];
+
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $this->db->set($data)->where(
+      array(
+        'question_meta_id' => $question_index,
+        'quiz_instance_id' => $last_quiz_instance_id
+      )
+    )->update('question_instances');
   }
 
   public function submit_student_response()
@@ -183,17 +245,117 @@ class Question_model extends CI_Model
     return $row;
   }
 
-  public function get_all_students($quiz_index) {
+  public function update_quiz_instance($quiz_meta_id, $teacher_id)
+  {
+    //get current status
+    $result_quiz_instance = $this->db->select('id')->from('quiz_instances')
+      ->where(array('quiz_meta_id' => $quiz_meta_id, 'teacher_id' => $teacher_id))
+      ->order_by('id', 'DESC')->limit(1)->get()->result_array();
+    if (!empty($result_quiz_instance)) {
+      $result_quiz_instance = $result_quiz_instance[0];
+      $quiz_instance_id = $result_quiz_instance['id'];
+
+      //get number of questions in the quiz
+      $result_num_of_questions = $this->db->select('COUNT(id) as num')->from('questions')->where(array('quiz_id' => $quiz_meta_id))
+        ->get()->result_array()[0]['num'];
+
+      //get the latest question instances associated with the quiz instance
+      $data = ['quiz_instance_id' => $quiz_instance_id];
+      $result_questions = $this->db->get_where('question_instances', $data)->result_array();
+      //check for completeness of question instance status
+      $is_all_complete = false;
+      foreach ($result_questions as $question) {
+        if ($question['status'] != "complete") {
+          $is_all_complete = false;
+        } else {
+          $is_all_complete = true;
+        }
+      }
+      if (count($result_questions) < $result_num_of_questions || $is_all_complete == false) {
+        //   //update quiz instance status to pause
+        $data = ['status' => 'pause'];
+      } else {
+        //   //update quiz instance status to complete
+        $data = ['status' => 'complete'];
+      }
+      $this->db->order_by('id', 'DESC')->limit(1);
+      return $this->db->set($data)->where(
+        array(
+          'teacher_id' => $teacher_id,
+          'quiz_meta_id' => $quiz_meta_id
+        )
+      )->update('quiz_instances');
+    } else {
+      return false;
+    }
+  }
+
+  public function get_all_students($quiz_index)
+  {
     $row = [];
 
     $results = $this->db->select('users.id')->from('users')
-    ->join('enrolled_students', 'enrolled_students.student_id=users.id')
-    ->join('quizs','quizs.classroom_id=enrolled_students.classroom_id')
-    ->where(array('quizs.id'=>$quiz_index))->get()->result_array();
+      ->join('enrolled_students', 'enrolled_students.student_id=users.id')
+      ->join('quizs', 'quizs.classroom_id=enrolled_students.classroom_id')
+      ->where(array('quizs.id' => $quiz_index))->get()->result_array();
 
-    foreach($results as $result ) {
+    foreach ($results as $result) {
       $row[$result['id']] = $result['id'];
     }
     return $row;
+  }
+
+  public function get_last_quiz_instance($quiz_meta_id, $teacher_id)
+  {
+    //get new or paused quiz instance
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $result = $this->db->select('*')->from('quiz_instances')
+      ->where(array('quiz_meta_id' => $quiz_meta_id, 'teacher_id' => $teacher_id, 'status !=' => 'complete'))
+      ->get()->result_array();
+    if (!empty($result)) {
+      //continue the last quiz instance
+      return $result[0]['id'];
+    } else {
+      //create new quiz instance
+      $data = [
+        'teacher_id' => $teacher_id,
+        'quiz_meta_id' => $quiz_meta_id,
+        'status' => 'new'
+      ];
+      $this->db->insert('quiz_instances', $data);
+      return $this->db->insert_id();
+    }
+  }
+
+  public function update_question_instance_status_tab_list($quiz_id, $teacher_id)
+  {
+    //get latest quiz instance
+    $this->db->order_by('id', 'DESC')->limit(1);
+    $result_quiz_instance = $this->db->get_where('quiz_instances', array(
+      'quiz_meta_id' => $quiz_id, 'teacher_id' => $teacher_id,
+      'status !=' => 'complete'
+    ))->result_array();
+    if (empty($result_quiz_instance)) {
+      return false;
+    } else {
+      $result_quiz_instance = $result_quiz_instance[0];
+      $quiz_instance_id = $result_quiz_instance['id'];
+
+      //get questions of current quiz instance
+      $result_question_instances = $this->db->get_where('question_instances', array('quiz_instance_id' => $quiz_instance_id))
+        ->result_array();
+      if (empty($result_question_instances)) { //no question instance has been created
+        return 'test';
+      } else {
+        $result = [];
+        foreach ($result_question_instances as $question_instance) {
+          $result[] = [
+            'question_id' => $question_instance['question_meta_id'],
+            'status' => $question_instance['status']
+          ];
+        }
+        return $result;
+      }
+    }
   }
 }

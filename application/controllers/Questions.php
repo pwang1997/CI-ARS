@@ -72,6 +72,7 @@ class Questions extends CI_Controller
         $data['quiz_index'] = $quiz_index;
         $data['question_list'] = $this->question->getQuestions($quiz_index);
         $data['question_instance_list'] = $this->question->get_question_instance_list($data['question_list']);
+
         $this->load->view('templates/header');
         $this->load->view('questions/ongoing_quiz_teacher', $data);
         $this->load->view('templates/footer');
@@ -111,10 +112,59 @@ class Questions extends CI_Controller
 
     public function add_question_instance()
     {
+        $quiz_meta_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
         $question_index = $this->input->post('question_meta_id');
-        $result = $this->question->add_question_instance($question_index);
+
+        $last_quiz_instance_id = $this->question->get_last_quiz_instance($quiz_meta_id, $teacher_id);
+        
+        $result = $this->question->add_question_instance($question_index, $last_quiz_instance_id);
         $msg['success'] = $result['success'];
         $msg['question_instance_id'] = $result['question_instance_id'];
+        echo json_encode($msg);
+    }
+
+    public function pause_question_instance()
+    {
+        $quiz_meta_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
+        $question_index = $this->input->post('question_meta_id');
+        $last_quiz_instance_id = $this->question->get_last_quiz_instance($quiz_meta_id, $teacher_id);
+        $this->question->pause_question_instance($question_index, $last_quiz_instance_id);
+    }
+    public function resume_question_instance()
+    {
+        $quiz_meta_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
+        $question_index = $this->input->post('question_meta_id');
+        $last_quiz_instance_id = $this->question->get_last_quiz_instance($quiz_meta_id, $teacher_id);
+        $this->question->resume_question_instance($question_index, $last_quiz_instance_id);
+    }
+
+    public function complete_question_instance()
+    {
+        $quiz_meta_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
+        $question_index = $this->input->post('question_meta_id');
+        $last_quiz_instance_id = $this->question->get_last_quiz_instance($quiz_meta_id, $teacher_id);
+        $this->question->complete_question_instance($question_index, $last_quiz_instance_id);
+    }
+    
+
+    public function update_quiz_instance()
+    {
+        $quiz_meta_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
+
+        $msg['result'] = $this->question->update_quiz_instance($quiz_meta_id, $teacher_id);
+        echo json_encode($msg);
+    }
+
+    public function update_question_instance_status_tab_list() {
+        $quiz_id = $this->input->post('quiz_id');
+        $teacher_id = $this->input->post('from_id');
+
+        $msg = $this->question->update_question_instance_status_tab_list($quiz_id, $teacher_id);
         echo json_encode($msg);
     }
 

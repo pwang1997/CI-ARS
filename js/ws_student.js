@@ -202,29 +202,15 @@ $(document).ready(() => {
                 console.log("Connected to WebSocket server error");
             }
 
+            websocket.onclose = function (event) {
+                console.log('websocket Connection Closed. ');
+                $('.question_on').removeClass("visible").addClass("invisible");
+                $('.question_off').addClass("visible").removeClass("invisible");
+                $('.options').empty(); //remove options
+                $('.progress').empty(); //remove timer progress bar
+                $('.choice_row').parent().empty(); //remove choices
+            }; // disable onclose handler first
 
-            let close_connection = function () {
-                let msg = {
-                    cmd: "closing_connection",
-                    from_id :user.id,
-                    role: user.role,
-                    quiz_id: quiz_id
-                }
-                websocket.send(JSON.stringify(msg));
-
-                websocket.onclose = function (event) {
-                    console.log('websocket Connection Closed. ');
-                    $('.question_on').removeClass("visible").addClass("invisible");
-                    $('.question_off').addClass("visible").removeClass("invisible");
-                    $('.options').empty(); //remove options
-                    $('.progress').empty(); //remove timer progress bar
-                    $('.choice_row').parent().empty(); //remove choices
-                }; // disable onclose handler first
-            };
-
-            window.onbeforeunload = function () {
-                close_connection();
-            }
         }
 
         $('.submit').click(function (e) {
@@ -260,12 +246,11 @@ $(document).ready(() => {
                             "answers": response.msg,
                             "username": user.username,
                             "role": user.role,
-                            "question_id": null,
                             "question_instance_id": question_instance_id
                         }
                         console.log(msg)
                         websocket.send(JSON.stringify(msg));
-                        alert('success')
+                        alert('answer submitted')
                     } else {
                         alert("Error: 1");
                     }
