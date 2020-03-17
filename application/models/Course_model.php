@@ -232,4 +232,38 @@ class Course_model extends CI_Model
     }
     return $result;
   }
+
+  public function export_classroom_history($classroom_id)
+  {
+    //get quizs
+    $quizs = $this->db->get_where('quizs', ['classroom_id' => $classroom_id])->result_array();
+    if (empty($quizs)) return false;
+    //get quiz instances
+    $quiz_instances = [];
+    //get questions' info by quiz id
+    $questions = [];
+    foreach ($quizs as $quiz) {
+      $quiz_instances[] = $this->db->get_where('quiz_instances', ['quiz_meta_id' => $quiz['id'], 'status' => 'complete'])->result_array();
+      $questions[] = $this->db->get_where('questions', ['quiz_id' => $quiz['id']])->result_array();
+    }
+    if (empty($quiz_instances) || empty($questions)) return false;
+    //get question instances by quiz_instances id
+    $question_instances = [];
+    foreach ($quiz_instances as $quiz_instance) {
+      foreach($quiz_instance as $q) {
+        $question_instances[] = $this->db->get_where('question_instances', array('quiz_instance_id' => $q['id']))->result_array();
+      }
+    }
+    if (empty($question_instances)) return false;
+    //get student response on question instances
+    $student_responses = [];
+    foreach($question_instances as $question_instance) {
+      foreach($question_instance as $q) {
+        $student_responses[$q['id']] = $this->db->select('*')->from('student_responses')->where(['question_instance_id'=>$q['id']])
+        ->join('users', 'users.id = student_responses.student_id')->get()->result_array();
+      }
+    }
+    return ['quizs'=>$quizs, 'quiz_instances'=>$quiz_instances, 'questions'=>$questions, 'question_instances'=>$question_instances,
+    'student_responses'=>$student_responses];
+  }
 }

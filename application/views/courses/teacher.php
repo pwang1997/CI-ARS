@@ -131,6 +131,16 @@
 								</div>
 							</div>
 						</div>
+
+						<div class="col-lg-3 py-2 ml-2">
+							<div class='card text-white bg-dark'>
+								<div class='card-teacher-course'>
+									<div class='card-body'>
+										<h5 class='card-title'><a href='#' id="export_class_history" name="<?php echo $classroom_id; ?>"class='text-secondary'>Export Class History</a></h5>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -35,7 +35,7 @@ class Courses extends CI_Controller
 
     $course_id = $this->uri->segment(3);
     $classroom_id = $this->uri->segment(4);
-
+    $data['classroom_id'] = $classroom_id;
     $data['course_info'] = $this->course->get_teacher_course($course_id, $classroom_id);
     $data['enrolled_students'] = $this->course->get_enrolled_students_for_teacher($classroom_id);
     $data['quizs'] = $this->course->get_quizs_for_teacher($classroom_id);
@@ -94,6 +94,12 @@ class Courses extends CI_Controller
   public function export_student_stat()
   {
     $result = $this->course->export_student_stat($this->input->post('quiz_id'));
+    $msg['result'] = $result;
+    echo json_encode($msg);
+  }
+
+  public function export_classroom_history() {
+    $result = $this->course->export_classroom_history($this->input->post('classroom_id'));
     $msg['result'] = $result;
     echo json_encode($msg);
   }
