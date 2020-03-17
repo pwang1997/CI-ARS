@@ -132,6 +132,7 @@ class EchoBot implements MessageComponentInterface
         $quiz_id = $msg->quiz_id;
         if (strcmp($role, "teacher") == 0) {
             //close classroom connection
+            $this->onClassMessage($msg);
             unset($this->chambers[$quiz_id]);
         }
     }
