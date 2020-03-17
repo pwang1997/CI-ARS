@@ -5,6 +5,7 @@ $(document).ready(() => {
     let url_params = get_url_params(window.location.href);
     let quiz_id = url_params[url_params.length - 1];
     let question_id;
+    let temp;
     //move question forward
     $('.next').click(function (e) {
         question_id = (this.id).split("_")[1];

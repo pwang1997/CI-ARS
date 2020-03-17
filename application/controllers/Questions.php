@@ -70,8 +70,10 @@ class Questions extends CI_Controller
     {
         $quiz_index = $this->uri->segment(3);
         $data['quiz_index'] = $quiz_index;
+        $teacher_id = $this->session->id;
         $data['question_list'] = $this->question->getQuestions($quiz_index);
-        $data['question_instance_list'] = $this->question->get_question_instance_list($data['question_list']);
+        $data['quiz_instance_list'] = $this->question->get_quiz_instance_list($quiz_index, $teacher_id);
+        $data['question_instance_list'] = $this->question->get_question_instance_list($data['quiz_instance_list']);
 
         $this->load->view('templates/header');
         $this->load->view('questions/ongoing_quiz_teacher', $data);
