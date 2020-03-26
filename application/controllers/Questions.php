@@ -74,6 +74,7 @@ class Questions extends CI_Controller
         $data['question_list'] = $this->question->getQuestions($quiz_index);
         $data['quiz_instance_list'] = $this->question->get_quiz_instance_list($quiz_index, $teacher_id);
         $data['question_instance_list'] = $this->question->get_question_instance_list($data['quiz_instance_list']);
+        $data['student_response_list'] = $this->question->get_student_response_list($data['question_instance_list']);
 
         $this->load->view('templates/header');
         $this->load->view('questions/ongoing_quiz_teacher', $data);

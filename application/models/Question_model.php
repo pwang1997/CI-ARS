@@ -34,9 +34,9 @@ class Question_model extends CI_Model
     return $this->db->select('COUNT(id) as counter')->get_where('questions', array('quiz_id' => $quiz_index))->result_array()[0]['counter'] != 0;
   }
 
-  public function getQuiz($lab_index)
+  public function getQuiz($quiz_index)
   {
-    return $result = $this->db->get_where('quizs', array('id' => $lab_index))->result_array();
+    return $result = $this->db->get_where('quizs', array('id' => $quiz_index))->result_array();
   }
 
   public function getQuestions($quiz_index)
@@ -346,9 +346,10 @@ class Question_model extends CI_Model
   }
 
 
-  public function get_quiz_instance_list($quiz_index, $teacher_id) {
-    $result = $this->db->get_where('quiz_instances', array('quiz_meta_id'=>$quiz_index, 'teacher_id'=>$teacher_id))
-    ->result_array();
+  public function get_quiz_instance_list($quiz_index, $teacher_id)
+  {
+    $result = $this->db->get_where('quiz_instances', array('quiz_meta_id' => $quiz_index, 'teacher_id' => $teacher_id))
+      ->result_array();
     return $result;
   }
 
@@ -356,17 +357,61 @@ class Question_model extends CI_Model
   {
     $row = array();
     foreach ($question_list as $question) {
-      $this->db->select('time_created,quiz_instance_id, users.id as user_id, username, student_responses.answer as answer, student_responses.time_answered as time_answered')
-      ->from('questions')->join('question_instances', 'questions.id = question_instances.question_meta_id')
-      ->join('quiz_instances', 'question_instances.quiz_instance_id = quiz_instances.id')
-      ->join('student_responses', 'question_instances.id = student_responses.question_instance_id')
-      ->join('users', 'users.id = student_responses.student_id')
-      ->where(['quiz_instance_id'=>$question['id'],'quiz_instances.status'=>'complete']);
+      $this->db->select('question_instances.id')
+        ->from('questions')->join('question_instances', 'questions.id = question_instances.question_meta_id')
+        ->join('quiz_instances', 'question_instances.quiz_instance_id = quiz_instances.id')
+        ->where(['quiz_instance_id' => $question['id'], 'quiz_instances.status' => 'complete']);
       $result = $this->db->get()->result_array();
-      if(!empty($result)) {
-        $row[$question['id']][] = $result;
+      if (!empty($result)) {
+        $row[$question['id']] = $result;
       }
     }
     return $row;
   }
+
+  public function get_student_response_list($question_instance_list)
+  {
+    $row = array();
+    foreach ($question_instance_list as $question_instances) {
+      foreach ($question_instances as $question_instance) {
+        //get last record of each instance for each user
+        $this->db->select('MAX(id) as id');
+        $this->db->from('student_responses')
+          ->where(['question_instance_id' => $question_instance['id']]);
+        $this->db->group_by(['student_id']);
+        $subquery = $this->db->get_compiled_select();
+
+
+        $this->db->select('student_responses.id, users.username, student_responses.answer,student_responses.time_answered');
+        $this->db->from('(' . $subquery . ') a');
+        $this->db->join('student_responses', 'student_responses.id= a.id');
+        $this->db->join('users', 'student_responses.student_id= users.id');
+        $this->db->group_by('student_responses.student_id');
+
+        $result = $this->db->get()->result_array();
+        if (!empty($result)) {
+          $row[$question_instance['id']] = $result;
+        }
+      }
+    }
+    return $row;
+  }
+  // public function get_question_instance_list($question_list)
+  // {
+  //   $row = array();
+  //   foreach ($question_list as $question) {
+  //     $this->db->select('time_created,quiz_instance_id, users.id as user_id, username, student_responses.answer as answer, student_responses.time_answered as time_answered')
+  //     ->from('questions')->join('question_instances', 'questions.id = question_instances.question_meta_id')
+  //     ->join('quiz_instances', 'question_instances.quiz_instance_id = quiz_instances.id')
+  //     ->join('student_responses', 'question_instances.id = student_responses.question_instance_id')
+  //     ->join('users', 'users.id = student_responses.student_id')
+  //     ->where(['quiz_instance_id'=>$question['id'],'quiz_instances.status'=>'complete'])
+  //     ->group_by('question_instance_id');
+  //     $result = $this->db->get()->result_array();
+  //     if(!empty($result)) {
+  //       $row[$question['id']][] = $result;
+  //     }
+  //   }
+  //   return $row;
+  // }
 }

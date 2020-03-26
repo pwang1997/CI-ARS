@@ -28,7 +28,8 @@
         <!-- main content -->
         <div class="col-md-10">
             <div class="tab-content" id="nav-tabContent">
-                <?php $index = 1; ?>
+                <?php $index = 1;
+                $quiz_number = 1; ?>
                 <?php foreach ($question_list as $question) : ?>
                     <div class="tab-pane fade <?php if ($index == 1) echo "show active"; ?>" id="list-<?= $question['id']; ?>" role="tabpanel" aria-labelledby="list-question_<?= $question['id']; ?>">
                         <h5>Question <?= $index; ?>:</h5>
@@ -133,7 +134,7 @@
                                 <div class="card-header" id="heading_<?= $quiz['id']; ?>">
                                     <h6 class="mb-0 row">
                                         <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $quiz['id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $quiz['id']; ?>">
-                                            <?= $quiz['id']; ?>
+                                            <?= $quiz_number++; ?>
                                         </button>
                                     </h6>
                                 </div>
@@ -147,8 +148,9 @@
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col">Question <?= $index++; ?></th>
-                                                                <th scope="col">Date: <?php $date = new DateTime($question_instance['time_created']);
-                                                                                        echo $date->format('Y-m-d'); ?></th>
+                                                                <!-- <th scope="col">Date: <?php //$date = new DateTime($question_instance['time_created']);
+                                                                                            //echo $date->format('Y-m-d'); 
+                                                                                            ?></th> -->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -164,18 +166,24 @@
                                                                 </thead>
                                                                 <tbody>
                                                                     <?php $i = 1; ?>
-                                                                    <?php
-                                                                    $student_answer = explode(",", $question_instance['answer']);
-                                                                    $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
-                                                                    ?>
-                                                                    <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
-                                                                                else echo "bg-success"; ?>>
-                                                                        <th scope="row"><?php echo $i++; ?></td>
-                                                                        <td><?php echo $question_instance['user_id']; ?></td>
-                                                                        <td><?php echo $question_instance['username']; ?></td>
-                                                                        <td><?php echo $question_instance['answer']; ?></td>
-                                                                        <td><?php echo $question_instance['time_answered']; ?></td>
-                                                                    </tr>
+                                                                    <?php if (!isset($student_response_list[$question_instance])) : ?>
+                                                                        <?php continue; ?>
+                                                                    <?php endif; ?>
+                                                                    <?php foreach ($student_response_list[$question_instance] as $student_response) : ?>
+                                                                        <?php
+                                                                        $student_answer = explode(",", $student_response['answer']);
+                                                                        $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
+
+                                                                        ?>
+                                                                        <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
+                                                                                    else echo "bg-success"; ?>>
+                                                                            <th scope="row"><?php echo $i++; ?></td>
+                                                                            <td><?php echo $student_response['id']; ?></td>
+                                                                            <td><?php echo $student_response['username']; ?></td>
+                                                                            <td><?php echo $student_response['answer']; ?></td>
+                                                                            <td><?php echo $student_response['time_answered']; ?></td>
+                                                                        </tr>
+                                                                    <?php endforeach; ?>
                                                                 </tbody>
                                                             </table>
                                                         </tbody>
