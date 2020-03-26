@@ -82,6 +82,9 @@
                                             </button>
                                         </h6>
                                     </div>
+                                    <?php if (!isset($question_instance_list[$quiz['id']])) : ?>
+                                        <?php continue; ?>
+                                    <?php endif; ?>
                                     <div id="collapse_<?= $quiz['id']; ?>" class="collapse" aria-labelledby="heading_<?= $quiz['id']; ?>" data-parent="#accordion_<?= $quiz['id']; ?>">
                                         <div class="card-body table-responsive">
                                             <table id="table_<?= $quiz['id']; ?>" class="table table-hover table-striped">
@@ -96,7 +99,6 @@
                                                 <tbody>
                                                     <?php foreach ($question_instance_list[$quiz['id']] as $question_instances) : ?>
                                                         <?php foreach ($question_instances as $question_instance) : ?>
-
                                                             <?php
                                                             $answers = explode(",", $question_instance['answer']);
                                                             $answers = str_replace(array("[", ",", "]", '"'), "", $answers);
