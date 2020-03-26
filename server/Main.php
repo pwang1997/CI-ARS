@@ -97,6 +97,13 @@ class EchoBot implements MessageComponentInterface
                     if ($msg->current_site !== "questions/student") { //notify the student that the quiz is up
                         $response_text = array("cmd" => "notification", "quiz_id" => $quiz_id);
                         $this->clients[$resource_id]->send(json_encode($response_text));
+                        $question_id = null;
+                        if(!empty($this->chambers[$quiz_id]['question_list'])) {
+                            $question_id = end($this->chambers[$quiz_id]['question_list']);
+                        }
+
+                        $response_text = ["cmd"=>"start", "question_id"=>$question_id];
+                        $this->clients[$resource_id]->send(json_encode($response_text));
                     } else {
                         $this->chambers[$quiz_id]['student'][$found] = $u;
                     }
@@ -110,6 +117,10 @@ class EchoBot implements MessageComponentInterface
      */
     private function onClassMessage($msg)
     {
+        if($msg->cmd == "start") {
+            //start question, store question id
+            $this->chambers[$msg->quiz_id]['question_list'][] = $msg->question_id;
+        }
         if (strcmp($msg->role, "teacher") == 0) {
             $students = $this->chambers[$msg->quiz_id]['student'];
             if (empty($students)) return;
