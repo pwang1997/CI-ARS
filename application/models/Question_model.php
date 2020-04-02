@@ -317,10 +317,11 @@ class Question_model extends CI_Model
   {
     //get latest quiz instance
     $this->db->order_by('id', 'DESC')->limit(1);
-    $result_quiz_instance = $this->db->get_where('quiz_instances', array(
+    $where = [
       'quiz_meta_id' => $quiz_id, 'teacher_id' => $teacher_id,
       'status !=' => 'complete'
-    ))->result_array();
+    ];
+    $result_quiz_instance = $this->db->select('*')->from('quiz_instances')->where($where)->get()->result_array();
     if (empty($result_quiz_instance)) {
       return false;
     } else {
