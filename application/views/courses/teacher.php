@@ -34,10 +34,12 @@
 				<div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
 					<h3><?= $title; ?></h3>
 					<hr>
+					<?php if(isset($course_info)): ?>
 					<p><strong>Course Name: </strong> <?php echo $course_info['course_name']; ?></p>
 					<p><strong>Course Code: </strong> <?php echo $course_info['course_code']; ?></p>
 					<p><strong>Section Number: </strong> <?php echo $course_info['section_id']; ?></p>
 					<p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
+					<?php endif; ?>
 				</div>
 				<!-- student list  -->
 				<div class="tab-pane fade" id="list-student" role="tabpanel" aria-labelledby="list-student-list">

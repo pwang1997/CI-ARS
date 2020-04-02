@@ -23,7 +23,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://54.183.88.168/CI-ARS/';
+$config['base_url'] = 'http://54.183.88.168/';
 //'http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/CI-ARS';
 // 'http://192.168.64.2/ars';
 
