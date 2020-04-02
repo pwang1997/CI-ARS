@@ -5,7 +5,7 @@ const root_url = "http://54.183.88.168";
 const base_url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
 // + "/" + getUrl.pathname.split('/')[2];
 // const wsurl = 'ws://127.0.0.1:8080/server/server.php';
-const wsurl = 'ws://172.31.0.204:8080/server/server.php';
+const wsurl = 'ws://172.31.0.204:8080/server/Main.php';
 
 function get_url_params(url) {
     return url.split('/');
