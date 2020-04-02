@@ -40,8 +40,8 @@ class Course_model extends CI_Model
       'course_id' => $course_id,
       'classrooms.id' => $classroom_id
     );
-
-    return $this->db->get_where('classrooms', $where)->result_array()[0];
+    $result = $this->db->get_where('classrooms', $where)->result_array();
+    return (!empty($result)) ? $result[0] : [];
   }
 
   public function get_enrolled_students_for_teacher($classroom_id)
