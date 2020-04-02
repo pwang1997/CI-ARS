@@ -1,4 +1,4 @@
-<script src="<?= base_url(); ?>js/questions/ongoing_quiz_teacher.js"></script>
+<script src="<?= 'http://54.183.88.168/' ?>js/questions/ongoing_quiz_teacher.js"></script>
 <?php if (strcmp($this->session->role, 'student') == 0) : ?>
     <?php redirect('home'); ?>
 <?php elseif (empty($this->session->username)) : ?>
