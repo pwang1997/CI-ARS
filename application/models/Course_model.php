@@ -48,8 +48,10 @@ class Course_model extends CI_Model
 
   public function get_enrolled_students_for_teacher($classroom_id)
   {
-    $query = $this->db->select('*')->from('enrolled_studnets')->where(array('classroom_id' => $classroom_id))
-    ->join('users', 'users.id = enrolled_students.student_id')->get();
+    $query = $this->db->select('*')->from('enrolled_studnets')
+    ->join('users', 'users.id = enrolled_students.student_id')
+    ->where(array('classroom_id' => $classroom_id))
+    ->get();
     $result = ($query !== FALSE && $query->num_rows > 0) ? $query->result_array() : null;
     return $result;
   }

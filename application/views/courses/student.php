@@ -7,10 +7,6 @@
 <?php endif; ?>
 </div><!-- end of container -->
 
-<?php 
-    print_r($quizs);
-?>
-
 <div class="container-fluid">
     <div class="row" style="height: 100%">
         <!-- <nav class="col-md-2 d-none d-md-block bg-light sidebar"> -->
