@@ -34,20 +34,26 @@ class Course_model extends CI_Model
   //get individual course where courseId and classroomId are specified
   public function get_teacher_course($course_id, $classroom_id)
   {
-    $this->db->select('*');
-    $this->db->join('courses', 'courses.id = classrooms.course_id');
     $where = array(
       'course_id' => $course_id,
       'classrooms.id' => $classroom_id
     );
-    $result = $this->db->get_where('classrooms', $where)->result_array();
-    return (!empty($result)) ? $result[0] : [];
+    $query = $this->db->select('*')->from('classrooms')->where($where)->join('courses', 'courses.id = classrooms.course_id')->get();
+    $result = null;
+    if($query !== FALSE && $query->num_rows() > 0) {
+      $result = $query->result_array()[0];
+    }
+    return $result;
   }
 
   public function get_enrolled_students_for_teacher($classroom_id)
   {
-    $this->db->join('users', 'users.id = enrolled_students.student_id');
-    return $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id))->result_array();
+    $query = $this->db->select('*')->from('enrolled_students')
+    ->join('users', 'users.id = enrolled_students.student_id')
+    ->where(array('classroom_id' => $classroom_id))
+    ->get();
+    $result = $query->result_array();
+    return $result;
   }
 
   public function get_quizs_for_teacher($classroom_id)
@@ -63,14 +69,20 @@ class Course_model extends CI_Model
 
   public function get_quizs_for_student($classroom_id)
   {
-    $this->db->select('quizs.id as quiz_index, users.username as username');
-    $this->db->from('users');
-    $this->db->join('enrolled_students', 'users.id = enrolled_students.student_id');
-    $this->db->join('classrooms', 'enrolled_students.classroom_id = classrooms.id');
-    $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
-    $this->db->group_by('quizs.id');
-    $this->db->where(array('enrolled_students.classroom_id' => $classroom_id));
-    return $this->db->get()->result_array();
+    $this->db->select('quizs.id as quiz_index, users.username as username')
+    ->from('users')
+    ->join('enrolled_students', 'users.id = enrolled_students.student_id')
+    ->join('classrooms', 'enrolled_students.classroom_id = classrooms.id')
+    ->join('quizs', 'quizs.classroom_id = classrooms.id')
+    ->group_by(['quiz_index', 'username'])
+    ->where(array('enrolled_students.classroom_id' => $classroom_id, 'users.id'=>$this->session->id));
+    $query = $this->db->get();
+
+    $result = null;
+    if($query !== FALSE && $query->num_rows() > 0) {
+      $result = $query->result_array();
+    }
+    return $result;
   }
 
   /**

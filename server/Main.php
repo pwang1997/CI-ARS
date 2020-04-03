@@ -77,8 +77,8 @@ class EchoBot implements MessageComponentInterface
      */
     private function onConnect(ConnectionInterface $from, $msg)
     {
-        $role = $msg->role;
-        $quiz_id = $msg->quiz_id;
+        $role = (isset($msg->role)) ? $msg->role : null;
+        $quiz_id = (isset($msg->quiz_id)) ? $msg->quiz_id : null;
         $list_of_students = json_decode($msg->list_of_students);
         $resource_id = $from->resourceId;
         $u = new User($resource_id);
