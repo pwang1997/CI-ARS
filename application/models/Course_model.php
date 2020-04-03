@@ -73,7 +73,7 @@ class Course_model extends CI_Model
     ->join('classrooms', 'enrolled_students.classroom_id = classrooms.id')
     ->join('quizs', 'quizs.classroom_id = classrooms.id')
     ->group_by(['quiz_index', 'username'])
-    ->where(array('enrolled_students.classroom_id' => $classroom_id));
+    ->where(array('enrolled_students.classroom_id' => $classroom_id, 'users.id'=>$this->session->id));
     $query = $this->db->get();
 
     $result = null;
