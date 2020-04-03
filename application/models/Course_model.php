@@ -50,7 +50,7 @@ class Course_model extends CI_Model
   {
     $query = $this->db->select('*')->from('enrolled_studnets')->where(array('classroom_id' => $classroom_id))
     ->join('users', 'users.id = enrolled_students.student_id')->get();
-    $result = $query->result_array();
+    $result = ($query !== FALSE && $query->num_rows > 0) ? $query->result_array() : null;
     return $result;
   }
 
