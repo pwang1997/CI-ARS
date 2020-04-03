@@ -156,6 +156,16 @@ $(document).ready(() => {
             }
         });
     });
+
+    $('.history').click((e) => {
+        e.preventDefault();
+        let target = e.target.id;
+        let quiz_id = target.split('_')[1];
+
+        location.replace(`${base_url}/review_history/${quiz_id}`);
+    });
+
+
     //jump to question(ongoing) view
     $('button').click(function () {
         let quiz_index = this.id.substring(3);

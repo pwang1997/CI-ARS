@@ -113,4 +113,18 @@ class Courses extends CI_Controller
     $msg['result'] = $result;
     echo json_encode($msg);
   }
+
+  public function review_history() {
+    $quiz_id = $this->uri->segment(3);
+
+    $teacher_id = $this->session->id;
+    $data['question_list'] = $this->course->getQuestions($quiz_id);
+    $data['quiz_instance_list'] = $this->course->get_quiz_instance_list_review_history($quiz_id, $teacher_id);
+    $data['question_instance_list'] = $this->course->get_question_instance_list_review_history($data['quiz_instance_list']);
+    $data['student_response_list'] = $this->course->get_student_response_list_review_history($data['question_instance_list']);
+    $data['student_list'] = $this->course->get_student_list($quiz_id);
+    $this->load->view('templates/header');
+    $this->load->view('courses/review_history', $data);
+    $this->load->view('templates/footer');
+  }
 }
