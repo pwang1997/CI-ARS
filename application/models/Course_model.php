@@ -52,7 +52,7 @@ class Course_model extends CI_Model
     ->join('users', 'users.id = enrolled_students.student_id')
     ->where(array('classroom_id' => $classroom_id))
     ->get();
-    $result = ($query !== FALSE && $query->num_rows > 0) ? $query->result_array() : null;
+    $result = $query->result_array();
     return $result;
   }
 
