@@ -1,6 +1,7 @@
 "use strict";
 //global variable 
 let getUrl = window.location;
+const root_url = getUrl.protocol + "//" + getUrl.host;
 const base_url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/" + getUrl.pathname.split('/')[2];
 const wsurl = 'ws://127.0.0.1:8080/server/server.php';
 

@@ -21,7 +21,7 @@
 						</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" id="list-student-list" data-toggle="list" href="#list-student" role="tab" aria-controls="student">Student
+						<a class="nav-link" id="list-student-list" data-toggle="list" href="#list-student" role="tab" aria-controls="student">Students
 						</a>
 					</li>
 				</ul>
@@ -39,19 +39,22 @@
 				</div>
 				<!-- student list  -->
 				<div class="tab-pane fade" id="list-student" role="tabpanel" aria-labelledby="list-student-list">
-					<div class="md-form mt-1 mb-2">
-						<input class="form-control" type="text" placeholder="Search" aria-label="Search">
-					</div>
+					<!-- <div class="md-form pl-1 mt-1 mb-2">
+						<div class="row">
+							<input class="form-control col-md-11 pt-1" type="text" placeholder="Search" aria-label="Search">
+							<button class='btn btn-primary col-md-1'>Search</button>
+						</div>
+					</div> -->
 
 					<div class="table-responsive">
-						<table class="table table-sm table-striped " id="list_of_students">
+						<table class="table table-sm table-striped table-fixed" id="list_of_students">
 							<thead class="">
 								<tr>
-									<th scope="col"></th>
+									<th scope="col">#</th>
 									<th scope="col">Name</th>
-									<th scope="col">Grade</th>
+									<!-- <th scope="col">Grade</th> -->
 									<th scope="col"></th>
-									<th scope="col">Detail</th>
+									<!-- <th scope="col">Detail</th> -->
 								</tr>
 							</thead>
 							<tbody>
@@ -60,7 +63,7 @@
 									<tr class="" id="<?php echo "{$student['username']}"; ?>">
 										<th><?php echo $j++; ?></th>
 										<th scope="row"><?php echo $student['username']; ?></th>
-										<th><?= (isset($student['grade'])) ? $student['grade'] : "N/A"; ?></th>
+										<!-- <th><?= (isset($student['grade'])) ? $student['grade'] : "N/A"; ?></th> -->
 										<th>
 											<div class="row">
 												<div class="col-md-6 pb-1">
@@ -68,7 +71,7 @@
 												</div>
 											</div>
 										</th>
-										<th>
+										<!-- <th>
 											<div class="row">
 												<div class="col-md-6 pb-1">
 													<a id="grade_detail_<?= $student['id']; ?>" href='' style="color: grey !important">
@@ -80,7 +83,7 @@
 													</a>
 												</div>
 											</div>
-										</th>
+										</th> -->
 									</tr>
 								<?php endforeach; ?>
 							</tbody>
@@ -174,7 +177,7 @@ function addedCard($index, $quiz_id, $created_at, $num_questions)
 								<p class='card-text'><a href='" . base_url() . "questions/teacher/{$quiz_id}' class='text-secondary'>Question pool: ${num_questions}</a></p>
 								<div class=row>
 								<div class='col-sm-6 col-lg-12 pb-2'>
-									<button style='width:100%' type='button' class='btn btn-primary btn-block start' id=st_{$quiz_id}>Start Quiz</button>
+									<button style='width:100%' type='button' class='btn btn-primary btn-block start' id=st_{$quiz_id}>Start</button>
 								</div>
 								<div class='col-sm-6 col-lg-12 pb-2'>
 									<button style='width:100%' type='button' class='btn btn-danger btn-block remove' id=rm_{$quiz_id}>Delete</button>
@@ -182,12 +185,12 @@ function addedCard($index, $quiz_id, $created_at, $num_questions)
 							</div>
 							<div class='row'>
 								<div class='col-sm-6 col-lg-12 pb-2'>
-									<button style='width:100%' type='button' class='btn btn-primary btn-block history' id=history_{$quiz_id}>History</button>
+									<button style='width:100%' type='button' class='btn btn-primary btn-block history' id=history_{$quiz_id}>Review History</button>
 								</div>
 							</div>
 							<div class='row'>
 								<div class='col-sm-6 col-lg-12 pb-2'>
-									<button style='width:100%' type='button' class='btn btn-primary btn-block export' id=export_{$quiz_id}>Download Stat</button>
+									<button style='width:100%' type='button' class='btn btn-primary btn-block export' id=export_{$quiz_id}>Download History</button>
 								</div>
 							</div>
 							</div>
