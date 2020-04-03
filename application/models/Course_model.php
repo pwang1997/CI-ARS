@@ -78,7 +78,7 @@ class Course_model extends CI_Model
 
     $result = null;
     if($query !== FALSE && $query->num_rows() > 0) {
-      $result = $query->result_array()[0];
+      $result = $query->result_array();
     }
     return $result;
   }
