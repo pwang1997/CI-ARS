@@ -8,8 +8,6 @@
 </div><!-- end of container -->
 
 <?php 
-    print_r($course_info);
-    echo "<br>";
     print_r($quizs);
 ?>
 
