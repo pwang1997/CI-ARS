@@ -84,17 +84,17 @@ class Courses extends CI_Controller
     $data['course_info'] = $this->course->get_teacher_course($course_id, $classroom_id);
     $data['quizs'] = $this->course->get_quizs_for_student($course_id, $classroom_id);
 
-    // $data['questions'] = $this->course->get_questions_for_student($data['quizs']);
-    // $data['student_responses'] = $this->course->get_student_response($data['questions']);
+    $data['questions'] = $this->course->get_questions_for_student($data['quizs']);
+    $data['student_responses'] = $this->course->get_student_response($data['questions']);
 
-    // $data['quiz_list'] = $this->course->get_quiz_list($classroom_id);
-    // $data['question_list'] = $data['questions'];
+    $data['quiz_list'] = $this->course->get_quiz_list($classroom_id);
+    $data['question_list'] = $data['questions'];
 
-    // $teacher_id = $this->course->get_teacher_id($classroom_id);
+    $teacher_id = $this->course->get_teacher_id($classroom_id);
 
-    // $data['quiz_instance_list'] = $this->course->get_quiz_instance_list($data['quiz_list'], $teacher_id);
+    $data['quiz_instance_list'] = $this->course->get_quiz_instance_list($data['quiz_list'], $teacher_id);
 
-    // $data['question_instance_list'] = $this->course->get_question_instance_list($data['quiz_instance_list']);
+    $data['question_instance_list'] = $this->course->get_question_instance_list($data['quiz_instance_list']);
 
     $this->load->view('templates/header');
     $this->load->view('courses/student', $data);

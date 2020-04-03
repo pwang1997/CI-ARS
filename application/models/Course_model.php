@@ -38,7 +38,7 @@ class Course_model extends CI_Model
       'course_id' => $course_id,
       'classrooms.id' => $classroom_id
     );
-    $query = $this->db->select('*')->from('classroom')->where($where)->join('courses', 'courses.id = classrooms.course_id')->get();
+    $query = $this->db->select('*')->from('classrooms')->where($where)->join('courses', 'courses.id = classrooms.course_id')->get();
     $result = null;
     if($query !== FALSE && $query->num_rows() > 0) {
       $result = $query->result_array()[0];
