@@ -32,9 +32,9 @@
                 <?php $quiz_instance_counter = 1; ?>
                 <?php foreach ($quiz_instance_list as $quiz_instance) : ?>
                     <?php $quiz_instance_id = $quiz_instance['id']; ?>
-                    <?php if (isset($question_instance_list[$quiz_instance_id])) : ?>
 
-                        <div class="tab-pane fade <?php if ($quiz_instance_counter == 1) echo "active show"; ?>" id="quiz-<?= $quiz_instance_id; ?>" role="tabpanel" aria-labelledby="list-quiz-<?= $quiz_instance_id; ?>">
+                    <div class="tab-pane fade <?php if ($quiz_instance_counter == 1) echo "active show"; ?>" id="quiz-<?= $quiz_instance_id; ?>" role="tabpanel" aria-labelledby="list-quiz-<?= $quiz_instance_id; ?>">
+                        <?php if (isset($question_instance_list[$quiz_instance_id])) : ?>
                             <?php $question_counter = 1; ?>
                             <?php foreach ($question_instance_list[$quiz_instance_id] as $question_instance) : ?>
 
@@ -104,8 +104,8 @@
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>

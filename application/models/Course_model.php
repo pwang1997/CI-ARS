@@ -401,7 +401,8 @@ class Course_model extends CI_Model
 
   public function get_quiz_instance_list_review_history($quiz_index, $teacher_id)
   {
-    $result = $this->db->get_where('quiz_instances', array('quiz_meta_id' => $quiz_index, 'teacher_id' => $teacher_id))
+    $result = $this->db->get_where('quiz_instances', 
+    array('quiz_meta_id' => $quiz_index, 'teacher_id' => $teacher_id, 'status'=>'complete'))
       ->result_array();
     return $result;
   }
