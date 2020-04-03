@@ -128,7 +128,7 @@
 							<div class='card text-white bg-dark'>
 								<div class='card-teacher-course'>
 									<div class='card-body'>
-										<h5 class='card-title'><a href='#' id="add_quiz" class='text-secondary'>New Quiz</a></h5>
+										<h5 class='card-title'><a href='' id="add_quiz" class='text-secondary text-center'>New Quiz</a></h5>
 									</div>
 								</div>
 							</div>
@@ -138,7 +138,7 @@
 							<div class='card text-white bg-dark'>
 								<div class='card-teacher-course'>
 									<div class='card-body'>
-										<h5 class='card-title'><a href='#' id="export_class_history" name="<?php echo $classroom_id; ?>"class='text-secondary'>Export Class History</a></h5>
+										<h5 class='card-title'><a href='#' id="export_class_history" name="<?php echo $classroom_id; ?>"class='text-secondary text-center'>Export Class History</a></h5>
 									</div>
 								</div>
 							</div>
