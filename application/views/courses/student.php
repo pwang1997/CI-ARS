@@ -6,6 +6,13 @@
     <?php redirect('users/login'); ?>
 <?php endif; ?>
 </div><!-- end of container -->
+
+<?php 
+    print_r($course_info);
+    echo "<br>";
+    print_r($quizs);
+?>
+
 <div class="container-fluid">
     <div class="row" style="height: 100%">
         <!-- <nav class="col-md-2 d-none d-md-block bg-light sidebar"> -->
@@ -34,10 +41,12 @@
                 <div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
                     <h3><?= $title; ?></h3>
                     <hr>
+					<?php if(isset($course_info)): ?>
                     <p><strong>Course Name: </strong> <?php echo $course_info['course_name']; ?></p>
                     <p><strong>Course Code: </strong> <?php echo $course_info['course_code']; ?></p>
                     <p><strong>Section Number: </strong> <?php echo $course_info['section_id']; ?></p>
                     <p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
+					<?php endif; ?>
                 </div>
 
                 <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
