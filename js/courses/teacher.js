@@ -73,8 +73,7 @@ $(document).ready(() => {
             },
             success: function (response) {
                 if (response.success) {
-                    quiz_index = response.quiz_index;
-                    location.replace(`${root_url}/questions/create/${quiz_index}`);
+                    location.replace(`${root_url}/questions/create/${response.quiz_index}`);
                 } else {
                     alert("failed ")
                 }
