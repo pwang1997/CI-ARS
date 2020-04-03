@@ -40,14 +40,17 @@ class Course_model extends CI_Model
       'course_id' => $course_id,
       'classrooms.id' => $classroom_id
     );
-    $result = $this->db->get_where('classrooms', $where)->result_array();
+    $query = $this->db->select('*')->from('classroom')->where($where)->get();
+    $result = ($query !== FALSE && $query->num_rows() > 0) ? $query->result_array() : [];
     return (!empty($result)) ? $result[0] : [];
   }
 
   public function get_enrolled_students_for_teacher($classroom_id)
   {
     $this->db->join('users', 'users.id = enrolled_students.student_id');
-    return $this->db->get_where('enrolled_students', array('classroom_id' => $classroom_id))->result_array();
+    $query = $this->db->select('*')->from('enrolled_studnets')->where(array('classroom_id' => $classroom_id))->get();
+    $result = ($query !== FALSE && $query->num_rows() > 0) ? $query->result_array() : [];
+    return $result;
   }
 
   public function get_quizs_for_teacher($classroom_id)
@@ -70,7 +73,10 @@ class Course_model extends CI_Model
     $this->db->join('quizs', 'quizs.classroom_id = classrooms.id');
     $this->db->group_by('quizs.id');
     $this->db->where(array('enrolled_students.classroom_id' => $classroom_id));
-    return $this->db->get()->result_array();
+    $query = $this->db->get();
+
+    $result = ($query !== FALSE && $query->num_rows() > 0) ? $query->result_array() : [];
+    return $result;
   }
 
   /**
