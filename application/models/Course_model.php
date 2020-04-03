@@ -365,7 +365,7 @@ class Course_model extends CI_Model
         if ($query !== FALSE && $query->num_rows() > 0) {
           $result = $query->result_array();
         }
-
+ 
         if (!empty($result)) {
           $arr_student_response = array();
           foreach ($result as $student_response) {
