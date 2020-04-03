@@ -19,12 +19,15 @@ $(document).ready(() => {
                     $(".modal").modal('hide');
                     $("#username").val("");
                     $("tbody").
-                        append(`<tr class="table-light" id=${response.username}>
+                        append(`<tr id=${response.username}>
                               <th>${$("tbody").length}</th>
                               <th scrope="row">${response.username}</th>
                               <th>
-                                <button style="width:100%" type="button" class="btn btn-outline-danger btn_remove_student" id=btn_${response.username}>Remove</button>
-                                <button style="width:100%" type="button" class="btn btn-outline-primary btn_modify_student">Edit</button>
+                              <div class="row">
+                                    <div class="col-md-6 pb-1">
+                                        <button style="width:100%" type="button" class="btn btn-outline-danger btn_remove_student" id=btn_${response.username}>Remove</button>
+                                    </div>
+                                </div>
                               </th>
                             </tr>`);
                 } else {
