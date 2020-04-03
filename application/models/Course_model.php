@@ -359,7 +359,7 @@ class Course_model extends CI_Model
           ->from('(' . $subquery . ') a')
           ->join('student_responses', 'student_responses.id= a.id')
           ->join('users', 'student_responses.student_id= users.id')
-          ->group_by('student_responses.student_id')->get();
+          ->group_by(['student_responses.student_id','student_responses.id','users.username','student_responses.answer','student_responses.time_answered'])->get();
 
         $result = null;
         if ($query !== FALSE && $query->num_rows() > 0) {
