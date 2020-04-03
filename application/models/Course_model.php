@@ -353,11 +353,11 @@ class Course_model extends CI_Model
         $subquery = $this->db->get_compiled_select();
 
 
-        $this->db->select('student_responses.id, student_responses.student_id, users.username, student_responses.answer,student_responses.time_answered');
-        $this->db->from('(' . $subquery . ') a');
-        $this->db->join('student_responses', 'student_responses.id= a.id');
-        $this->db->join('users', 'student_responses.student_id= users.id');
-        $this->db->group_by('student_responses.student_id');
+        $this->db->select('student_responses.id, student_responses.student_id, users.username, student_responses.answer,student_responses.time_answered')
+        ->from('(' . $subquery . ') a')
+        ->join('student_responses', 'student_responses.id= a.id')
+        ->join('users', 'student_responses.student_id= users.id')
+        ->group_by('student_responses.student_id');
 
         $result = $this->db->get()->result_array();
         if (!empty($result)) {
