@@ -3,6 +3,7 @@
 $(document).ready(() => {
     let ids = $("[id^=question_]");
     let arr_ids = [];
+    let arr_quill = [];
     for (let i = 0; i < ids.length; i++) {
         arr_ids.push((ids[i]).id.substring(9));
     };
@@ -24,7 +25,7 @@ $(document).ready(() => {
             placeholder: 'Question Content',
             theme: 'snow' // or 'bubble'
         });
-        // quills.push(quill);
+        arr_quill[arr_ids[i]] = quill;
     }
 
     let arr_param = get_url_params(window.location.href)
@@ -47,7 +48,7 @@ $(document).ready(() => {
             });
 
             choices = choices.filter(Boolean);
-            console.log($(`#editor_${this.id}`).container.innerHTML.trim());
+            console.log(arr_quill[this.id].root.innerHTML.trim());
             $.ajax({
                 url: `${base_url}/update_question`,
                 type: "POST",
@@ -57,7 +58,7 @@ $(document).ready(() => {
                     'quiz_index': $(`#quiz_index_${this.id}`).val(),
                     'timer_type': $(`input[name=timer_types_${this.id}]:checked`).val(),
                     'duration': $(`input[name=duration_${this.id}]`).val().split(' ')[0],
-                    'content': $(`#editor_${this.id}`).container.innerHTML.trim(),
+                    'content': arr_quill[this.id].root.innerHTML.trim(),
                     'isPublic': $(`input[name=accesses_${this.id}]:checked`).val(),
                     'difficulty': $(`input[name=difficulties_${this.id}]:checked`).val(),
                     'category': $(`input[name=category_${this.id}]`).val(),
