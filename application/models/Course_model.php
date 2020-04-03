@@ -43,10 +43,9 @@ class Course_model extends CI_Model
     $query = $this->db->select('*')->from('classroom')->where($where)->get();
     $result = null;
     if($query !== FALSE && $query->num_rows() > 0) {
-      $result = $query->result_array();
-      return $result[0];
+      $result = $query->result_array()[0];
     }
-    return null;
+    return $result;
   }
 
   public function get_enrolled_students_for_teacher($classroom_id)
@@ -79,7 +78,10 @@ class Course_model extends CI_Model
     $this->db->where(array('enrolled_students.classroom_id' => $classroom_id));
     $query = $this->db->get();
 
-    $result = $query->result_array();
+    $result = null;
+    if($query !== FALSE && $query->num_rows() > 0) {
+      $result = $query->result_array()[0];
+    }
     return $result;
   }
 
