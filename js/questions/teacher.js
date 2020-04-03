@@ -47,7 +47,7 @@ $(document).ready(() => {
             });
 
             choices = choices.filter(Boolean);
-
+            console.log($(`#editor_${this.id}`).container.innerHTML.trim());
             $.ajax({
                 url: `${base_url}/update_question`,
                 type: "POST",
@@ -57,7 +57,7 @@ $(document).ready(() => {
                     'quiz_index': $(`#quiz_index_${this.id}`).val(),
                     'timer_type': $(`input[name=timer_types_${this.id}]:checked`).val(),
                     'duration': $(`input[name=duration_${this.id}]`).val().split(' ')[0],
-                    'content': quill.root.innerHTML.trim(),
+                    'content': $(`#editor_${this.id}`).container.innerHTML.trim(),
                     'isPublic': $(`input[name=accesses_${this.id}]:checked`).val(),
                     'difficulty': $(`input[name=difficulties_${this.id}]:checked`).val(),
                     'category': $(`input[name=category_${this.id}]`).val(),
