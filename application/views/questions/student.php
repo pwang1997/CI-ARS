@@ -4,7 +4,7 @@
     <?php redirect('users/login'); ?>
 <?php endif; ?>
 <link rel="stylesheet" href="../../css/spinner.css">
-<script src="<?= base_url(); ?>js/questions/student.js"></script>
+<!-- <script src="<?= base_url(); ?>js/questions/student.js"></script> -->
 
 <div class="question_off visible">
     <div class="d-flex flex-column align-items-center justify-content-center">

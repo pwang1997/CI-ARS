@@ -180,61 +180,61 @@
             }, 1000);
         };
 
-        var wsurl = 'ws://127.0.0.1:8080/server/server.php';
-        var websocket, cmd, message, client_name, question_index, role, question_instance_id, action;
+        // var wsurl = 'ws://127.0.0.1:8080/server/server.php';
+        // var websocket, cmd, message, client_name, question_index, role, question_instance_id, action;
 
-        if (window.WebSocket) {
-            websocket = new WebSocket(wsurl);
+        // if (window.WebSocket) {
+        //     websocket = new WebSocket(wsurl);
 
-            websocket.onopen = function(evevt) {
-                console.log("Connected to WebSocket server.");
-                msg = {
-                    'cmd': "connect",
-                    'from': <?php echo "'" . $this->session->id . "'"; ?>,
-                    'username': <?php echo "'" . $this->session->username . "'"; ?>,
-                    'role': <?php echo "'" . $this->session->role . "'"; ?>,
-                };
+        //     websocket.onopen = function(evevt) {
+        //         console.log("Connected to WebSocket server.");
+        //         msg = {
+        //             'cmd': "connect",
+        //             'from': <?php echo "'" . $this->session->id . "'"; ?>,
+        //             'username': <?php echo "'" . $this->session->username . "'"; ?>,
+        //             'role': <?php echo "'" . $this->session->role . "'"; ?>,
+        //         };
 
-                websocket.send(JSON.stringify(msg));
-            }
-            websocket.onmessage = function(event) {
-                var msg = JSON.parse(event.data);
+        //         websocket.send(JSON.stringify(msg));
+        //     }
+        //     websocket.onmessage = function(event) {
+        //         var msg = JSON.parse(event.data);
 
-                cmd = msg.cmd;
-                message = msg.message;
-                client_name = msg.client_name;
-                question_index = msg.question_id;
-                role = msg.role;
-                if (msg.question_instance_id != null) {
-                    question_instance_id = msg.question_instance_id;
-                }
-                targeted_time = msg.targeted_time;
+        //         cmd = msg.cmd;
+        //         message = msg.message;
+        //         client_name = msg.client_name;
+        //         question_index = msg.question_id;
+        //         role = msg.role;
+        //         if (msg.question_instance_id != null) {
+        //             question_instance_id = msg.question_instance_id;
+        //         }
+        //         targeted_time = msg.targeted_time;
 
-                console.log(msg);
-                if (cmd == "pause") {
-                    action = "pause";
-                    if (msg.question_status == "pause_answerable") {
-                        // do nothing
-                    } else if (msg.question_status == "pause_disable") {
-                        $('.submit').addClass('disabled');
-                        $('button[name=choice]').addClass('disabled');
-                    }
-                } else if (cmd == "resume") {
-                    action = "resume";
-                    $('.submit').removeClass('disabled');
-                    $('button[name=choice]').removeClass('disabled');
-                }
+        //         console.log(msg);
+        //         if (cmd == "pause") {
+        //             action = "pause";
+        //             if (msg.question_status == "pause_answerable") {
+        //                 // do nothing
+        //             } else if (msg.question_status == "pause_disable") {
+        //                 $('.submit').addClass('disabled');
+        //                 $('button[name=choice]').addClass('disabled');
+        //             }
+        //         } else if (cmd == "resume") {
+        //             action = "resume";
+        //             $('.submit').removeClass('disabled');
+        //             $('button[name=choice]').removeClass('disabled');
+        //         }
 
-            }
+        //     }
 
-            websocket.onerror = function(event) {
-                console.log("Connected to WebSocket server error");
-            }
+        //     websocket.onerror = function(event) {
+        //         console.log("Connected to WebSocket server error");
+        //     }
 
-            websocket.onclose = function(event) {
-                console.log('websocket Connection Closed. ');
-            }
-        }
+        //     websocket.onclose = function(event) {
+        //         console.log('websocket Connection Closed. ');
+        //     }
+        // }
     });
 </script>
 

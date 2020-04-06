@@ -117,7 +117,7 @@
 
     <?php if (isset($this->session->role) && $this->session->role == "student") : ?>
       <!-- <script src="<?= base_url(); ?>js/ws_student_helper.js"></script> -->
-      <!-- <script src="<?= base_url(); ?>js/ws_student.js"></script> -->
+      <script src="<?= base_url(); ?>js/ws_student.js"></script>
     <?php elseif (isset($this->session->role) && $this->session->role == "teacher") : ?>
       <!-- <script src="<?= base_url(); ?>js/ws_teacher_helper.js"></script> -->
       <!-- <script src="<?= base_url(); ?>js/ws_teacher.js"></script> -->

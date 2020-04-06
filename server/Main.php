@@ -1,8 +1,9 @@
 <?php
 
 namespace EchoBot;
-require dirname(__FILE__).'/../vendor/autoload.php';
-// require dirname(__DIR__) . '/src/User.php';
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+require dirname(__DIR__) . '/server/User.php';
 
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
@@ -18,14 +19,16 @@ class EchoBot implements MessageComponentInterface
     public function __construct()
     {
         echo "server started...\n";
-        $this->clients = array();
-        $this->clients[0] = new \SplObjectStorage; //public room
+        $this->clients = [];
+        $this->chambers = [];
     }
+
 
     public function onOpen(ConnectionInterface $conn)
     {
         // Store the new connection to send messages to later
-        $this->clients[0]->attach($conn);
+        $this->clients[$conn->resourceId] = $conn;
+
         echo "New connection! ({$conn->resourceId})\n";
     }
     /**
@@ -33,46 +36,38 @@ class EchoBot implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $numRecv = count($this->clients) - 1;
-        $response_text = "";
-
         $decoded_msg = json_decode($msg);
-        // print_r($decoded_msg);
 
         //ENUM: [connect,start, pause, resume, close, submit]
         $cmd = $decoded_msg->cmd;
-        // if ($cmd == "connect") {
-        //     $this->onConnect($from, $decoded_msg);
-        // } else if ($cmd == "start") {
-        //     $this->onStart();
-        // } else if ($cmd == "pause") {
-        //     $this->onPause();
-        // } else if ($cmd == "resume") {
-        //     $this->onResume();
-        // } else if ($cmd == "close") {
-        //     $this->onCloseQuestion();
-        // } else if ($cmd == "submit") {
-        //     $this->onSubmit();
-        // } else if ($cmd == "closing_connection") {
-        //     $this->onCloseConnection();
-        // }
+        if ($cmd == "connect") {
+            $this->onConnect($from, $decoded_msg);
+        } else if (
+            $cmd == "start" || $cmd == "pause" || $cmd == "resume"
+            || $cmd == "close" || $cmd == "submit" || $cmd == "update_remaining_time"
+            || $cmd == "display_answer" || $cmd == "hide_answer"
+        ) {
+            $this->onClassMessage($decoded_msg);
+        } else if ($cmd == "closing_connection") {
+            $this->onCloseConnection($decoded_msg);
+        }
 
         // echo $cmd;
-        $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
-    "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
-"question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
+        //         $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
+        //     "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
+        // "question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
 
-        $response_text = json_encode($response_text);
+        // $response_text = json_encode($response_text);
 
-        echo sprintf(
-            'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
-            $from->resourceId,
-            $response_text,
-            $numRecv,
-            $numRecv == 1 ? '' : 's'
-        );
+        // echo sprintf(
+        //     'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
+        //     $from->resourceId,
+        //     $response_text,
+        //     $numRecv,
+        //     $numRecv == 1 ? '' : 's'
+        // );
 
-        $this->broadcast($from, $response_text);
+        // $this->broadcast($from, $response_text);
     }
 
     /**
@@ -82,50 +77,81 @@ class EchoBot implements MessageComponentInterface
      */
     private function onConnect(ConnectionInterface $from, $msg)
     {
-        $role = $msg->role;
+        $role = (isset($msg->role)) ? $msg->role : null;
+        $quiz_id = (isset($msg->quiz_id)) ? $msg->quiz_id : null;
+        $list_of_students = json_decode($msg->list_of_students);
         $resource_id = $from->resourceId;
+        $u = new User($resource_id);
+        $u->importUserInfo($msg->from_id, $msg->username, $msg->role);
         //initialize chambers[teacher's resource id]
-        echo"1";
-        if (strcmp($role, "teacher") == 0 && empty($this->clients[$resource_id])) {
-            $this->clients[$resource_id] = array();
-            $this->clients[$resource_id]['teacher']->attach($from);
-            $this->clients[0]->dettach($from);
-            print_r($this->clients[$resource_id]);
-        } else if (strcmp($role, "student") == 0 && empty($this->clients[$msg->teacher_resource_id])) {
-        } else if (strcmp($role, "student")) {
+        if (strcmp($role, "teacher") == 0 && empty($this->chambers[$quiz_id])) {
+            $this->chambers[$quiz_id] = [];
+            $this->chambers[$quiz_id]['teacher'] = $u;
+            $this->chambers[$quiz_id]['list_of_students'] = $list_of_students;
+        } elseif (strcmp($role, "student") == 0) {
+            foreach ($this->chambers as $quiz_id => $chamber) {
+                $list_of_students = json_decode(json_encode($chamber['list_of_students']), true);
+                $found = array_search($msg->from_id, $list_of_students);
+
+                if ($found !== FALSE) { //quiz room found
+                    if ($msg->current_site !== "questions/student") { //notify the student that the quiz is up
+                        $response_text = array("cmd" => "notification", "quiz_id" => $quiz_id);
+                        $this->clients[$resource_id]->send(json_encode($response_text));
+                        $question_id = null;
+                        if(!empty($this->chambers[$quiz_id]['question_list'])) {
+                            $question_id = end($this->chambers[$quiz_id]['question_list']);
+                        }
+
+                        $response_text = ["cmd"=>"start", "question_id"=>$question_id];
+                        $this->clients[$resource_id]->send(json_encode($response_text));
+                    } else {
+                        $this->chambers[$quiz_id]['student'][$found] = $u;
+                    }
+                }
+            }
         }
     }
     /**
-     * 
+     * Start the quiz as a teacher, broadcast all connections in 'student' with 
+     * quiz_id, question info
      */
-    private function onStart()
+    private function onClassMessage($msg)
     {
+        if($msg->cmd == "start") {
+            //start question, store question id
+            $this->chambers[$msg->quiz_id]['question_list'][] = $msg->question_id;
+        }
+        if (strcmp($msg->role, "teacher") == 0) {
+            $students = $this->chambers[$msg->quiz_id]['student'];
+            if (empty($students)) return;
+            foreach ($students as $student) {
+                $resource_id = $student->get_resource_id();
+                $this->clients[$resource_id]->send(json_encode($msg));
+            }
+        } else { // student submit answer
+
+        }
     }
 
-    private function onPause()
+    /**
+     * close all connections within the class if it's a teacher
+     * otherwise, unset its own connection
+     */
+    private function onCloseConnection($msg)
     {
-    }
-
-    private function onResume()
-    {
-    }
-
-    private function onCloseQuestion()
-    {
-    }
-
-    private function onSubmit()
-    {
-    }
-
-    private function onCloseConnection()
-    {
+        $role = $msg->role;
+        $quiz_id = $msg->quiz_id;
+        if (strcmp($role, "teacher") == 0) {
+            //close classroom connection
+            $this->onClassMessage($msg);
+            unset($this->chambers[$quiz_id]);
+        }
     }
 
     public function onClose(ConnectionInterface $conn)
     {
         // The connection is closed, remove it, as we can no longer send it messages
-        $this->clients[0]->detach($conn);
+        unset($this->clients[$conn->resourecId]);
 
         echo "\nConnection {$conn->resourceId} has disconnected\n";
     }
@@ -135,21 +161,6 @@ class EchoBot implements MessageComponentInterface
         echo "An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
-    }
-
-    private function broadcast($from, $msg)
-    {
-        foreach ($this->clients[0] as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                echo $msg;
-                $client->send($msg);
-            }
-        }
-    }
-
-    private function sendTo($to, $msg) {
-        $to->send($msg);
     }
 }
 

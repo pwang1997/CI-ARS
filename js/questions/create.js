@@ -1,5 +1,7 @@
+"use strict";
+
 $(document).ready(() => {
-    var quill = new Quill('#editor', {
+    let quill = new Quill('#editor', {
         modules: {
             toolbar: [
                 [{
@@ -16,8 +18,8 @@ $(document).ready(() => {
 
     //add n choices
     $('#add_more_choices').click(function() {
-        num_choices = $(`.option_row > .choice_row`).length + 1;
-        var moreChoices = `<div class="form-group row choice_row">
+        let num_choices = $(`.option_row > .choice_row`).length + 1;
+        let moreChoices = `<div class="form-group row choice_row">
                           <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice ${num_choices}</label>
                           <div class="col-sm-6">
                               <input type="text" class="form-control" id="choice${num_choices}" autocomplete="on">
@@ -39,8 +41,8 @@ $(document).ready(() => {
     $("input[type='submit']").click((e) => {
         e.preventDefault();
 
-        choices = [];
-        answers = [];
+        let choices = [];
+        let answers = [];
         //get all values of choices
         $('input[name="answers"]').each(function() {
             if ($(this).is(':checked')) {

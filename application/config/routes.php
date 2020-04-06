@@ -12,6 +12,8 @@ $route['questions/create/:num'] = 'questions/create';
 $route['questions/teacher/:num'] = 'questions/teacher';
 
 $route['courses/student/:num/:num'] = 'courses/student';
+$route['courses/review_history/:num'] = 'courses/review_history';
+
 $route['courses/create'] = 'courses/create';
 $route['courses/teacher/:num/:num'] = 'courses/teacher';
 $route['courses/student'] = 'courses/student';

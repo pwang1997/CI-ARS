@@ -84,7 +84,7 @@
         </div>
 
         <div class="row editor-container">
-            <div class="col-sm-8" id="scrolling-container">
+            <div class="col-sm-8" id="scrolling-container_<?= $question['id']; ?>">
                 <div class="editor" id="editor_<?= $question['id']; ?>" style=" height: 350px; flex: 1; overflow-y: auto; width: 100%;"><?= $question['content']; ?></div>
             </div>
         </div>

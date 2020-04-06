@@ -1,14 +1,17 @@
+"use strict";
+
 $(document).ready(() => {
-    ids = $("[id^=question_]");
-    arr_ids = [];
-    for (i = 0; i < ids.length; i++) {
+    let ids = $("[id^=question_]");
+    let arr_ids = [];
+    let arr_quill = [];
+    for (let i = 0; i < ids.length; i++) {
         arr_ids.push((ids[i]).id.substring(9));
     };
 
-    for (i = 0; i < ids.length; i++) {
-        id = "#editor_" + arr_ids[i];
+    for (let i = 0; i < ids.length; i++) {
+        let id = "#editor_" + arr_ids[i];
         // console.log(id);
-        quill = new Quill(`#editor_${arr_ids[i]}`, {
+        let quill = new Quill(`#editor_${arr_ids[i]}`, {
             modules: {
                 toolbar: [
                     [{
@@ -22,10 +25,10 @@ $(document).ready(() => {
             placeholder: 'Question Content',
             theme: 'snow' // or 'bubble'
         });
-        // quills.push(quill);
+        arr_quill[arr_ids[i]] = quill;
     }
 
-    arr_param = get_url_params(window.location.href)
+    let arr_param = get_url_params(window.location.href)
     $('#new_question').click((e) => {
         location.replace(`${base_url}/create/${arr_param[arr_param.length - 1]}`);
     })
@@ -33,11 +36,11 @@ $(document).ready(() => {
     $("button").click(function() {
         //update question
         if ($(this).hasClass('update')) {
-            choices = [];
-            answers = [];
+            let choices = [];
+            let answers = [];
             //get all values of choices
             $(`input[name=choice_row_${this.id}]`).each(function() {
-                temp = $(this).parent().prev().children().first().val();
+                let temp = $(this).parent().prev().children().first().val();
                 if ($(this).is(':checked')) {
                     answers.push(temp);
                 }
@@ -45,7 +48,7 @@ $(document).ready(() => {
             });
 
             choices = choices.filter(Boolean);
-
+            console.log(arr_quill[this.id].root.innerHTML.trim());
             $.ajax({
                 url: `${base_url}/update_question`,
                 type: "POST",
@@ -55,7 +58,7 @@ $(document).ready(() => {
                     'quiz_index': $(`#quiz_index_${this.id}`).val(),
                     'timer_type': $(`input[name=timer_types_${this.id}]:checked`).val(),
                     'duration': $(`input[name=duration_${this.id}]`).val().split(' ')[0],
-                    'content': quill.root.innerHTML.trim(),
+                    'content': arr_quill[this.id].root.innerHTML.trim(),
                     'isPublic': $(`input[name=accesses_${this.id}]:checked`).val(),
                     'difficulty': $(`input[name=difficulties_${this.id}]:checked`).val(),
                     'category': $(`input[name=category_${this.id}]`).val(),
@@ -74,11 +77,11 @@ $(document).ready(() => {
                 }
             });
         } else if ($(this).hasClass('add')) {
-            question_index = this.id.substring(4);
+            let question_index = this.id.substring(4);
             //number of current options in the question
-            num_choices = $(`#option_row${question_index} > .choice_row`).length + 1;
+            let num_choices = $(`#option_row${question_index} > .choice_row`).length + 1;
             //content
-            var moreChoices = `<div class="form-group row choice_row">
+            let moreChoices = `<div class="form-group row choice_row">
                     <label for="choice${num_choices}" class="col-sm-12 col-md-2 col-form-label">:Choice ${num_choices}</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" name="choice${num_choices}" id="${question_index}_${num_choices}" autocomplete="on" >
@@ -91,7 +94,7 @@ $(document).ready(() => {
 
             $(`#option_row${question_index}`).append(moreChoices);
         } else if ($(this).hasClass('remove')) {
-            question_index = this.id.substring(4);
+            let question_index = this.id.substring(4);
             $(`#option_row${question_index}`).children().last().remove();
         }
     });

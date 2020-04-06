@@ -21,7 +21,7 @@
   <?php foreach ($category_list as $category) : ?>
     myWords.push({
       word: <?php echo "'" . $category['category'] . "'"; ?>,
-      size: <?php echo "'" . ($size[$category['category']]['size'] *10). "'"; ?>
+      size: <?php echo "'" . ($size[$category['category']]['size'] * 10) . "'"; ?>
     })
 
   <?php endforeach; ?>

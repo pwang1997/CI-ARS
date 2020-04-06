@@ -1,10 +1,12 @@
+"use strict";
+
 $(document).ready(() => {
     get_session().then((user) => {
         user = JSON.parse(user);
-        action = null;
 
-        var websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
-        var action, timer_type;
+        let websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
+        let action, timer_type;
+        let msg = null;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
 
@@ -12,15 +14,15 @@ $(document).ready(() => {
                 console.log("Connected to WebSocket server.");
                 msg = {
                     'cmd': "connect",
-                    'from': user.id,
+                    'from_id': user.id,
                     'username': user.username,
-                    'role': user.role,
+                    'role': user.role
                 };
 
                 websocket.send(JSON.stringify(msg));
             }
             websocket.onmessage = function(event) {
-                var msg = JSON.parse(event.data);
+                msg = JSON.parse(event.data);
 
                 cmd = msg.cmd;
                 message = msg.message;
@@ -72,7 +74,7 @@ $(document).ready(() => {
                                 $('#targeted_time').html(`Targeted Time: ${targeted_time} s`)
                                     // update question choices
                                     // arr_choices = response.result.choices.split(",");
-                                var arr = JSON.parse("[" + response.result.choices + "]")[0];
+                                let arr = JSON.parse("[" + response.result.choices + "]")[0];
                                 for (i = 0; i < arr.length; i++) {
                                     newContent = `<div class="form-group row choice_row">
                                                     <div class="col-sm-6">
@@ -111,6 +113,7 @@ $(document).ready(() => {
                         $(`#quiz_status`).html("Please prepare for quiz");
                     } else {
                         $(`#quiz_status`).html("Quiz is not available at the moment");
+                        websocket.close();
                     }
                 } else if (cmd == "pause") {
                     action = "pause";
@@ -153,7 +156,7 @@ $(document).ready(() => {
                         arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
                     }
 
-                    var student_answers = [];
+                    let student_answers = [];
                     i = 0;
                     $(`button[name=choice]`).each(function() {
                         content = $(this).html();
@@ -209,7 +212,7 @@ $(document).ready(() => {
         });
 
         function sendAnswers(question_instance_id) {
-            answers = [];
+            let answers = [];
             //get all values of choices
             $('button[name=choice]').each(function() {
                 if ($(this).hasClass('active')) {
@@ -254,7 +257,7 @@ $(document).ready(() => {
         //toggle choice buttons with 'active'
         function toggleActive() {
             $('button[name=choice]').each(function() {
-                btn_id = $(this)[0].id;
+                let btn_id = $(this)[0].id;
                 $(`#${btn_id}`).on('click', function() {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active')

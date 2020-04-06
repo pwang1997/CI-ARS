@@ -25,7 +25,8 @@
         <!-- main content -->
         <div class="col-md-10">
             <div class="tab-content" id="nav-tabContent">
-                <?php $index = 1; ?>
+                <?php $index = 1;
+                $quiz_number = 1; ?>
                 <?php foreach ($question_list as $question) : ?>
                     <div class="tab-pane fade <?php if ($index == 1) echo "show active"; ?>" id="list-<?= $question['id']; ?>" role="tabpanel" aria-labelledby="list-question_<?= $question['id']; ?>">
                         <h5>Question <?= $index; ?>:</h5>
@@ -118,58 +119,7 @@
                             </div>
                         </div>
                         <div class="border-top my-3 d-block"></div>
-                        <h3>Stat</h3>
-                        <div class="accordion" id="accordion_<?= $question['id']; ?>">
-                            <?php foreach ($question_instance_list[$question['id']] as $question_instance) : ?>
-                                <div class="card">
-                                    <div class="card-header" id="heading_<?= $question_instance['question_instance_id']; ?>">
-                                        <h6 class="mb-0 row">
-                                            <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $question_instance['question_instance_id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question_instance['question_instance_id']; ?>">
-                                                <?= $question_instance['time_created']; ?>
-                                            </button>
-                                            <p class="offset-md-5 col-md-4 mb-0">Correct:
-                                                <?php
-                                                $correct_counter = 0;
-                                                $total = count($question_instance_list[$question['id']]);
-                                                $student_answer = explode(",", $question_instance['answer']);
-                                                $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
-                                                if (count(array_diff($answers, $student_answer)) === 0) {
-                                                    $correct_counter++;
-                                                }
-                                                echo "{$correct_counter}/{$total}</p>";
-                                                ?>
-                                        </h6>
 
-
-                                    </div>
-                                    <div id="collapse_<?= $question_instance['question_instance_id']; ?>" class="collapse" aria-labelledby="heading_<?= $question_instance['question_instance_id']; ?>" data-parent="#accordion_<?= $question_instance['question_instance_id']; ?>">
-                                        <div class="card-body table-responsive">
-                                            <table id="table_<?= $question_instance['question_instance_id']; ?>" class="table table-hover table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Index</th>
-                                                        <th scope="col">Student Id</th>
-                                                        <th scope="col">Response</th>
-                                                        <th scope="col">Time Answered</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php $i = 1; ?>
-                                                    <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
-                                                                else echo "bg-success"; ?>>
-                                                        <th scope="row"><?php echo $i++; ?></td>
-                                                        <td><?php echo $question_instance['student_id']; ?></td>
-                                                        <td><?php echo $question_instance['answer']; ?></td>
-                                                        <td><?php echo $question_instance['time_answered']; ?></td>
-                                                    </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
                         <?php $index++; ?>
                     </div>
                 <?php endforeach; ?>
@@ -177,8 +127,3 @@
         </div>
     </div>
 </div>
-
-<?php
-
-
-?>

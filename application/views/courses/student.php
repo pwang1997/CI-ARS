@@ -6,6 +6,7 @@
     <?php redirect('users/login'); ?>
 <?php endif; ?>
 </div><!-- end of container -->
+
 <div class="container-fluid">
     <div class="row" style="height: 100%">
         <!-- <nav class="col-md-2 d-none d-md-block bg-light sidebar"> -->
@@ -34,10 +35,12 @@
                 <div class="tab-pane fade show active" id="list-course" role="tabpanel" aria-labelledby="list-course-detail">
                     <h3><?= $title; ?></h3>
                     <hr>
+					<?php if(isset($course_info)): ?>
                     <p><strong>Course Name: </strong> <?php echo $course_info['course_name']; ?></p>
                     <p><strong>Course Code: </strong> <?php echo $course_info['course_code']; ?></p>
                     <p><strong>Section Number: </strong> <?php echo $course_info['section_id']; ?></p>
                     <p><strong>Description: </strong> <?php echo $course_info['description']; ?></p>
+					<?php endif; ?>
                 </div>
 
                 <div class="tab-pane fade" id="list-quiz" role="tabpanel" aria-labelledby="list-quiz-list">
@@ -68,68 +71,61 @@
                 <div class="tab-pane fade" id="list-grade" role="tabpanel" aria-labelledby="list-grade-list">
                     <h3 class=" border-gray pb-2 mb-0">Grade list</h3>
                     <hr>
+                    <!-- placeholder  -->
+                    <?php $quiz_index = 1; ?>
+                    <?php foreach ($quiz_instance_list as $quiz_instances) : ?>
+                        <?php foreach ($quiz_instances as $quiz) : ?>
+                            <?php $question_index = 1; ?>
+                            <div class="accordion" id="accordion_<?= $quiz['id']; ?>">
+                                <div class="card">
+                                    <div class="card-header" id="heading_<?= $quiz['id']; ?>">
+                                        <h6 class="mb-0 row">
+                                            <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $quiz['id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $quiz['id']; ?>">
+                                                <?php echo "Quiz " . $quiz_index++; ?>
+                                            </button>
+                                        </h6>
+                                    </div>
+                                    <?php if (!isset($question_instance_list[$quiz['id']])) : ?>
+                                        <?php continue; ?>
+                                    <?php endif; ?>
+                                    <div id="collapse_<?= $quiz['id']; ?>" class="collapse" aria-labelledby="heading_<?= $quiz['id']; ?>" data-parent="#accordion_<?= $quiz['id']; ?>">
+                                        <div class="card-body table-responsive">
+                                            <table id="table_<?= $quiz['id']; ?>" class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Question</th>
+                                                        <th scope="col">Response</th>
+                                                        <th scope="col">Answer</th>
+                                                        <th scope="col">Time Answered</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($question_instance_list[$quiz['id']] as $question_instances) : ?>
+                                                        <?php foreach ($question_instances as $question_instance) : ?>
+                                                            <?php
+                                                            $answers = explode(",", $question_instance['answer']);
+                                                            $answers = str_replace(array("[", ",", "]", '"'), "", $answers);
 
-                    <?php foreach ($questions as $question) : ?>
-                        <?php $i = 1; ?>
-                        <?php if (count($question) > 0) : ?>
-                            <?php if (count($question[$i - 1]) > 0) : ?>
-                                <div class="accordion" id="accordion_<?= $question[$i - 1]['id']; ?>">
-                                    <div class="card">
-                                        <div class="card-header" id="heading_<?= $question[$i - 1]['id']; ?>">
-                                            <h6 class="mb-0 row">
-                                                <button class="btn btn-primary col-md-3" type="button" data-toggle="collapse" data-target="#collapse_<?= $question[$i - 1]['id']; ?>" aria-expanded="true" aria-controls="collapse_<?= $question[$i - 1]['id']; ?>">
-                                                    <?php echo "Date: {$question[$i - 1]['time_created']}" ?>
-                                                </button>
-                                                <p class="offset-md-5 col-md-4 mb-0">
-                                                    Score:
-                                                    <?php
-                                                    $count = 0;
-                                                    $total_question = count($question);
-                                                    foreach ($question as $q) {
-                                                        if (count($student_responses[$q['id']]) > 0 && $student_responses[$q['id']][0]['answer'] === $q['answer']) {
-                                                            $count++;
-                                                        }
-                                                    }
-                                                    echo "{$count}/{$total_question}";
-                                                    ?>
-                                                </p>
-                                            </h6>
-                                        </div>
-                                        <div id="collapse_<?= $question[$i - 1]['id']; ?>" class="collapse" aria-labelledby="heading_<?= $question[$i - 1]['id']; ?>" data-parent="#accordion_<?= $question[$i - 1]['id']; ?>">
-                                            <div class="card-body table-responsive">
-                                                <?php if (count($question) > 0) : ?>
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col">Question</th>
-                                                                <th scope="col">Content</th>
-                                                                <th scope="col">Your Choice</th>
-                                                                <th scope="col">Answer</th>
-                                                                <th scope="col">Date</th>
+                                                            $student_answer = explode(",", $question_instance['student_answer']);
+                                                            $student_answer = str_replace(array("[", ",", "]", '"'), "", $student_answer);
+                                                            ?>
+                                                            <tr class=<?php if (count(array_diff($answers, $student_answer)) !== 0) echo "bg-danger";
+                                                                        else echo "bg-success"; ?>>
+                                                                <th><?= $question_index++; ?></th>
+                                                                <th><?php echo $question_instance['student_answer']; ?></th>
+                                                                <th><?php echo $question_instance['answer']; ?></th>
+                                                                <th><?php echo $question_instance['time_answered']; ?></th>
                                                             </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php foreach ($question as $q) : ?>
-                                                                <tr class=<?php if (count($student_responses[$q['id']]) == 0 || $student_responses[$q['id']][0]['answer'] !== $q['answer']) echo "table-danger";
-                                                                            elseif(count($student_responses[$q['id']]) > 0 && $student_responses[$q['id']][0]['answer'] === $q['answer'])  echo "table-success"; ?>>
-                                                                    <th scope="row" id="<?= $q['id']; ?>"><?= $i++; ?></th>
-                                                                    <td><?= $q['content']; ?></td>
-                                                                    <td><?php if(!empty($student_responses[$q['id']][0]['answer'])) echo  $student_responses[$q['id']][0]['answer'];
-                                                                    else echo "[]"; ?></td>
-                                                                    <td><?= $q['answer']; ?></td>
-                                                                    <td><?= $q['time_created']; ?></td>
-                                                                </tr>
-                                                            <?php endforeach; ?>
-                                                        </tbody>
-                                                    </table>
-                                                <?php endif; ?>
+                                                        <?php endforeach; ?>
+                                                    <?php endforeach; ?>
+                                            </table>
 
-                                            </div>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     <?php endforeach; ?>
                 </div>
             </div>

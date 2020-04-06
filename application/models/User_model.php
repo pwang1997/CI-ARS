@@ -46,36 +46,38 @@ class User_model extends CI_Model
   {
     $this->db->select('courses.id as course_id,  classrooms.id as classroom_id, course_name, course_code, taught_by');
     $this->db->join('classrooms', 'courses.id = classrooms.course_id');
-    $where = array('taught_by'=>$teacher_id);
+    $where = array('taught_by' => $teacher_id);
     return $this->db->get_where('courses', $where)->result_array();
   }
 
   public function get_courses_for_students($student_id)
   {
     $this->db->select('courses.id as course_id, classrooms.id as classroom_id, course_name, section_id, course_code, taught_by');
-    $this->db->join('enrolledStudents', 'enrolledStudents.student_id=users.id');
-    $this->db->join('classrooms', 'enrolledStudents.classroom_id = classrooms.id');
+    $this->db->join('enrolled_students', 'enrolled_students.student_id=users.id');
+    $this->db->join('classrooms', 'enrolled_students.classroom_id = classrooms.id');
     $this->db->join('courses', 'classrooms.course_id = courses.id');
     $data = array(
-      'enrolledStudents.student_id' => $student_id,
+      'enrolled_students.student_id' => $student_id,
       'users.role' => 'student'
     );
     return $this->db->get_where('users', $data)->result_array();
   }
 
-  public function get_username($course_list) {
-    $result['username'] = array();
-    foreach($course_list as $course) {
+  public function get_username($course_list)
+  {
+    $result['username'] = [];
+    foreach ($course_list as $course) {
       $this->db->select('username');
-      $result[$course['taught_by']] = $this->db->get_where('users', array('id'=>$course['taught_by']))->result_array();
+      $result[$course['taught_by']] = $this->db->get_where('users', array('id' => $course['taught_by']))->result_array();
     }
     return $result;
   }
 
-  public function get_section_list($course_list) {
-    $result = array();
-    foreach($course_list as $course) {
-      $result[] = $this->db->select('section_id')->from('classrooms')->where(array('course_id'=>$course['course_id']))->get()->result_array()[0];
+  public function get_section_list($course_list)
+  {
+    $result = [];
+    foreach ($course_list as $course) {
+      $result[] = $this->db->select('section_id')->from('classrooms')->where(array('course_id' => $course['course_id']))->get()->result_array()[0];
     }
     return $result;
   }
