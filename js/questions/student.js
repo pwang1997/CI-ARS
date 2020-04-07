@@ -238,6 +238,7 @@ $(document).ready(() => {
                             "answers": response.msg,
                             "username": user.username,
                             "role": user.role,
+                            "from_id": user.id,
                             "question_id": null,
                             "question_instance_id": question_instance_id
                         }

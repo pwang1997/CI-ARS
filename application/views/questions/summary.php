@@ -1,30 +1,21 @@
 <div class="question_on">
     <!-- content + buttons  -->
     <div class="row">
-        <div class="col-8">
-            <br>
-            <div class="form-group row" style="position:relative;">
-                <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
-                    <div id="editor" style="min-height:100%; height:auto;"></div>
+        <h6 class="ml-2" id="editor"></h6>
+        <div class="d-flex flex-column">
+            <div class="p-2" id="targeted_time">Targeted Time: </div>
+            <div class="p-2">
+                <p id="duration">
+                </p>
+                <div class="progress">
                 </div>
             </div>
-        </div>
-        <div class="col-4">
-            <br>
-            <div class="d-flex flex-column">
-                <div class="p-2" id="targeted_time">Targeted Time: </div>
-                <div class="p-2">
-                    <p id="duration">
-                    </p>
-                    <div class="progress">
-                    </div>
-                </div>
-                <div class="p-2">
-                    <p>Number of Responses: <span id="num_response">0</span></p>
-                </div>
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary" id="stat">Stats</button>
-                </div>
+            <div class="p-2">
+                <p>Number of Responses: <span id="num_response">0</span></p>
+                <p>Number of Online Students: <span id="num_online_students">0</span></p>
+            </div>
+            <div class="p-2">
+                <button type="button" class="btn btn-primary" id="stat">Stats</button>
             </div>
         </div>
     </div>
@@ -34,9 +25,8 @@
         $i = 1;
         foreach ($choices as $choice) : ?>
             <div class="form-group row choice_row">
-                <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
                 <div class="col-sm-6">
-                    <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
+                    <input type="text" disabled class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
                 </div>
                 <div class="form-check col-sm-1">
                     <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
@@ -47,19 +37,18 @@
     </div>
     <div class="options"></div>
 </div>
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<h3><?= $title; ?></h3>
+<!-- Create a div where the graph will take place -->
+<div id="chart"></div>
+
 <script>
     $(document).ready(() => {
-        var quill = new Quill('#editor', {
-            modules: {
-                "toolbar": false
-            },
-            theme: 'snow' // or 'bubble'
-        });
-        quill.enable(false);
-
-
         $.ajax({
-            url: "<?php echo base_url(); ?>questions/get_question_for_student",
+            url: `${root_url}/questions/get_question_for_student`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -68,8 +57,8 @@
             success: function(response) {
                 if (response.result != null) {
                     console.log(response);
-                    $('#content').val(response.result.content)
-                    $('#editor').html(response.result.content)
+                    $('#content').val(response.result.content);
+                    $('#editor').html(response.result.content);
                     timer_type = response.result.timer_type;
                     choices = response.result.choices;
                     duration = response.result.duration;
@@ -92,7 +81,6 @@
                     var arr = JSON.parse("[" + response.result.choices + "]")[0];
                     for (i = 0; i < arr.length; i++) {
                         newContent = `<div class="form-group row choice_row">
-                                                    <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i+1}</label>
                                                     <div class="col-sm-6">
                                                         <button type="button" class="btn btn-outline-secondary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
                                                     </div>
@@ -180,72 +168,94 @@
             }, 1000);
         };
 
-        // var wsurl = 'ws://127.0.0.1:8080/server/server.php';
-        // var websocket, cmd, message, client_name, question_index, role, question_instance_id, action;
+        get_session().then((user) => {
+            user = JSON.parse(user);
+            let url_params = get_url_params(window.location.href);
+            let quiz_id = url_params[url_params.length - 1];
+            get_all_students(quiz_id).then((list_of_students) => {
+                console.log(`list of students: ${list_of_students}`);
+                let action = null;
+                let init_progress = null;
+                let websocket = null;
+                let msg = null;
 
-        // if (window.WebSocket) {
-        //     websocket = new WebSocket(wsurl);
+                if (window.WebSocket) {
+                    websocket = new WebSocket(wsurl);
 
-        //     websocket.onopen = function(evevt) {
-        //         console.log("Connected to WebSocket server.");
-        //         msg = {
-        //             'cmd': "connect",
-        //             'from': <?php echo "'" . $this->session->id . "'"; ?>,
-        //             'username': <?php echo "'" . $this->session->username . "'"; ?>,
-        //             'role': <?php echo "'" . $this->session->role . "'"; ?>,
-        //         };
+                    websocket.onopen = function(evevt) {
+                        msg = {
+                            'cmd': "connect",
+                            'from_id': user.id,
+                            'username': user.username,
+                            'role': user.role,
+                            'quiz_id': quiz_id
+                        };
+                        websocket.send(JSON.stringify(msg));
+                        console.log("Connected to WebSocket server.");
+                    }
+                    websocket.onerror = function(event) {
+                        console.log("Connected to WebSocket server error");
+                    }
 
-        //         websocket.send(JSON.stringify(msg));
-        //     }
-        //     websocket.onmessage = function(event) {
-        //         var msg = JSON.parse(event.data);
+                    let close_connection = async function() {
+                        msg = {
+                            cmd: "closing_connection",
+                            from_id: user.id,
+                            role: user.role,
+                            quiz_id: quiz_id
+                        }
+                        websocket.send(JSON.stringify(msg));
 
-        //         cmd = msg.cmd;
-        //         message = msg.message;
-        //         client_name = msg.client_name;
-        //         question_index = msg.question_id;
-        //         role = msg.role;
-        //         if (msg.question_instance_id != null) {
-        //             question_instance_id = msg.question_instance_id;
-        //         }
-        //         targeted_time = msg.targeted_time;
+                        websocket.onclose = function(event) {
+                            console.log('websocket Connection Closed. ', event);
+                        }; // disable onclose handler first
+                    };
 
-        //         console.log(msg);
-        //         if (cmd == "pause") {
-        //             action = "pause";
-        //             if (msg.question_status == "pause_answerable") {
-        //                 // do nothing
-        //             } else if (msg.question_status == "pause_disable") {
-        //                 $('.submit').addClass('disabled');
-        //                 $('button[name=choice]').addClass('disabled');
-        //             }
-        //         } else if (cmd == "resume") {
-        //             action = "resume";
-        //             $('.submit').removeClass('disabled');
-        //             $('button[name=choice]').removeClass('disabled');
-        //         }
+                    window.onbeforeunload = function() {
+                        close_connection();
+                    };
+                    //receive message
+                    websocket.onmessage = function(event) {
+                        msg = JSON.parse(event.data);
 
-        //     }
+                        let type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
+                        let num_clients = msg.num_online_students;
+                        let num_responses = 0;
+                        console.log(msg);
+                        if (type == "connect") { //update number of students in the class room
+                            $('#num_online_students').html(num_clients - 1);
+                        }
+                        //initialize dataset array(associative)
+                        let arr_dataset = [];
+                        let frequency = [];
+                        for (let i = 0; i < list_of_students.length; i++) {
+                            arr_dataset[`${list_of_students[i]}`] = "";
+                        }
+                        //student submits an answer
+                        if (msg.cmd == "submit") {
+                            $('#chart').empty();
 
-        //     websocket.onerror = function(event) {
-        //         console.log("Connected to WebSocket server error");
-        //     }
-
-        //     websocket.onclose = function(event) {
-        //         console.log('websocket Connection Closed. ');
-        //     }
-        // }
+                            let student_id = msg.from_id;
+                            let student_answer = msg.answer;
+                            student_answer = student_answer.replace("[", "").replace("]", "").split("'").join("").split(",");
+                            //a new student response
+                            if (arr_dataset[`${student_id}`].length == 0) {
+                                num_responses++;
+                            }
+                            arr_dataset[`${student_id}`] = student_answer;
+                            if(frequency[`${student_answer}`] && frequency[`${student_answer}`].length > 0) {
+                                frequency[`${student_answer}`]++;
+                            } else {
+                                frequency[`${student_answer}`] = 1;
+                            }
+                            console.log([arr_dataset, frequency]);
+                        }
+                    }
+                }
+            });
+        });
     });
 </script>
-
-<!-- Load d3.js -->
-<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
-<script src="https://d3js.org/d3.v4.min.js"></script>
-
-<h3><?= $title; ?></h3>
-<!-- Create a div where the graph will take place -->
-<div id="chart"></div>
-<!-- <svg width="960" height="500"></svg> -->
 
 <script>
     $(document).ready(() => {
