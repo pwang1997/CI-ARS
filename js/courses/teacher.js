@@ -165,15 +165,14 @@ $(document).ready(() => {
         let target = e.target.id;
         let quiz_id = target.split('_')[1];
 
-        location.replace(`${base_url}/review_history/${quiz_id}`);
+        window.location.replace(`${base_url}/courses/review_history/${quiz_id}`);
     });
-
 
     //jump to question(ongoing) view
     $('button').click(function () {
         let quiz_index = this.id.substring(3);
         if ($(this).hasClass('start')) {
-            let head = `${base_url}/../questions/ongoing_quiz_teacher/${quiz_index}`;
+            let head = `${base_url}/../questions/quiz/${quiz_index}`;
             location.replace(head);
         } else if ($(this).hasClass('remove')) {
             $.ajax({
@@ -200,7 +199,7 @@ $(document).ready(() => {
     $('#export_class_history').click((e) => {
 
         $.ajax({
-            url: `${base_url}/export_classroom_history`,
+            url: `${base_url}courses/export_classroom_history`,
             type: "POST",
             dataType: "JSON",
             data: {

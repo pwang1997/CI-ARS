@@ -66,7 +66,7 @@ class Questions extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    public function ongoing_quiz_teacher()
+    public function quiz()
     {
         $quiz_index = $this->uri->segment(3);
         $data['quiz_index'] = $quiz_index;
@@ -76,8 +76,8 @@ class Questions extends CI_Controller
         $data['question_instance_list'] = $this->question->get_question_instance_list($data['quiz_instance_list']);
         $data['student_response_list'] = $this->question->get_student_response_list($data['question_instance_list']);
 
-        $this->load->view('templates/header');
-        $this->load->view('questions/ongoing_quiz_teacher', $data);
+        $this->load->view('templates/header', $data);
+        $this->load->view('questions/quiz', $data);
         $this->load->view('templates/footer');
     }
 

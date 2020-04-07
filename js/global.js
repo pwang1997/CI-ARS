@@ -18,7 +18,7 @@ async function get_all_students(quiz_id) {
             url: `${root_url}/questions/get_all_students`,
             type: "POST",
             data: {
-                quiz_id : quiz_id
+                quiz_id: quiz_id
             },
             done: (response) => {
                 return response;
@@ -49,4 +49,14 @@ $(document).ready(() => {
         $('#overlay').hide();
     });
     //end of toast
+    //Header tooltips
+    $('#sign-up').tooltip('enable');
+    $('#sign-in').tooltip('enable');
+    $('#sign-out').tooltip('enable');
+    $('#user').tooltip('enable');
+    //side bar
+    $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
 })

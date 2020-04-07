@@ -123,7 +123,7 @@ class Courses extends CI_Controller
     $data['question_instance_list'] = $this->course->get_question_instance_list_review_history($data['quiz_instance_list']);
     $data['student_response_list'] = $this->course->get_student_response_list_review_history($data['question_instance_list']);
     $data['student_list'] = $this->course->get_student_list($quiz_id);
-    $this->load->view('templates/header');
+    $this->load->view('templates/header', $data);
     $this->load->view('courses/review_history', $data);
     $this->load->view('templates/footer');
   }
