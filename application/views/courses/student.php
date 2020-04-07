@@ -28,7 +28,52 @@
         </div>
     </div>
     <div class="tab-pane fade" id="list-grade" role="tabpanel" aria-labelledby="list-grade-list">
-
+        <div class="table-responsive">
+            <table class="table table-striped table-fixed">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Out</th>
+                        <th scope="col">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $index = 1;
+                    ?>
+                    <?php foreach ($quiz_instance_list as $quiz_instances) : ?>
+                        <?php foreach ($quiz_instances as $quiz_instance) : ?>
+                            <?php
+                                $quiz_instance_id = $quiz_instance['id'];
+                                $quiz_id = $quiz_instance['quiz_meta_id'];
+                                $question_instances = $question_instance_list[$quiz_instance_id];
+                                $c_correct = 0;
+                                foreach($question_instances as $question_instance) {
+                                    $question_instance_id = $question_instance['id'];
+                                    //check student responses
+                                    $teacher_answer = ($question_instance['answer']);
+                                    if(!empty($student_responses[$question_instance_id])) {
+                                        $student_answer = ($student_responses[$question_instance_id][0]['answer']);
+                                        if($teacher_answer === $student_answer) {
+                                            $c_correct++;
+                                        }
+                                    }
+                                }
+                            ?>
+                            <tr>
+                                <th><?php echo $index++; ?></th>
+                                <th><?php echo $quiz_instance['create_at']; ?></th>
+                                <th><?php echo $c_correct; ?></th>
+                                <th><?php echo count($questions[$quiz_id]);?></th>
+                                <th><?php echo ($c_correct / count($questions[$quiz_id])*100).'%'; ?></th>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
