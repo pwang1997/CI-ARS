@@ -27,7 +27,7 @@ $(document).ready(() => {
             }
             websocket.onmessage = function (event) {
                 msg = JSON.parse(event.data);
-                if(msg.cmd !== "update_remaining_time") {
+                if (msg.cmd !== "update_remaining_time") {
                     console.log(msg);
                 }
 
@@ -106,7 +106,7 @@ $(document).ready(() => {
                     $('.submit').prop('disabled', true);
                     $('button[name=choice]').prop('disabled', true);
 
-                } else if (cmd == "close" || cmd == "closing_connection") { //remove question contents
+                } else if (cmd == "close") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
                     $('.options').empty(); //remove options
@@ -118,11 +118,9 @@ $(document).ready(() => {
                     $('.submit').prop('disabled', false);
 
                     action = "close";
-                    if (cmd == "close") {
-                        $(`#quiz_status`).html("Please prepare for quiz");
-                    } else {
-                        $(`#quiz_status`).html("Quiz is not available at the moment");
-                    }
+                    $(`#quiz_status`).html("Please prepare for quiz");
+                } else if (cmd == "closing_connection") {
+                    window.location.replace(`${root_url}/users/student`);
                 } else if (cmd == "pause") {
                     action = "pause";
                     init_progress = remaining_time;
