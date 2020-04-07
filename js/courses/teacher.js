@@ -7,7 +7,7 @@ $(document).ready(() => {
         e.preventDefault();
         let sname = $("#username");
         $.ajax({
-            url: `${base_url}/add_student_from_classroom`,
+            url: `${root_url}/courses/add_student_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -45,7 +45,7 @@ $(document).ready(() => {
         let target = e.target.id;
         let sname = target.split('_')[1];
         $.ajax({
-            url: `${base_url}/remove_student_from_classroom`,
+            url: `${root_url}/courses/remove_student_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -68,7 +68,7 @@ $(document).ready(() => {
     $('#add_quiz').click((e) => {
         e.preventDefault();
         $.ajax({
-            url: `${base_url}/add_quiz_from_classroom`,
+            url: `${root_url}/courses/add_quiz_from_classroom`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -93,7 +93,7 @@ $(document).ready(() => {
         let quiz_id = target.split('_')[1];
 
         $.ajax({
-            url: `${base_url}/export_student_stat`,
+            url: `${root_url}/courses/export_student_stat`,
             type: "POST",
             dataType: "JSON",
             data: {
@@ -172,11 +172,11 @@ $(document).ready(() => {
     $('button').click(function () {
         let quiz_index = this.id.substring(3);
         if ($(this).hasClass('start')) {
-            let head = `${base_url}/../questions/quiz/${quiz_index}`;
+            let head = `${root_url}/questions/quiz/${quiz_index}`;
             location.replace(head);
         } else if ($(this).hasClass('remove')) {
             $.ajax({
-                url: `${base_url}/remove_quiz_from_classroom`,
+                url: `${root_url}/courses/remove_quiz_from_classroom`,
                 type: "POST",
                 dataType: "JSON",
                 data: {
@@ -199,7 +199,7 @@ $(document).ready(() => {
     $('#export_class_history').click((e) => {
 
         $.ajax({
-            url: `${root_url}/courses//export_classroom_history`,
+            url: `${root_url}/courses/export_classroom_history`,
             type: "POST",
             dataType: "JSON",
             data: {
