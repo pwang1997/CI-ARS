@@ -5,11 +5,10 @@ $(document).ready(() => {
         user = JSON.parse(user);
         let current_site = getUrl.pathname.split('/');
         current_site = `${current_site[current_site.length - 3]}/${current_site[current_site.length - 2]}`;
-        console.log(current_site);
         let websocket, cmd, message,
             client_name, question_index,
             role, question_instance_id, init_progress = null;
-        let action, timer_type;
+        let action, timer_type, content;
         let msg = null, duration = null;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
@@ -28,7 +27,9 @@ $(document).ready(() => {
             }
             websocket.onmessage = function (event) {
                 msg = JSON.parse(event.data);
-                console.log(msg);
+                if(msg.cmd !== "update_remaining_time") {
+                    console.log(msg);
+                }
 
                 cmd = msg.cmd;
                 message = msg.message;
@@ -215,7 +216,7 @@ $(document).ready(() => {
 
         $('.submit').click(function (e) {
             e.preventDefault();
-            console.log(question_instance_id);
+            // console.log(question_instance_id);
             sendAnswers(question_instance_id);
         });
 
