@@ -122,7 +122,8 @@ class EchoBot implements MessageComponentInterface
             // $summary = $this->chambers[$msg->quiz_id]['summary'];
             // $resource_id = $summary->get_resource_id();
             // $this->clients[$resource_id]->send(json_encode($msg));
-            print_r($this->chambers[$msg->quiz_id]['summary']);
+            echo "quiz id: {$msg->quiz_id}";
+            print_r($this->chambers[$msg->quiz_id]['summary']->get_resource_id());
         }
     }
 
