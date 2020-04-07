@@ -51,23 +51,6 @@ class EchoBot implements MessageComponentInterface
         } else if ($cmd == "closing_connection") {
             $this->onCloseConnection($decoded_msg);
         }
-
-        // echo $cmd;
-        //         $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
-        //     "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
-        // "question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
-
-        // $response_text = json_encode($response_text);
-
-        // echo sprintf(
-        //     'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
-        //     $from->resourceId,
-        //     $response_text,
-        //     $numRecv,
-        //     $numRecv == 1 ? '' : 's'
-        // );
-
-        // $this->broadcast($from, $response_text);
     }
 
     /**
@@ -132,13 +115,14 @@ class EchoBot implements MessageComponentInterface
                 $resource_id = $student->get_resource_id();
                 $this->clients[$resource_id]->send(json_encode($msg));
             }
-            $summary = $this->chambers[$msg->quiz_id]['summary'];
-            $resource_id = $summary->get_resource_id();
-            $this->clients[$resource_id]->send(json_encode($msg));
+            // $summary = $this->chambers[$msg->quiz_id]['summary'];
+            // $resource_id = $summary->get_resource_id();
+            // $this->clients[$resource_id]->send(json_encode($msg));
         } elseif($msg->role === "student" && $msg->cmd === "submit") { // student submit answe
-            $summary = $this->chambers[$msg->quiz_id]['summary'];
-            $resource_id = $summary->get_resource_id();
-            $this->clients[$resource_id]->send(json_encode($msg));
+            // $summary = $this->chambers[$msg->quiz_id]['summary'];
+            // $resource_id = $summary->get_resource_id();
+            // $this->clients[$resource_id]->send(json_encode($msg));
+            print_r($this->chambers[$msg->quiz_id]['summary']);
         }
     }
 
