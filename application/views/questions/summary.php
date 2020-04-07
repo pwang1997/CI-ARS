@@ -1,24 +1,7 @@
 <div class="question_on">
     <!-- content + buttons  -->
-    <div class="row">
-        <h6 class="ml-2" id="editor"></h6>
-        <div class="d-flex flex-column">
-            <div class="p-2" id="targeted_time">Targeted Time: </div>
-            <div class="p-2">
-                <p id="duration">
-                </p>
-                <div class="progress">
-                </div>
-            </div>
-            <div class="p-2">
-                <p>Number of Responses: <span id="num_response">0</span></p>
-                <p>Number of Online Students: <span id="num_online_students">0</span></p>
-            </div>
-            <div class="p-2">
-                <button type="button" class="btn btn-primary" id="stat">Stats</button>
-            </div>
-        </div>
-    </div>
+    <h5>Question:</h5>
+    <h6 class="ml-2" id="editor"></h6>
     <!-- answer/choices -->
     <div>
         <?php $choices = (isset($this->session->choices)) ? json_decode($this->session->choices) : [];
@@ -36,6 +19,20 @@
         endforeach; ?>
     </div>
     <div class="options"></div>
+    <div id="targeted_time">Targeted Time: </div>
+    <div>
+        <p id="duration">
+        </p>
+        <div class="progress">
+        </div>
+    </div>
+    <div>
+        <p>Number of Responses: <span id="num_response">0</span></p>
+        <p>Number of Online Students: <span id="num_online_students">0</span></p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary" id="stat">Stats</button>
+    </div>
 </div>
 
 <!-- Load d3.js -->
@@ -171,7 +168,7 @@
         get_session().then((user) => {
             user = JSON.parse(user);
             let url_params = get_url_params(window.location.href);
-            let quiz_id = url_params[url_params.length - 1];
+            let quiz_id = url_params[url_params.length - 2];
             get_all_students(quiz_id).then((list_of_students) => {
                 console.log(`list of students: ${list_of_students}`);
                 let action = null;
@@ -243,7 +240,7 @@
                                 num_responses++;
                             }
                             arr_dataset[`${student_id}`] = student_answer;
-                            if(frequency[`${student_answer}`] && frequency[`${student_answer}`].length > 0) {
+                            if (frequency[`${student_answer}`] && frequency[`${student_answer}`].length > 0) {
                                 frequency[`${student_answer}`]++;
                             } else {
                                 frequency[`${student_answer}`] = 1;
