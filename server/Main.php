@@ -111,6 +111,7 @@ class EchoBot implements MessageComponentInterface
             }
         } elseif($role === "summary" && !empty($this->chambers[$quiz_id])) {
             $this->chambers[$quiz_id]['summary'] = $u;
+            print_r($this->chambers[$quiz_id]);
         }
     }
     /**

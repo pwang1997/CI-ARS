@@ -28,7 +28,6 @@
     </div>
     <div>
         <p>Number of Responses: <span id="num_response">0</span></p>
-        <p>Number of Online Students: <span id="num_online_students">0</span></p>
     </div>
     <div>
         <button type="button" class="btn btn-primary" id="stat">Stats</button>
@@ -204,9 +203,7 @@
                         let num_clients = msg.num_online_students;
                         let num_responses = 0;
                         console.log(msg);
-                        if (type == "connect") { //update number of students in the class room
-                            $('#num_online_students').html(num_clients - 1);
-                        }
+
                         //initialize dataset array(associative)
                         let arr_dataset = [];
                         let frequency = [];
