@@ -95,7 +95,7 @@ class EchoBot implements MessageComponentInterface
             }
         } elseif($role === "summary" && !empty($this->chambers[$quiz_id])) {
             $this->chambers[$quiz_id]['summary'] = $u;
-            print_r($this->chambers[$quiz_id]);
+            print_r($this->chambers);
         }
     }
     /**
@@ -122,8 +122,9 @@ class EchoBot implements MessageComponentInterface
             // $summary = $this->chambers[$msg->quiz_id]['summary'];
             // $resource_id = $summary->get_resource_id();
             // $this->clients[$resource_id]->send(json_encode($msg));
-            echo "quiz id: {$msg->quiz_id}";
-            print_r($this->chambers[$msg->quiz_id]['summary']->get_resource_id());
+            print_r($msg);
+            // echo "quiz id: {$msg->quiz_id}";
+            // print_r($this->chambers[$msg->quiz_id]['summary']->get_resource_id());
         }
     }
 
