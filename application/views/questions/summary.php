@@ -203,7 +203,6 @@
                         let num_clients = msg.num_online_students;
                         let num_responses = 0;
                         console.log(msg);
-
                         //initialize dataset array(associative)
                         let arr_dataset = [];
                         let frequency = [];

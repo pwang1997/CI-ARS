@@ -79,7 +79,7 @@ class EchoBot implements MessageComponentInterface
     {
         $role = (isset($msg->role)) ? $msg->role : null;
         $quiz_id = (isset($msg->quiz_id)) ? $msg->quiz_id : null;
-        $list_of_students = json_decode($msg->list_of_students);
+        $list_of_students = ($msg->role === "teacher") ? json_decode($msg->list_of_students) : null;
         $resource_id = $from->resourceId;
         $u = new User($resource_id);
         $u->importUserInfo($msg->from_id, $msg->username, $msg->role);
@@ -88,6 +88,7 @@ class EchoBot implements MessageComponentInterface
             $this->chambers[$quiz_id] = [];
             $this->chambers[$quiz_id]['teacher'] = $u;
             $this->chambers[$quiz_id]['list_of_students'] = $list_of_students;
+            $this->chambers[$quiz_id]['summary']= [];
         } elseif (strcmp($role, "student") == 0) {
             foreach ($this->chambers as $quiz_id => $chamber) {
                 $list_of_students = json_decode(json_encode($chamber['list_of_students']), true);
