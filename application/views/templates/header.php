@@ -44,7 +44,7 @@
         <?php if ($this->session->role == "teacher") : ?>
           <a href="#teacher" data-toggle="collapse" aria-expanded="true" class="dropdown-toggle list-group-item list-group-item-action bg-dark text-light <?php if (in_array("teacher", $arr_url) && in_array("courses", $arr_url)) echo "font-weight-bold"; ?>">Classroom</a>
           <ul class="nav collapse list-unstyled" id="teacher">
-            <?php if (in_array("teacher", $arr_url) && in_array("courses", $arr_url)) : ?>
+            <?php if ((in_array("teacher", $arr_url) && in_array("courses", $arr_url)) || (in_array("teacher", $arr_url) && in_array("questions", $arr_url))) : ?>
               <li>
                 <a href="<?php echo base_url(); ?>users/teacher" class="list-group-item list-group-item-action bg-dark text-light <?php if (in_array("teacher", $arr_url) && !in_array("courses", $arr_url)) echo "font-weight-bold"; ?>">Manage Courses</a>
               </li>

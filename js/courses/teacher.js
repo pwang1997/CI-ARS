@@ -165,7 +165,7 @@ $(document).ready(() => {
         let target = e.target.id;
         let quiz_id = target.split('_')[1];
 
-        window.location.replace(`${base_url}/courses/review_history/${quiz_id}`);
+        window.location.replace(`${base_url}/review_history/${quiz_id}`);
     });
 
     //jump to question(ongoing) view
@@ -199,7 +199,7 @@ $(document).ready(() => {
     $('#export_class_history').click((e) => {
 
         $.ajax({
-            url: `${base_url}courses/export_classroom_history`,
+            url: `${base_url}/export_classroom_history`,
             type: "POST",
             dataType: "JSON",
             data: {
