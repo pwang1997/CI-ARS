@@ -62,7 +62,7 @@
               </li>
             <?php elseif (in_array("teacher", $arr_url) && in_array("questions", $arr_url)) : ?>
               <li>
-                <a href="<?php echo $_SERVER['HTTP_REFERER']; ?>" class="nav-link active list-group-item list-group-item-action bg-dark text-light" id="list-course-detail" data-toggle="list" href="#list-course" role="tab" aria-controls="course">Quizs
+                <a href="<?php echo $_SERVER['HTTP_REFERER']; ?>" class="list-group-item list-group-item-action bg-dark text-light">Quizs</a>
               </li>
             <?php else : ?>
               <li>
