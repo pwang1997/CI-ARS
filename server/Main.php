@@ -109,6 +109,8 @@ class EchoBot implements MessageComponentInterface
                     }
                 }
             }
+        } elseif($role === "summary" && !empty($this->chambers[$quiz_id])) {
+            $this->chambers[$quiz_id]['summary'] = $u;
         }
     }
     /**
@@ -128,8 +130,13 @@ class EchoBot implements MessageComponentInterface
                 $resource_id = $student->get_resource_id();
                 $this->clients[$resource_id]->send(json_encode($msg));
             }
-        } else { // student submit answer
-
+            $summary = $this->chambers[$msg->quiz_id]['summary'];
+            $resource_id = $summary->get_resource_id();
+            $this->clients[$resource_id]->send(json_encode($msg));
+        } elseif($msg->role === "student" && $msg->cmd === "submit") { // student submit answe
+            $summary = $this->chambers[$msg->quiz_id]['summary'];
+            $resource_id = $summary->get_resource_id();
+            $this->clients[$resource_id]->send(json_encode($msg));
         }
     }
 

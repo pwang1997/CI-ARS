@@ -23,7 +23,7 @@
     <div>
         <p id="duration">
         </p>
-        <div class="progress">
+        <div class="progress col-sm-6 p-0">
         </div>
     </div>
     <div>
@@ -184,7 +184,7 @@
                             'cmd': "connect",
                             'from_id': user.id,
                             'username': user.username,
-                            'role': user.role,
+                            'role': 'summary',
                             'quiz_id': quiz_id
                         };
                         websocket.send(JSON.stringify(msg));
@@ -193,23 +193,8 @@
                     websocket.onerror = function(event) {
                         console.log("Connected to WebSocket server error");
                     }
-
-                    let close_connection = async function() {
-                        msg = {
-                            cmd: "closing_connection",
-                            from_id: user.id,
-                            role: user.role,
-                            quiz_id: quiz_id
-                        }
-                        websocket.send(JSON.stringify(msg));
-
-                        websocket.onclose = function(event) {
-                            console.log('websocket Connection Closed. ', event);
-                        }; // disable onclose handler first
-                    };
-
-                    window.onbeforeunload = function() {
-                        close_connection();
+                    websocket.onclose = function(event) {
+                        console.log('websocket Connection Closed. ', event);
                     };
                     //receive message
                     websocket.onmessage = function(event) {
