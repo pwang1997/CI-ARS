@@ -104,8 +104,12 @@ class Courses extends CI_Controller
 
   public function export_student_stat()
   {
-    $result = $this->course->export_student_stat($this->input->post('quiz_id'));
-    $msg['result'] = $result;
+    $quiz_id = $this->input->post('quiz_id');
+    $msg['question_info'] = $this->course->get_questions($quiz_id);
+
+    $msg['quiz_info'] = $this->course->get_quiz_info($quiz_id);
+    $msg['student_response'] = $this->course->get_student_responses($msg['quiz_info']['question_instances']);
+    $msg['student_list'] = $this->course->get_student_list($quiz_id);
     echo json_encode($msg);
   }
 
@@ -119,7 +123,7 @@ class Courses extends CI_Controller
     $quiz_id = $this->uri->segment(3);
 
     $teacher_id = $this->session->id;
-    $data['question_list'] = $this->course->getQuestions($quiz_id);
+    $data['question_list'] = $this->course->get_questions($quiz_id);
     $data['quiz_instance_list'] = $this->course->get_quiz_instance_list_review_history($quiz_id, $teacher_id);
     $data['question_instance_list'] = $this->course->get_question_instance_list_review_history($data['quiz_instance_list']);
     $data['student_response_list'] = $this->course->get_student_response_list_review_history($data['question_instance_list']);

@@ -100,59 +100,105 @@ $(document).ready(() => {
                 "quiz_id": quiz_id
             },
             success: function (response) {
-                let questions = response.result.question;
-                let arr_questions = [];
-                //export question
-                for (let question of questions) {
-                    let choices = question.choices.split('"').join("").split(',').join(";");
-                    let answer = question.answer.split('"').join("").split(',').join(";");;
-                    arr_questions.push({
-                        question_id: question.id,
-                        quiz_id: question.quiz_id,
-                        content: question.content,
-                        choices: choices,
-                        answer: answer,
-                        time_created: question.time_created
-                    });
+                let question_info = response.question_info;
+                let quiz_info = response.quiz_info;
+                let student_response = response.student_response;
+                let student_list = response.student_list;
+
+                let arr_question_info = [[], [], [], []];
+                for (let a of Object.entries(question_info)) {
+                    arr_question_info[0].push(a[1].id);
+                    arr_question_info[1].push(a[1].content);
+                    arr_question_info[2].push(a[1].choices);
+                    arr_question_info[3].push(a[1].answer);
                 }
+
+                console.log(quiz_info);
+                // console.log(question_info);
+                console.log(student_response);
+                // console.log(student_list);
+                //export question
+                let quiz_index = 1, question_index = 1;
+                let arr_quiz = [];
+                let arr_student_response = [];
+                for (let quiz of Object.entries(quiz_info.quiz_instances)) {
+                    quiz = quiz[1];
+                    let created_at = quiz.create_at;
+                    let quiz_id = quiz.id;
+                    for (let question of Object.entries(quiz_info.question_instances[quiz_id])) {
+                        let question_id = question[1].question_meta_id;
+                        let question_instance_id = question[1].id;
+                        let index = arr_question_info[0].indexOf(question_id);
+
+                        let question_choices = arr_question_info[2][index].split('"').join("").split(',').join(";");
+                        let question_answer = arr_question_info[3][index].split('"').join("").split(',').join(";");;
+
+                        arr_quiz.push({
+                            quiz_id: quiz_index,
+                            question_id: question_index,
+                            time_created: created_at,
+                            content: arr_question_info[1][index],
+                            choice: question_choices,
+                            answer: question_answer
+                        });
+                        for (let s of Object.entries(student_list)) {
+                            let student_id = s[1].student_id;
+                            let student_name = s[1].username;
+
+                            let student_response_list = student_response[question_instance_id];
+                            let student_found = -1;
+                            let c = 0;
+                            for(let s_ of Object.entries(student_response_list)) {
+                                if(s_[1].student_id == student_id) {
+                                    student_found = c;
+                                    break;
+                                }
+                                c++;
+                            }
+                            let student_answer = "";
+
+                            if(student_found !== -1) {
+                                student_answer = student_response_list[student_found].answer.split('"').join("").split(',').join(";");
+                            }
+                            arr_student_response.push({
+                                quiz_id: quiz_index,
+                                question_id: question_index,
+                                student_id: student_id,
+                                student_name: student_name,
+                                student_answer: student_answer,
+                                score: (student_answer == question_answer) ? 1 : 0
+                            });
+                        }
+
+                        question_index++;
+                    }
+                    question_index = 1;
+                    quiz_index++;
+                }
+                // console.log(arr_quiz);
+                // console.log(arr_student_response);
 
                 // let object_question = JSON.stringify(arr_questions);
                 let headers_question = {
-                    question_id: "question id",
-                    quiz_id: "quiz id",
-                    content: "content",
-                    choices: "choices",
-                    answer: "answer",
-                    time_created: "time created"
+                    quiz_id: "Quiz Index",
+                    question_id: "Question Index",
+                    time_created: "Created At",
+                    content: "Question Content",
+                    choices: "Question Choices",
+                    answer: "Question Answer"
                 };
 
-                //export student record
-                let students = response.result.student;
-                let arr_students = [];
-                console.log(arr_questions)
-                for (let i = 0; i < arr_questions.length; i++) {
-                    let student = students[arr_questions[i].question_id][0];
-                    console.log(student);
-                    if (student != null) {
-                        let answer = student.answer.split('"').join("").split(',').join(";");
-                        arr_students.push({
-                            question_id: student.question_instance_id,
-                            student_name: student.username,
-                            answer: answer,
-                            time_answered: student.time_answered
-                        });
-                    }
-                }
-                // let object_student = JSON.stringify(arr_students);
                 let headers_student = {
-                    question_id: "question id",
-                    student_name: "username",
-                    answer: "answer",
-                    time_answered: "time answered"
+                    quiz_id: "Quiz Index",
+                    question_id: "Question Index",
+                    student_id: "Student Id",
+                    student_name: "Student Name",
+                    answer: "Answer",
+                    score: "Score"
                 };
-
-                export_csv_file(headers_question, arr_questions, `questions-classroom-${classroom_id.val()}`);
-                export_csv_file(headers_student, arr_students, `student-response-classroom-${classroom_id.val()}`);
+                
+                export_csv_file(headers_question, arr_quiz, `questions-classroom-${classroom_id.val()}`);
+                export_csv_file(headers_student, arr_student_response, `student-response-classroom-${classroom_id.val()}`);
             },
             fail: function () {
                 alert("failed");
@@ -211,7 +257,7 @@ $(document).ready(() => {
                 let question_instances = response.result.question_instances;
                 // console.log(question_instances);
                 //arr_questions[0]:list of question info, arr_questions[1]: list of question instances
-                let arr_questions = [[],[]];
+                let arr_questions = [[], []];
                 //export question
                 for (let question of questions) {
                     for (let q of question) {
@@ -226,9 +272,9 @@ $(document).ready(() => {
                             answer: answer
                         });
                         //get question instances
-                        for(let question_instance of question_instances) {
-                            for(let q_i of question_instance) {
-                                if(arr_questions[1].indexOf(q_i.id) == -1 && q_i.question_meta_id == q.id) {
+                        for (let question_instance of question_instances) {
+                            for (let q_i of question_instance) {
+                                if (arr_questions[1].indexOf(q_i.id) == -1 && q_i.question_meta_id == q.id) {
                                     arr_questions[1].push({
                                         question_id: q.id,
                                         question_instance_id: q_i.id,
@@ -255,10 +301,10 @@ $(document).ready(() => {
                 console.log(students);
                 console.log(arr_questions);
 
-                for(let i = 0; i < arr_questions[1].length; i++) {
+                for (let i = 0; i < arr_questions[1].length; i++) {
                     let question_instance_id = arr_questions[1][i].question_instance_id;
                     let student = students[question_instance_id];
-                    if(student.length != 0) {
+                    if (student.length != 0) {
                         student = student[0];
                         let answer = student.answer.split('"').join("").split(',').join(";");
                         arr_students.push({
@@ -284,11 +330,11 @@ $(document).ready(() => {
                     question_instance: "question instance id",
                     time_answered: "time answered"
                 };
-                
+
                 export_csv_file(headers_question, arr_questions[0], `questions-classroom-${classroom_id.val()}`);
                 export_csv_file(headers_question_instances, arr_questions[1], `question-instances-classroom-${classroom_id.val()}`);
                 export_csv_file(headers_student, arr_students, `student-response-classroom-${classroom_id.val()}`);
-                
+
             },
             fail: function () {
                 alert("failed");

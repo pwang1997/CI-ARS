@@ -209,20 +209,6 @@ class Course_model extends CI_Model
       ->get()->result_array();
   }
 
-  public function export_student_stat($quiz_id)
-  {
-    $result_questions = $this->db->select('*')->from('questions')
-      ->where(array('quiz_id' => $quiz_id))->join('question_instances', 'questions.id = question_instances.question_meta_id')
-      ->get()->result_array();
-    $result_student_response = [];
-    foreach ($result_questions as $instance) {
-      $result_student_response[$instance['id']] = $this->db->select('*')->from('student_responses')
-        ->where(array('question_instance_id' => $instance['id']))->join('users', 'users.id = student_responses.student_id')->get()->result_array();
-    }
-    $result['question'] = $result_questions;
-    $result['student'] = $result_student_response;
-    return $result;
-  }
 
   public function export_classroom_history($classroom_id)
   {
@@ -271,9 +257,9 @@ class Course_model extends CI_Model
   public function get_questions_for_student($quizs)
   {
     $result = [];
-    foreach($quizs as $quiz) {
+    foreach ($quizs as $quiz) {
       $result[$quiz['quiz_index']] = $this->db->get_where('questions', [
-        'quiz_id'=>$quiz['quiz_index']
+        'quiz_id' => $quiz['quiz_index']
       ])->result_array();
     }
     return $result;
@@ -281,18 +267,18 @@ class Course_model extends CI_Model
 
   public function get_quiz_list($classroom_id)
   {
-    return $this->db->get_where('quizs',['classroom_id'=>$classroom_id])->result_array();
+    return $this->db->get_where('quizs', ['classroom_id' => $classroom_id])->result_array();
   }
 
   public function get_student_response($question_instance_list)
   {
     $result = [];
-    foreach($question_instance_list as $question_instances) {
-      foreach($question_instances as $question_instance) {
-        $this->db->order_by('id','DESC')->limit(1);
+    foreach ($question_instance_list as $question_instances) {
+      foreach ($question_instances as $question_instance) {
+        $this->db->order_by('id', 'DESC')->limit(1);
         $result[$question_instance['id']] = $this->db->get_where('student_responses', [
-          'question_instance_id'=>$question_instance['id'],
-          'student_id'=>$this->session->id
+          'question_instance_id' => $question_instance['id'],
+          'student_id' => $this->session->id
         ])->result_array();
       }
     }
@@ -303,8 +289,8 @@ class Course_model extends CI_Model
   public function get_quiz_instance_list($quiz_list, $teacher_id)
   {
     $result = [];
-    foreach($quiz_list as $quiz) {
-      $result[$quiz['id']] = $this->db->get_where('quiz_instances', ['teacher_id'=>$teacher_id])->result_array();
+    foreach ($quiz_list as $quiz) {
+      $result[$quiz['id']] = $this->db->get_where('quiz_instances', ['teacher_id' => $teacher_id])->result_array();
     }
     return $result;
   }
@@ -312,24 +298,24 @@ class Course_model extends CI_Model
   public function get_question_instance_list($quiz_instance_list)
   {
     $result = [];
-    foreach($quiz_instance_list as $quiz_instances) {
-      foreach($quiz_instances as $quiz_instance) {
+    foreach ($quiz_instance_list as $quiz_instances) {
+      foreach ($quiz_instances as $quiz_instance) {
         $result[$quiz_instance['id']] = $this->db->select('question_instances.id, question_meta_id, quiz_instance_id,
-          questions.id as question_id, answer')->from('question_instances')->where(['quiz_instance_id'=>$quiz_instance['id']])
-        ->join('questions','questions.id = question_instances.question_meta_id','left')->get()->result_array();
+          questions.id as question_id, answer')->from('question_instances')->where(['quiz_instance_id' => $quiz_instance['id']])
+          ->join('questions', 'questions.id = question_instances.question_meta_id', 'left')->get()->result_array();
       }
     }
     return $result;
   }
 
-  public function getQuiz($quiz_index)
+  public function get_quiz($quiz_index)
   {
     return $this->db->get_where('quizs', array('id' => $quiz_index))->result_array();
   }
 
-  public function getQuestions($quiz_index)
+  public function get_questions($quiz_index)
   {
-    $quiz_id = $this->getQuiz($quiz_index)[0]['id'];
+    $quiz_id = $this->get_quiz($quiz_index)[0]['id'];
     $query = $this->db->select('*')->from('questions')->where(array('quiz_id' => $quiz_id))->get()->result_array();
     $row = array();
     foreach ($query as $result) {
@@ -355,13 +341,13 @@ class Course_model extends CI_Model
           ->from('(' . $subquery . ') a')
           ->join('student_responses', 'student_responses.id= a.id')
           ->join('users', 'student_responses.student_id= users.id')
-          ->group_by(['student_responses.student_id','student_responses.answer','student_responses.time_answered'])->get();
+          ->group_by(['student_responses.student_id', 'student_responses.answer', 'student_responses.time_answered'])->get();
 
         $result = null;
         if ($query !== FALSE && $query->num_rows() > 0) {
           $result = $query->result_array();
         }
- 
+
         if (!empty($result)) {
           $arr_student_response = array();
           foreach ($result as $student_response) {
@@ -397,8 +383,10 @@ class Course_model extends CI_Model
 
   public function get_quiz_instance_list_review_history($quiz_index, $teacher_id)
   {
-    $result = $this->db->get_where('quiz_instances', 
-    array('quiz_meta_id' => $quiz_index, 'teacher_id' => $teacher_id, 'status'=>'complete'))
+    $result = $this->db->get_where(
+      'quiz_instances',
+      array('quiz_meta_id' => $quiz_index, 'teacher_id' => $teacher_id, 'status' => 'complete')
+    )
       ->result_array();
     return $result;
   }
@@ -408,5 +396,37 @@ class Course_model extends CI_Model
     return $this->db->select('enrolled_students.student_id, users.username')->from('quizs')
       ->join('enrolled_students', 'quizs.classroom_id = enrolled_students.classroom_id')
       ->join('users', 'enrolled_students.student_id = users.id')->where(['quizs.id' => $quiz_id])->get()->result_array();
+  }
+
+
+  public function get_quiz_info($quiz_id)
+  {
+    $quiz_instances = $this->get_quiz_instance_list_review_history($quiz_id, $this->session->id);
+    $question_instances = $this->get_question_instance_list_review_history($quiz_instances);
+    return ['quiz_instances' => $quiz_instances, 'question_instances' => $question_instances];
+  }
+
+  public function get_student_responses($question_instances)
+  {
+    $result = [];
+    foreach ($question_instances as $instance_list) {
+      foreach ($instance_list as $question_instance) {
+        $this->db->select('MAX(id) as id');
+        $this->db->from('student_responses')
+          ->where(['question_instance_id' => $question_instance['id']]);
+        $this->db->group_by(['student_id']);
+        $subquery = $this->db->get_compiled_select();
+
+
+        $query = $this->db->select('student_responses.student_id, users.username, student_responses.answer,student_responses.time_answered')
+          ->from('(' . $subquery . ') a')
+          ->join('student_responses', 'student_responses.id= a.id')
+          ->join('users', 'student_responses.student_id= users.id')
+          ->group_by(['student_responses.student_id', 'student_responses.answer', 'student_responses.time_answered'])->get()->result_array();
+
+        $result[$question_instance['id']] = $query;
+      }
+    }
+    return $result;
   }
 }
