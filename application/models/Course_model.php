@@ -220,15 +220,18 @@ class Course_model extends CI_Model
     //get questions' info by quiz id
     $questions = [];
     foreach ($quizs as $quiz) {
-      $quiz_instances[] = $this->db->get_where('quiz_instances', ['quiz_meta_id' => $quiz['id'], 'status' => 'complete'])->result_array();
-      $questions[] = $this->db->get_where('questions', ['quiz_id' => $quiz['id']])->result_array();
+      $quiz_instances[$quiz['id']] = $this->db->get_where('quiz_instances', ['quiz_meta_id' => $quiz['id'], 'status' => 'complete'])->result_array();
+      $question_list = $this->db->get_where('questions', ['quiz_id' => $quiz['id']])->result_array();
+      foreach($question_list as $question) {
+        $questions[$question['id']] = $question;
+      }
     }
     if (empty($quiz_instances) || empty($questions)) return false;
     //get question instances by quiz_instances id
     $question_instances = [];
     foreach ($quiz_instances as $quiz_instance) {
       foreach ($quiz_instance as $q) {
-        $question_instances[] = $this->db->get_where('question_instances', array('quiz_instance_id' => $q['id']))->result_array();
+        $question_instances[$q['id']] = $this->db->get_where('question_instances', array('quiz_instance_id' => $q['id']))->result_array();
       }
     }
     if (empty($question_instances)) return false;
@@ -398,6 +401,10 @@ class Course_model extends CI_Model
       ->join('users', 'enrolled_students.student_id = users.id')->where(['quizs.id' => $quiz_id])->get()->result_array();
   }
 
+  public function get_student_list_in_classroom($classroom_id) {
+    return $this->db->select('users.id, users.username')->from('users')->join('enrolled_students', 'enrolled_students.student_id = users.id')
+    ->where(['classroom_id'=>$classroom_id])->get()->result_array();
+  }
 
   public function get_quiz_info($quiz_id)
   {

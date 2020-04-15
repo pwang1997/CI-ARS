@@ -114,8 +114,11 @@ class Courses extends CI_Controller
   }
 
   public function export_classroom_history() {
-    $result = $this->course->export_classroom_history($this->input->post('classroom_id'));
+    $classroom_id = $this->input->post('classroom_id');
+    $msg['student_list'] = $this->course->get_student_list_in_classroom($classroom_id);
+    $result = $this->course->export_classroom_history($classroom_id);
     $msg['result'] = $result;
+
     echo json_encode($msg);
   }
 
