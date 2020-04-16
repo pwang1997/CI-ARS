@@ -44,7 +44,7 @@ $(document).ready(() => {
                 let targeted_time = msg.targeted_time;
 
                 if (cmd == "notification") {
-                    location.replace(`${base_url}/../questions/student/${msg.quiz_id}`);
+                    location.replace(`${root_url}/questions/student/${msg.quiz_id}`);
                 } else if (cmd == "start") {
                     $('.question_on').removeClass("invisible").addClass("visible");
                     $('.question_off').addClass("invisible").removeClass("visible");
