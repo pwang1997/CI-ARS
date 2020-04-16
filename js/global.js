@@ -1,11 +1,11 @@
 "use strict";
 //global variable 
 let getUrl = window.location;
-const root_url = "http://192.168.64.2/CI-ARS";
+const root_url = "http://54.183.88.168";
 const base_url = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1]  + "/" + getUrl.pathname.split('/')[2];
 // + "/" + getUrl.pathname.split('/')[2];
-const wsurl = 'ws://127.0.0.1:8080/server/server.php';
-// const wsurl = 'ws://192.168.64.2:8080/';
+// const wsurl = 'ws://127.0.0.1:8080/server/server.php';
+const wsurl = 'ws://54.183.88.168:8080/';
 
 function get_url_params(url) {
     return url.split('/');
