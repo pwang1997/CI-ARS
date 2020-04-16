@@ -21,33 +21,7 @@ $(document).ready(() => {
         temp.tab('show')
         window.scrollTo(0, 0);
     });
-    // /**
-    //  * update each question status based on current quiz instance
-    //  */
-    // function update_question_status(quiz_id, teacher_id) {
-    //     $.ajax({
-    //         url: `${base_url}/update_question_instance_status_tab_list`,
-    //         type: "POST",
-    //         dataType: "JSON",
-    //         data: {
-    //             quiz_id: quiz_id,
-    //             from_id: teacher_id
-    //         },
-    //         success: (response) => {
-    //             // console.log(`${response}`);
-    //             for(let i = 0; i < response.length; i++) {
-    //                 question_id = response[i].question_id;
-    //                 status = response[i].status;
-    //                 if(status == "complete") {
-    //                     $(`#list-question_${question_id}`).removeClass('bg-primary').addClass('bg-success');
-    //                 }
-    //             }
-    //         },
-    //         fail: () => {
-    //             alert('failed to connect with the database');
-    //         }
-    //     });
-    // }
+
     get_session().then((user) => {
         user = JSON.parse(user);
 
@@ -103,7 +77,7 @@ $(document).ready(() => {
                     websocket.send(JSON.stringify(msg));
 
                     await $.ajax({
-                        url: `${base_url}/update_quiz_instance`,
+                        url: `${root_url}/questions/update_quiz_instance`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
@@ -131,7 +105,7 @@ $(document).ready(() => {
                 $(`.btn-summary`).click(function () {
                     question_id = (this.id).split("_")[1];
                     console.log(question_id);
-                    let popup = window.open(`${base_url}/summary/${question_id}/${question_instance_id}`);
+                    let popup = window.open(`${root_url}/questions/summary/${question_id}/${question_instance_id}`);
                     popup.blur();
                     window.focus();
                 });
@@ -175,7 +149,7 @@ $(document).ready(() => {
                             $(`#list- question_${question_id}`).removeClass('bg-success').addClass('bg-primary');
                             try {
                                 $.ajax({
-                                    url: `${base_url}/add_question_instance`,
+                                    url: `${root_url}/questions/add_question_instance`,
                                     type: "POST",
                                     dataType: "JSON",
                                     data: {
@@ -201,7 +175,7 @@ $(document).ready(() => {
                                             default_duration = time_remain;
                                             timer_type = $(`#timerType_${question_id} > span`).html()
                                             action = "start";
-                                            window.open(`${base_url}/summary/${question_id}/${response.question_instance_id}`)
+                                            window.open(`${root_url}/questions/summary/${question_id}/${response.question_instance_id}`)
                                             sleep_half_second();
                                             websocket.send(JSON.stringify(msg));
                                             if (timer_type == "timedown") {
@@ -254,7 +228,7 @@ $(document).ready(() => {
                         $(this).html("Resume");
                         //update question instance to new from pause
                         $.ajax({
-                            url: `${base_url}/resume_question_instance`,
+                            url: `${root_url}/questions/resume_question_instance`,
                             type: "POST",
                             dataType: "JSON",
                             data: {
@@ -285,7 +259,7 @@ $(document).ready(() => {
                     }
                     //update question instance status to complete
                     $.ajax({
-                        url: `${base_url}/complete_question_instance`,
+                        url: `${root_url}/questions/complete_question_instance`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
@@ -333,7 +307,7 @@ $(document).ready(() => {
                     };
 
                     $.ajax({
-                        url: `${base_url}/pause_question_instance`,
+                        url: `${root_url}/questions/pause_question_instance`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
