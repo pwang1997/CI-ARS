@@ -180,7 +180,7 @@ class Questions extends CI_Controller
 
     public function submit_student_response()
     {
-        $msg['success'] = $this->question->submit_student_response();
+        $msg['quiz_id'] = $this->question->submit_student_response();
         $msg['cmd'] = "submit";
         $msg['msg'] = $this->input->post('answer');
         $msg['question_instance_id'] = $this->input->post('question_instance_id');

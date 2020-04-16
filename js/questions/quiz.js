@@ -202,6 +202,7 @@ $(document).ready(() => {
                                             timer_type = $(`#timerType_${question_id} > span`).html()
                                             action = "start";
                                             window.open(`${base_url}/summary/${question_id}/${response.question_instance_id}`)
+                                            sleep_half_second();
                                             websocket.send(JSON.stringify(msg));
                                             if (timer_type == "timedown") {
                                                 init_progress = default_duration;

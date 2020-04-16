@@ -51,12 +51,19 @@
 
         let action = "start";
         let websocket, init_progress, msg, timer_type;
-
+        //initialize dataset array(associative)
+        let arr_dataset = new Object();
+        let frequency = new Object();
+        let arr_student_answer = new Object();
         get_session().then((user) => {
             user = JSON.parse(user);
             let url_params = get_url_params(window.location.href);
             let quiz_id = url_params[url_params.length - 2];
             get_all_students(quiz_id).then((list_of_students) => {
+                list_of_students = JSON.parse(list_of_students);
+                for (let student of Object.entries(list_of_students)) {
+                    arr_student_answer[student[1]] = "";
+                }
                 if (window.WebSocket) {
                     websocket = new WebSocket(wsurl);
                     websocket.onopen = function(evevt) {
@@ -128,36 +135,42 @@
                     //receive message
                     websocket.onmessage = function(event) {
                         msg = JSON.parse(event.data);
+                        // console.log(msg);
                         remaining_time = msg.remaining_time;
                         let type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
                         let num_clients = msg.num_online_students;
                         let num_responses = 0;
-                        //initialize dataset array(associative)
-                        let arr_dataset = [];
-                        let frequency = [];
-                        for (let i = 0; i < list_of_students.length; i++) {
-                            arr_dataset[`${list_of_students[i]}`] = "";
-                        }
+
                         //student submits an answer
                         if (msg.cmd == "submit") {
                             $('#chart').empty();
-                            // conosole.log(msg);
                             let student_id = msg.from_id;
-                            let student_answer = msg.answer;
-                            student_answer = student_answer.replace("[", "").replace("]", "").split("'").join("").split(",");
-                            //a new student response
-                            if (arr_dataset[`${student_id}`].length == 0) {
-                                num_responses++;
+                            let student_answers = msg.answers.split('"').join("").split(',').join(",");
+                            let answer_exist = arr_dataset[student_answers];
+                            console.log(answer_exist);
+                            if (answer_exist === undefined) { //new answer, initialize frequncy of the answer
+                                arr_dataset[student_answers] = student_answers;
+                                if(frequency[arr_student_answer[student_id]] !== undefined) {//previous answer
+                                    frequency[arr_student_answer[student_id]]--;
+                                    console.log(`previous answer: ${arr_student_answer[student_id]}`);
+                                }
+                                frequency[student_answers] = 1;//new answer
+                            } else {//existed answer, increment the frequency of the answer by one, decrement the previous answer's frequency
+                                frequency[arr_dataset[student_answers]]++;
+                                frequency[arr_student_answer[student_id]]--;
+                                console.log(`previous answer: ${arr_student_answer[student_id]}`);
                             }
-                            arr_dataset[`${student_id}`] = student_answer;
-                            if (frequency[`${student_answer}`] && frequency[`${student_answer}`].length > 0) {
-                                frequency[`${student_answer}`]++;
-                            } else {
-                                frequency[`${student_answer}`] = 1;
-                            }
-                            console.log([arr_dataset, frequency]);
+                            // update student answer
+                            arr_student_answer[student_id] = student_answers;
+
+                            console.log(arr_student_answer);
+                            console.log(arr_dataset);
+                            console.log(frequency);
+
                             //placeholder for d3
                             //********************************************* */
+
+
                         } else if (msg.cmd == "close" || msg.cmd == "closing_connection") { //remove question contents
                             websocket.close();
                         } else if (msg.cmd == "pause") {
@@ -200,7 +213,6 @@
                                 arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
                             }
 
-                            let student_answers = [];
                             i = 0;
                             $(`button[name=choice]`).each(function() {
                                 let content = $(this).html();

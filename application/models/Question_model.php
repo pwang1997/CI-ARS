@@ -194,7 +194,17 @@ class Question_model extends CI_Model
       'student_id' => $this->input->post('student_id'),
       'answer' => $this->input->post('answer')
     );
-    return $this->db->insert('student_responses', $data);
+    $this->db->insert('student_responses', $data);
+    $question_instance_id = $this->input->post('question_instance_id');
+
+    $query = $this->db->select("quiz_meta_id as quiz_id")->from("quiz_instances")
+    ->join("question_instances", "question_instances.quiz_instance_id = quiz_instances.id")
+    ->where(["question_instances.id"=>$question_instance_id])->get()->result_array();
+    if(!empty($query)) {
+      return $query[0]['quiz_id'];
+    } else {
+      return 'fail';
+    }
   }
 
   public function get_num_question($quiz_index)

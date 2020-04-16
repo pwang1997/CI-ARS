@@ -238,21 +238,20 @@ $(document).ready(() => {
                     'question_instance_id': question_instance_id
                 },
                 success: function (response) {
-                    if (response.success) {
-                        console.log(response);
-                        let msg = {
-                            "cmd": response.cmd,
-                            "answers": response.msg,
-                            "username": user.username,
-                            "role": user.role,
-                            "question_instance_id": question_instance_id
-                        }
-                        console.log(msg)
-                        websocket.send(JSON.stringify(msg));
-                        alert('answer submitted')
-                    } else {
-                        alert("Error: 1");
+                    console.log(response);
+                    let msg = {
+                        "cmd": "submit",
+                        "role": user.role,
+                        "from_id": user.id,
+                        "answers": response.msg,
+                        "username": user.username,
+                        "role": user.role,
+                        "question_instance_id": question_instance_id,
+                        "quiz_id" : response.quiz_id
                     }
+                    console.log(msg)
+                    websocket.send(JSON.stringify(msg));
+                    alert('answer submitted');
                 },
                 fail: function () {
                     alert("Error: 2");
