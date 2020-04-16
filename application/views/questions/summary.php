@@ -1,5 +1,13 @@
 <h3><?= $title; ?></h3>
 <div class="question_on">
+    <div class="row">
+        <div class="col-md-6">
+            <p>Classroom Size: <span id="classroom_size">0</span></p>
+        </div>
+        <div class="col-md-6">
+            <p>Number of Responses: <span id="num_response">0</span></p>
+        </div>
+    </div>
     <!-- content + buttons  -->
     <h5>Question:</h5>
     <h6 class="ml-2" id="editor"></h6>
@@ -24,31 +32,26 @@
     <div>
         <p id="duration">
         </p>
-        <div class="progress col-sm-6 p-0">
+        <div class="progress col-sm-6 p-0 mb-2">
         </div>
-    </div>
-    <div>
-        <p>Number of Responses: <span id="num_response">0</span></p>
     </div>
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
         Show Data
     </button>
-</div>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-<script src="https://d3js.org/d3.v5.min.js"></script>
-
-<div class="collapse" id="collapseExample">
-    <div class="card card-body">
-        <div id='layout'>
-            <!-- <h2>Bar chart example</h2> -->
-            <div id='container'>
-                <svg id="chart"></svg>
+    <div class="collapse" id="collapseExample">
+        <div class="card card-body">
+            <div id='layout'>
+                <!-- <h2>Bar chart example</h2> -->
+                <div id='container'>
+                    <svg id="chart"></svg>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 <script>
     $("#stat").click(function() {
@@ -71,6 +74,7 @@
             for (let student of Object.entries(list_of_students)) {
                 arr_student_answer[student[1]] = "";
             }
+            $("#classroom_size").html(Object.keys(arr_student_answer).length);
             if (window.WebSocket) {
                 websocket = new WebSocket(wsurl);
                 websocket.onopen = function(evevt) {
@@ -153,14 +157,13 @@
                         let student_id = msg.from_id;
                         let student_answers = msg.answers.split('"').join("").split(',').join(",");
                         let answer_exist = arr_dataset[student_answers];
-                        console.log(answer_exist);
+                        let c = 0;
                         if (answer_exist === undefined) { //new answer, initialize frequncy of the answer
                             arr_dataset[student_answers] = student_answers;
                             let prev_answers = arr_student_answer[student_id];
                             for (let i = 0; i < arr_data.length; ++i) { // decrement previous answer's frequency of the student
                                 if (arr_data[i].answers === prev_answers) {
                                     arr_data[i].value--;
-                                    break;
                                 }
                             }
                             //add new answer to the dataset
@@ -178,9 +181,14 @@
                                 }
                             }
                         }
+
+                        for(let i = 0; i < arr_data.length; ++i) {
+                            c+= arr_data[i].value;
+                        }
                         // update student answer
                         arr_student_answer[student_id] = student_answers;
-                        console.log(arr_student_answer);
+                        $("#num_response").html(c);
+                        // console.log(arr_student_answer);
                         // console.log(arr_dataset);
                         // console.log(arr_data);
                         //placeholder for d3
@@ -331,7 +339,7 @@
             }
         }, 1000);
     };
-
+    // https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
     function demo(sample, class_size) {
         const svg = d3.select('#chart');
         const svgContainer = d3.select('#container');
@@ -456,5 +464,9 @@
             .attr('y', height + margin * 1.7)
             .attr('text-anchor', 'middle')
             .text('Student Answers')
+    }
+    // https://stackoverflow.com/questions/16449295/how-to-sum-the-values-of-a-javascript-object
+    function sum(obj) {
+        return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
     }
 </script>
