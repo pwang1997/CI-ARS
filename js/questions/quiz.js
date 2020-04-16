@@ -360,6 +360,10 @@ $(document).ready(() => {
 
                 function animate_time_down(max_progress, $element, websocket) {
                     setTimeout(function () {
+                        if(websocket.readyState === WebSocket.CLOSED) {
+                            alert('server is not available at the moment');
+                            return;
+                        }
                         if (action == "start" || action == "resume") {
                             init_progress = init_progress - 1;
                             if (init_progress >= 0) {
@@ -415,6 +419,10 @@ $(document).ready(() => {
 
                 function animate_time_up(max_progress, $element, websocket) {
                     setTimeout(function () {
+                        if(websocket.readyState === WebSocket.CLOSED) {
+                            alert('server is not available at the moment');
+                            return;
+                        }
                         if (action == "start" || action == "resume") {
                             init_progress = init_progress + 1;
                             if (init_progress <= max_progress) {

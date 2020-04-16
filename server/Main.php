@@ -12,7 +12,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 
 
-class EchoBot implements MessageComponentInterface
+class EchoBot extends User implements MessageComponentInterface 
 {
     protected $clients;
 
@@ -115,13 +115,17 @@ class EchoBot implements MessageComponentInterface
                 $resource_id = $student->get_resource_id();
                 $this->clients[$resource_id]->send(json_encode($msg));
             }
-            // $summary = $this->chambers[$msg->quiz_id]['summary'];
-            // $resource_id = $summary->get_resource_id();
-            // $this->clients[$resource_id]->send(json_encode($msg));
+            if(!empty($this->chambers[$msg->quiz_id]['summary'])) {
+                $summary = $this->chambers[$msg->quiz_id]['summary'];
+                $resource_id = $summary->resource_id;
+                $this->clients[$resource_id]->send(json_encode($msg));
+            }
         } elseif($msg->role === "student" && $msg->cmd === "submit") { // student submit answe
-            // $summary = $this->chambers[$msg->quiz_id]['summary'];
-            // $resource_id = $summary->get_resource_id();
-            // $this->clients[$resource_id]->send(json_encode($msg));
+            if(!empty($this->chambers[$msg->quiz_id]['summary'])) {
+                $summary = $this->chambers[$msg->quiz_id]['summary'];
+                $resource_id = $summary->resource_id;
+                $this->clients[$resource_id]->send(json_encode($msg));
+            }
             print_r($msg);
             // echo "quiz id: {$msg->quiz_id}";
             // print_r($this->chambers[$msg->quiz_id]['summary']->get_resource_id());
