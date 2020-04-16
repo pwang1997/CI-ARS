@@ -12,7 +12,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 
 
-class EchoBot implements MessageComponentInterface
+class EchoBot extends User implements MessageComponentInterface
 {
     protected $clients;
 
@@ -51,23 +51,6 @@ class EchoBot implements MessageComponentInterface
         } else if ($cmd == "closing_connection") {
             $this->onCloseConnection($decoded_msg);
         }
-
-        // echo $cmd;
-        //         $response_text = array("cmd"=>$decoded_msg->cmd, "username"=>$decoded_msg->username, "role"=>$decoded_msg->role,"from_id"=>$decoded_msg->from_id,
-        //     "question_id"=>$decoded_msg->question_id, "answers"=>$decoded_msg->answers,"question_instance_id"=>$decoded_msg->question_instance_id, "targeted_time"=>$decoded_msg->targeted_time,
-        // "question_status"=>$decoded_msg->question_status, "remaining_time"=>$decoded_msg->remaining_time);
-
-        // $response_text = json_encode($response_text);
-
-        // echo sprintf(
-        //     'Connection %d sending message "%s" to %d other connection%s' . "\n\n",
-        //     $from->resourceId,
-        //     $response_text,
-        //     $numRecv,
-        //     $numRecv == 1 ? '' : 's'
-        // );
-
-        // $this->broadcast($from, $response_text);
     }
 
     /**
@@ -79,7 +62,7 @@ class EchoBot implements MessageComponentInterface
     {
         $role = (isset($msg->role)) ? $msg->role : null;
         $quiz_id = (isset($msg->quiz_id)) ? $msg->quiz_id : null;
-        $list_of_students = json_decode($msg->list_of_students);
+        $list_of_students = ($msg->role === "teacher") ? json_decode($msg->list_of_students) : null;
         $resource_id = $from->resourceId;
         $u = new User($resource_id);
         $u->importUserInfo($msg->from_id, $msg->username, $msg->role);
@@ -88,6 +71,7 @@ class EchoBot implements MessageComponentInterface
             $this->chambers[$quiz_id] = [];
             $this->chambers[$quiz_id]['teacher'] = $u;
             $this->chambers[$quiz_id]['list_of_students'] = $list_of_students;
+            $this->chambers[$quiz_id]['summary'] = [];
         } elseif (strcmp($role, "student") == 0) {
             foreach ($this->chambers as $quiz_id => $chamber) {
                 $list_of_students = json_decode(json_encode($chamber['list_of_students']), true);
@@ -98,17 +82,21 @@ class EchoBot implements MessageComponentInterface
                         $response_text = array("cmd" => "notification", "quiz_id" => $quiz_id);
                         $this->clients[$resource_id]->send(json_encode($response_text));
                         $question_id = null;
-                        if(!empty($this->chambers[$quiz_id]['question_list'])) {
+                        if (!empty($this->chambers[$quiz_id]['question_list'])) {
                             $question_id = end($this->chambers[$quiz_id]['question_list']);
                         }
 
-                        $response_text = ["cmd"=>"start", "question_id"=>$question_id];
+                        $response_text = ["cmd" => "start", "question_id" => $question_id];
                         $this->clients[$resource_id]->send(json_encode($response_text));
                     } else {
                         $this->chambers[$quiz_id]['student'][$found] = $u;
                     }
                 }
             }
+        } elseif ($role === "summary" && !empty($this->chambers[$quiz_id])) {
+            $this->chambers[$quiz_id]['summary'] = $u;
+            echo "summary bot{$resource_id} enters room {$quiz_id}\n";
+            print_r($this->chambers[$quiz_id]);
         }
     }
     /**
@@ -117,7 +105,7 @@ class EchoBot implements MessageComponentInterface
      */
     private function onClassMessage($msg)
     {
-        if($msg->cmd == "start") {
+        if ($msg->cmd == "start") {
             //start question, store question id
             $this->chambers[$msg->quiz_id]['question_list'][] = $msg->question_id;
         }
@@ -128,8 +116,22 @@ class EchoBot implements MessageComponentInterface
                 $resource_id = $student->get_resource_id();
                 $this->clients[$resource_id]->send(json_encode($msg));
             }
-        } else { // student submit answer
-
+            if (!empty($this->chambers[$msg->quiz_id]['summary'])) {
+                $summary = $this->chambers[$msg->quiz_id]['summary'];
+                $resource_id = $summary->resource_id;
+                $this->clients[$resource_id]->send(json_encode($msg));
+                echo "room{$msg->quiz_id}: teacher cmd {$msg->cmd} to summary bot{$resource_id}\n";
+            }
+        } elseif ($msg->role === "student" && $msg->cmd === "submit") { // student submit answe
+            echo "room{$msg->quiz_id}: student submits an answer: {$msg->answers} in room {$msg->quiz_id}\n";
+            if (!empty($this->chambers[$msg->quiz_id]['summary'])) {
+                $summary = $this->chambers[$msg->quiz_id]['summary'];
+                $resource_id = $summary->resource_id;
+                $this->clients[$resource_id]->send(json_encode($msg));
+                echo "room{$msg->quiz_id}: student sends msg to summary bot{$resource_id}\n";
+            }
+            // echo "quiz id: {$msg->quiz_id}";
+            // print_r($this->chambers[$msg->quiz_id]['summary']->get_resource_id());
         }
     }
 

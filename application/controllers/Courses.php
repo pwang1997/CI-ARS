@@ -80,21 +80,22 @@ class Courses extends CI_Controller
 
     $course_id = $this->uri->segment(3);
     $classroom_id = $this->uri->segment(4);
+    $teacher_id = $this->course->get_teacher_id($classroom_id);
 
     $data['course_info'] = $this->course->get_teacher_course($course_id, $classroom_id);
     $data['quizs'] = $this->course->get_quizs_for_student($course_id, $classroom_id);
 
     $data['questions'] = $this->course->get_questions_for_student($data['quizs']);
-    $data['student_responses'] = $this->course->get_student_response($data['questions']);
 
     $data['quiz_list'] = $this->course->get_quiz_list($classroom_id);
     $data['question_list'] = $data['questions'];
-
-    $teacher_id = $this->course->get_teacher_id($classroom_id);
-
+    // list of quizs
     $data['quiz_instance_list'] = $this->course->get_quiz_instance_list($data['quiz_list'], $teacher_id);
-
+    // list of questions within the quiz list
     $data['question_instance_list'] = $this->course->get_question_instance_list($data['quiz_instance_list']);
+
+    $data['student_responses'] = $this->course->get_student_response($data['question_instance_list']);
+
 
     $this->load->view('templates/header');
     $this->load->view('courses/student', $data);
@@ -103,14 +104,21 @@ class Courses extends CI_Controller
 
   public function export_student_stat()
   {
-    $result = $this->course->export_student_stat($this->input->post('quiz_id'));
-    $msg['result'] = $result;
+    $quiz_id = $this->input->post('quiz_id');
+    $msg['question_info'] = $this->course->get_questions($quiz_id);
+
+    $msg['quiz_info'] = $this->course->get_quiz_info($quiz_id);
+    $msg['student_response'] = $this->course->get_student_responses($msg['quiz_info']['question_instances']);
+    $msg['student_list'] = $this->course->get_student_list($quiz_id);
     echo json_encode($msg);
   }
 
   public function export_classroom_history() {
-    $result = $this->course->export_classroom_history($this->input->post('classroom_id'));
+    $classroom_id = $this->input->post('classroom_id');
+    $msg['student_list'] = $this->course->get_student_list_in_classroom($classroom_id);
+    $result = $this->course->export_classroom_history($classroom_id);
     $msg['result'] = $result;
+
     echo json_encode($msg);
   }
 
@@ -118,12 +126,12 @@ class Courses extends CI_Controller
     $quiz_id = $this->uri->segment(3);
 
     $teacher_id = $this->session->id;
-    $data['question_list'] = $this->course->getQuestions($quiz_id);
+    $data['question_list'] = $this->course->get_questions($quiz_id);
     $data['quiz_instance_list'] = $this->course->get_quiz_instance_list_review_history($quiz_id, $teacher_id);
     $data['question_instance_list'] = $this->course->get_question_instance_list_review_history($data['quiz_instance_list']);
     $data['student_response_list'] = $this->course->get_student_response_list_review_history($data['question_instance_list']);
     $data['student_list'] = $this->course->get_student_list($quiz_id);
-    $this->load->view('templates/header');
+    $this->load->view('templates/header', $data);
     $this->load->view('courses/review_history', $data);
     $this->load->view('templates/footer');
   }

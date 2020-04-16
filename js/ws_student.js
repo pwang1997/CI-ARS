@@ -5,11 +5,10 @@ $(document).ready(() => {
         user = JSON.parse(user);
         let current_site = getUrl.pathname.split('/');
         current_site = `${current_site[current_site.length - 3]}/${current_site[current_site.length - 2]}`;
-        console.log(current_site);
         let websocket, cmd, message,
             client_name, question_index,
             role, question_instance_id, init_progress = null;
-        let action, timer_type;
+        let action, timer_type, content;
         let msg = null, duration = null;
         if (window.WebSocket) {
             websocket = new WebSocket(wsurl);
@@ -28,7 +27,9 @@ $(document).ready(() => {
             }
             websocket.onmessage = function (event) {
                 msg = JSON.parse(event.data);
-                console.log(msg);
+                if (msg.cmd !== "update_remaining_time") {
+                    console.log(msg);
+                }
 
                 cmd = msg.cmd;
                 message = msg.message;
@@ -43,13 +44,13 @@ $(document).ready(() => {
                 let targeted_time = msg.targeted_time;
 
                 if (cmd == "notification") {
-                    location.replace(`${base_url}/../questions/student/${msg.quiz_id}`);
+                    location.replace(`${root_url}/questions/student/${msg.quiz_id}`);
                 } else if (cmd == "start") {
                     $('.question_on').removeClass("invisible").addClass("visible");
                     $('.question_off').addClass("invisible").removeClass("visible");
 
                     $.ajax({
-                        url: `${base_url}/get_question_for_student`,
+                        url: `${root_url}/questions/get_question_for_student`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
@@ -105,7 +106,7 @@ $(document).ready(() => {
                     $('.submit').prop('disabled', true);
                     $('button[name=choice]').prop('disabled', true);
 
-                } else if (cmd == "close" || cmd == "closing_connection") { //remove question contents
+                } else if (cmd == "close") { //remove question contents
                     $('.question_on').removeClass("visible").addClass("invisible");
                     $('.question_off').addClass("visible").removeClass("invisible");
                     $('.options').empty(); //remove options
@@ -117,11 +118,9 @@ $(document).ready(() => {
                     $('.submit').prop('disabled', false);
 
                     action = "close";
-                    if (cmd == "close") {
-                        $(`#quiz_status`).html("Please prepare for quiz");
-                    } else {
-                        $(`#quiz_status`).html("Quiz is not available at the moment");
-                    }
+                    $(`#quiz_status`).html("Please prepare for quiz");
+                } else if (cmd == "closing_connection") {
+                    window.location.replace(`${root_url}/users/student`);
                 } else if (cmd == "pause") {
                     action = "pause";
                     init_progress = remaining_time;
@@ -215,7 +214,7 @@ $(document).ready(() => {
 
         $('.submit').click(function (e) {
             e.preventDefault();
-            console.log(question_instance_id);
+            // console.log(question_instance_id);
             sendAnswers(question_instance_id);
         });
 
@@ -230,7 +229,7 @@ $(document).ready(() => {
             answers = answers.filter(Boolean);
             // console.log(answers)
             $.ajax({
-                url: `${base_url}/submit_student_response`,
+                url: `${root_url}/questions/submit_student_response`,
                 type: "POST",
                 dataType: "JSON",
                 data: {
@@ -239,21 +238,20 @@ $(document).ready(() => {
                     'question_instance_id': question_instance_id
                 },
                 success: function (response) {
-                    if (response.success) {
-                        console.log(response);
-                        let msg = {
-                            "cmd": response.cmd,
-                            "answers": response.msg,
-                            "username": user.username,
-                            "role": user.role,
-                            "question_instance_id": question_instance_id
-                        }
-                        console.log(msg)
-                        websocket.send(JSON.stringify(msg));
-                        alert('answer submitted')
-                    } else {
-                        alert("Error: 1");
+                    console.log(response);
+                    let msg = {
+                        "cmd": "submit",
+                        "role": user.role,
+                        "from_id": user.id,
+                        "answers": response.msg,
+                        "username": user.username,
+                        "role": user.role,
+                        "question_instance_id": question_instance_id,
+                        "quiz_id" : response.quiz_id
                     }
+                    console.log(msg)
+                    websocket.send(JSON.stringify(msg));
+                    alert('answer submitted');
                 },
                 fail: function () {
                     alert("Error: 2");
@@ -279,6 +277,10 @@ $(document).ready(() => {
 
         function animate_time_down(max_progress, $element) {
             setTimeout(function () {
+                if (websocket.readyState === WebSocket.CLOSED) {
+                    alert('server is not available at the moment');
+                    return;
+                }
                 if (action == "start" || action == "resume") {
                     init_progress = init_progress - 1;
                     if (init_progress >= 0) {
@@ -316,6 +318,10 @@ $(document).ready(() => {
 
         function animate_time_up(max_progress, $element) {
             setTimeout(function () {
+                if (websocket.readyState === WebSocket.CLOSED) {
+                    alert('server is not available at the moment');
+                    return;
+                }
                 if (action == "start" || action == "resume") {
                     init_progress = init_progress + 1;
                     if (init_progress <= max_progress) {

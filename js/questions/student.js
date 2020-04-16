@@ -3,7 +3,8 @@
 $(document).ready(() => {
     get_session().then((user) => {
         user = JSON.parse(user);
-
+        let url_params = get_url_params(window.location.href);
+        let quiz_id = url_params[url_params.length - 1];
         let websocket, cmd, message, client_name, question_index, role, question_instance_id, init_progress;
         let action, timer_type;
         let msg = null;
@@ -238,7 +239,8 @@ $(document).ready(() => {
                             "answers": response.msg,
                             "username": user.username,
                             "role": user.role,
-                            "question_id": null,
+                            "from_id": user.id,
+                            "quiz_id": quiz_id,
                             "question_instance_id": question_instance_id
                         }
                         console.log(msg)

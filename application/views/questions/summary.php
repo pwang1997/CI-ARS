@@ -1,42 +1,24 @@
+<h3><?= $title; ?></h3>
 <div class="question_on">
-    <!-- content + buttons  -->
     <div class="row">
-        <div class="col-8">
-            <br>
-            <div class="form-group row" style="position:relative;">
-                <div class="col-sm-8" id="scrolling-container" style="height:425px; min-width:100%; min-height:100%">
-                    <div id="editor" style="min-height:100%; height:auto;"></div>
-                </div>
-            </div>
+        <div class="col-md-6">
+            <p>Classroom Size: <span id="classroom_size">0</span></p>
         </div>
-        <div class="col-4">
-            <br>
-            <div class="d-flex flex-column">
-                <div class="p-2" id="targeted_time">Targeted Time: </div>
-                <div class="p-2">
-                    <p id="duration">
-                    </p>
-                    <div class="progress">
-                    </div>
-                </div>
-                <div class="p-2">
-                    <p>Number of Responses: <span id="num_response">0</span></p>
-                </div>
-                <div class="p-2">
-                    <button type="button" class="btn btn-primary" id="stat">Stats</button>
-                </div>
-            </div>
+        <div class="col-md-6">
+            <p>Number of Responses: <span id="num_response">0</span></p>
         </div>
     </div>
+    <!-- content + buttons  -->
+    <h5>Question:</h5>
+    <h6 class="ml-2" id="editor"></h6>
     <!-- answer/choices -->
     <div>
         <?php $choices = (isset($this->session->choices)) ? json_decode($this->session->choices) : [];
         $i = 1;
         foreach ($choices as $choice) : ?>
             <div class="form-group row choice_row">
-                <label for="choice<?= $i; ?>" class="col-sm-2 col-form-label">:Choice <?= $i; ?></label>
                 <div class="col-sm-6">
-                    <input type="text" disabled choice_row class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
+                    <input type="text" disabled class="form-control" name="choice_row" placeholder="<?= $choice; ?>">
                 </div>
                 <div class="form-check col-sm-1">
                     <input class="form-check-input" type="checkbox" name="answers" value="<?= $choice; ?>">
@@ -46,343 +28,445 @@
         endforeach; ?>
     </div>
     <div class="options"></div>
+    <div id="targeted_time">Targeted Time: </div>
+    <div>
+        <p id="duration">
+        </p>
+        <div class="progress col-sm-6 p-0 mb-2">
+        </div>
+    </div>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        Show Data
+    </button>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <div class="collapse" id="collapseExample">
+        <div class="card card-body">
+            <div id='layout'>
+                <!-- <h2>Bar chart example</h2> -->
+                <div id='container'>
+                    <svg id="chart"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 <script>
-    $(document).ready(() => {
-        var quill = new Quill('#editor', {
-            modules: {
-                "toolbar": false
-            },
-            theme: 'snow' // or 'bubble'
-        });
-        quill.enable(false);
+    $("#stat").click(function() {
+        $('html, body').animate({
+            scrollTop: $("#chart").offset().top
+        }, 2000);
+    });
+    let action = "start";
+    let websocket, init_progress, msg, timer_type;
+    //initialize dataset array(associative)
+    let arr_dataset = new Object();
+    let arr_student_answer = new Object();
+    let arr_data = [];
+    get_session().then((user) => {
+        user = JSON.parse(user);
+        let url_params = get_url_params(window.location.href);
+        let quiz_id = url_params[url_params.length - 2];
+        get_all_students(quiz_id).then((list_of_students) => {
+            list_of_students = JSON.parse(list_of_students);
+            for (let student of Object.entries(list_of_students)) {
+                arr_student_answer[student[1]] = "";
+            }
+            $("#classroom_size").html(Object.keys(arr_student_answer).length);
+            if (window.WebSocket) {
+                websocket = new WebSocket(wsurl);
+                websocket.onopen = function(evevt) {
+                    msg = {
+                        'cmd': "connect",
+                        'from_id': user.id,
+                        'username': user.username,
+                        'role': 'summary',
+                        'quiz_id': quiz_id
+                    };
+                    websocket.send(JSON.stringify(msg));
+                    console.log("Connected to WebSocket server.");
 
+                    $.ajax({
+                        url: `${root_url}/questions/get_question_for_student`,
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            'question_index': <?php echo $question_id; ?>
+                        },
+                        success: function(response) {
+                            if (response.result != null) {
+                                $('#content').val(response.result.content);
+                                $('#editor').html(response.result.content);
+                                timer_type = response.result.timer_type;
+                                choices = response.result.choices;
+                                duration = response.result.duration;
+                                action = "start";
+                                if (timer_type == "timedown") {
+                                    $(`#duration`).html(`Remaining Time: ${duration} seconds`);
+                                    $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:100%" aria-valuenow="${duration}" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
+                                    init_progress = duration;
+                                    animate_time_down(duration, duration, $(`#progress_bar`))
+                                } else if (timer_type == "timeup") {
+                                    $(`#duration`).html(`Time: 0 seconds`);
+                                    $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
+                                    init_progress = 0;
+                                    animate_time_up(0, duration, $(`#progress_bar`))
+                                }
 
-        $.ajax({
-            url: "<?php echo base_url(); ?>questions/get_question_for_student",
-            type: "POST",
-            dataType: "JSON",
-            data: {
-                'question_index': <?php echo $question_id; ?>
-            },
-            success: function(response) {
-                if (response.result != null) {
-                    console.log(response);
-                    $('#content').val(response.result.content)
-                    $('#editor').html(response.result.content)
-                    timer_type = response.result.timer_type;
-                    choices = response.result.choices;
-                    duration = response.result.duration;
-                    default_duration = duration;
-                    // console.log(timer_type)
-                    action = "start";
-                    if (timer_type == "timedown") {
-                        $(`#duration`).html(`Remaining Time: ${duration} seconds`);
-                        $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:100%" aria-valuenow="${duration}" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
-                        animate_time_down(duration, duration, $(`#progress_bar`))
-                    } else if (timer_type == "timeup") {
-                        $(`#duration`).html(`Time: 0 seconds`);
-                        $(`.progress`).html(`<div class="progress-bar" id="progress_bar" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="${duration}"></div>`);
-                        animate_time_up(0, duration, $(`#progress_bar`))
-                    }
-
-                    $('#targeted_time').html(`Targeted Time: ${duration} s`)
-                    // update question choices
-                    // arr_choices = response.result.choices.split(",");
-                    var arr = JSON.parse("[" + response.result.choices + "]")[0];
-                    for (i = 0; i < arr.length; i++) {
-                        newContent = `<div class="form-group row choice_row">
-                                                    <label for="choice${i}" class="col-sm-2 col-form-label">:Choice ${i+1}</label>
+                                $('#targeted_time').html(`Targeted Time: ${duration} s`)
+                                // update question choices
+                                // arr_choices = response.result.choices.split(",");
+                                var arr = JSON.parse("[" + response.result.choices + "]")[0];
+                                for (i = 0; i < arr.length; i++) {
+                                    newContent = `<div class="form-group row choice_row">
                                                     <div class="col-sm-6">
                                                         <button type="button" class="btn btn-outline-secondary col-sm-12" name=choice id=choice_${i}>${arr[i]}</button>
                                                     </div>
                                                 </div>`;
-                        $('.options').append(newContent);
-                    }
-                } else {
-                    alert("failed to insert question1");
-                }
-            },
-            fail: function() {
-                alert("failed to insert question2");
-            }
-        })
-
-        $("#stat").click(function() {
-            $('html, body').animate({
-                scrollTop: $("#chart").offset().top
-            }, 2000);
-        });
-
-        function animate_time_down(init_progress, max_progress, $element) {
-            setTimeout(function() {
-                if (action == "start" || action == "resume") {
-                    init_progress -= 1;
-                    if (init_progress >= 0) {
-                        $element.attr('aria-valuenow', init_progress);
-                        percentage = init_progress / max_progress;
-                        $element.css('width', percentage * 100 + "%");
-                        if (percentage <= 0.5) {
-                            $element.addClass('bg-warning');
-                        }
-                        if (percentage <= 0.2 || init_progress <= 5) { //remaining time is less than 5 seconds
-                            $element.removeClass('bg-warning');
-                            $element.addClass('bg-danger');
-                        }
-                        $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
-                        animate_time_down(init_progress, max_progress, $element);
-                    } else {
-                        msg = {
-                            "cmd": "timeout",
-                            "username": <?php echo "'" . $this->session->username . "'"; ?>,
-                            "role": <?php echo "'" . $this->session->role . "'"; ?>,
-                        }
-                        websocket.send(JSON.stringify(msg));
-                        sendAnswers(question_instance_id);
-                        $element.removeClass('bg-danger');
-                        return false;
-                    }
-                } else if (action == "close") {
-                    return false;
-                } else if (action == "pause") {
-                    console.log("quiz has been paused")
-                    animate_time_down(init_progress, max_progress, $element);
-                }
-            }, 1000);
-        };
-
-        function animate_time_up(init_progress, max_progress, $element) {
-            setTimeout(function() {
-                if (action == "start" || action == "resume") {
-                    init_progress++;
-                    if (init_progress <= max_progress) {
-                        $element.attr('aria-valuenow', init_progress);
-                        percentage = init_progress / max_progress;
-                        $element.css('width', percentage * 100 + "%");
-                        if (percentage >= 0.5) {
-                            $element.addClass('bg-warning');
-                        }
-                        if (percentage >= 0.9) {
-                            $element.removeClass('bg-warning');
-                            $element.addClass('bg-danger');
-                        }
-                    }
-                    //update timer
-                    $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
-                    animate_time_up(init_progress, max_progress, $element);
-                } else if (action == "close") {
-                    $element.removeClass('bg-danger');
-                    return false;
-                } else if (action == "pause") {
-                    animate_time_up(init_progress, max_progress, $element);
-                    // return;
-                }
-            }, 1000);
-        };
-
-        // var wsurl = 'ws://127.0.0.1:8080/server/server.php';
-        // var websocket, cmd, message, client_name, question_index, role, question_instance_id, action;
-
-        // if (window.WebSocket) {
-        //     websocket = new WebSocket(wsurl);
-
-        //     websocket.onopen = function(evevt) {
-        //         console.log("Connected to WebSocket server.");
-        //         msg = {
-        //             'cmd': "connect",
-        //             'from': <?php echo "'" . $this->session->id . "'"; ?>,
-        //             'username': <?php echo "'" . $this->session->username . "'"; ?>,
-        //             'role': <?php echo "'" . $this->session->role . "'"; ?>,
-        //         };
-
-        //         websocket.send(JSON.stringify(msg));
-        //     }
-        //     websocket.onmessage = function(event) {
-        //         var msg = JSON.parse(event.data);
-
-        //         cmd = msg.cmd;
-        //         message = msg.message;
-        //         client_name = msg.client_name;
-        //         question_index = msg.question_id;
-        //         role = msg.role;
-        //         if (msg.question_instance_id != null) {
-        //             question_instance_id = msg.question_instance_id;
-        //         }
-        //         targeted_time = msg.targeted_time;
-
-        //         console.log(msg);
-        //         if (cmd == "pause") {
-        //             action = "pause";
-        //             if (msg.question_status == "pause_answerable") {
-        //                 // do nothing
-        //             } else if (msg.question_status == "pause_disable") {
-        //                 $('.submit').addClass('disabled');
-        //                 $('button[name=choice]').addClass('disabled');
-        //             }
-        //         } else if (cmd == "resume") {
-        //             action = "resume";
-        //             $('.submit').removeClass('disabled');
-        //             $('button[name=choice]').removeClass('disabled');
-        //         }
-
-        //     }
-
-        //     websocket.onerror = function(event) {
-        //         console.log("Connected to WebSocket server error");
-        //     }
-
-        //     websocket.onclose = function(event) {
-        //         console.log('websocket Connection Closed. ');
-        //     }
-        // }
-    });
-</script>
-
-<!-- Load d3.js -->
-<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
-<script src="https://d3js.org/d3.v4.min.js"></script>
-
-<h3><?= $title; ?></h3>
-<!-- Create a div where the graph will take place -->
-<div id="chart"></div>
-<!-- <svg width="960" height="500"></svg> -->
-
-<script>
-    $(document).ready(() => {
-        var interval = 1000;
-
-        function fetchData() {
-            $.ajax({
-                url: <?php echo "'" . base_url() . "questions/get_answered_question_instance/" . $question_instance_id . "'"; ?>,
-                type: "POST",
-                dataType: "JSON",
-                data: {},
-                success: function(response) {
-                    // //get dataset from database
-                    $('#chart').empty();
-                    dataset = [];
-                    frequency = [];
-                    $('#num_response').html(response.dataset.length);
-                    choices = <?php echo $question['choices']; ?>;
-                    for (i = 0; i < choices.length; i++) {
-                        frequency.push(0);
-                    }
-                    for (i = 0; i < response.dataset.length; i++) {
-                        element = response.dataset[i]
-                        element = element.replace("[", "").replace("]", "").split("'").join("").split(",")
-                        dataset.push(element)
-                    }
-                    //get frequency of all choices
-                    for (i = 0; i < dataset.length; i++) {
-                        for (j = 0; j < dataset[i].length; j++) {
-                            temp_index = choices.indexOf(dataset[i][j])
-                            frequency[temp_index]++;
-                        }
-                    }
-                    var url = <?php echo "'" . base_url() . "questions/get_answered_question_instance/" . $question_instance_id . "'"; ?>;
-                    // console.log(`choices: ${choices}`)
-                    // console.log(`frequency: ${frequency}`)
-                    var data = [];
-                    //building json 
-                    for (var c in choices) {
-                        temp_var = {};
-                        temp_var['choice'] = choices[c]
-                        temp_var['freq'] = frequency[c]
-
-                        data.push(temp_var)
-
-                    }
-                    data1 = data;
-                    data = JSON.stringify(data);
-                    //graph bar chart
-                    let margin = {
-                            top: 35,
-                            right: 145,
-                            bottom: 35,
-                            left: 45
+                                    $('.options').append(newContent);
+                                }
+                            } else {
+                                alert("failed to insert question1");
+                            }
                         },
-                        width = 700 - margin.left - margin.right,
-                        height = 400 - margin.top - margin.bottom;
-
-                    // scale to ordinal because x axis is not numerical
-                    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
-
-                    //scale to numerical value by height
-                    var y = d3.scaleLinear().range([height, 0]);
-
-                    var chart = d3.select("#chart").append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .append("g")
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                        .attr("fill", "#002145");
-                    var xAxis = d3.axisBottom(x); //orient bottom because x-axis will appear below the bars
-
-                    var yAxis = d3.axisLeft(y);
-
-                    // d3.json("coucou.json", function(error, data1) {
-                    x.domain(data1.map(function(d) {
-                        return d.choice
-                    }));
-                    y.domain([0, d3.max(data1, function(d) {
-                        // console.log(d.freq);
-                        return d.freq
-                    })]);
-
-                    var bar = chart.selectAll("g")
-                        .data(data1)
-                        .enter();
-
-                    bar.append("rect")
-                        .attr("y", function(d) {
-                            // console.log(d)
-                            return y(d.freq);
-                        })
-                        .attr("x", function(d, i) {
-                            return x(d.choice);
-                        })
-                        .attr("height", function(d) {
-                            return height - y(d.freq);
-                        })
-                        .attr("width", x.bandwidth()); //set width base on range on ordinal data
-
-                    bar.append("text")
-                        .attr("y", function(d) {
-                            return y(d.freq) - 15;
-                        })
-                        .attr("x", function(d, i) {
-                            return x(d.choice);
-                        })
-                        .attr("dy", ".75em")
-                        .text(function(d) {
-                            return d.freq;
-                        });
-
-                    chart.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis);
-
-                    chart.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("responses");
-                    // });
-                },
-                fail: function(response) {
-                    alert("failed to fetch dataset")
-                },
-                complete: function() {
-                    setTimeout(fetchData, interval);
+                        fail: function() {
+                            alert("failed to insert question2");
+                        }
+                    });
+                    console.log(websocket);
                 }
-            }); //end of ajax
-        }
-        setTimeout(fetchData(), interval);
+                websocket.onerror = function(event) {
+                    console.log("Connected to WebSocket server error");
+                }
+                websocket.onclose = function(event) {
+                    console.log('websocket Connection Closed. ', event);
+                };
+                //receive message
+                websocket.onmessage = function(event) {
+                    msg = JSON.parse(event.data);
+                    // console.log(msg);
+                    remaining_time = msg.remaining_time;
+                    let type = msg.cmd; //cmd ie. start/pause/resume/close/timeout
+                    let num_clients = msg.num_online_students;
+                    let num_responses = 0;
 
-    })
+                    //student submits an answer
+                    if (msg.cmd == "submit") {
+                        let student_id = msg.from_id;
+                        let student_answers = msg.answers.split('"').join("").split(',').join(",");
+                        let answer_exist = arr_dataset[student_answers];
+                        let c = 0;
+                        if (answer_exist === undefined) { //new answer, initialize frequncy of the answer
+                            arr_dataset[student_answers] = student_answers;
+                            let prev_answers = arr_student_answer[student_id];
+                            for (let i = 0; i < arr_data.length; ++i) { // decrement previous answer's frequency of the student
+                                if (arr_data[i].answers === prev_answers) {
+                                    arr_data[i].value--;
+                                }
+                            }
+                            //add new answer to the dataset
+                            arr_data.push({
+                                answers: student_answers,
+                                value: 1
+                            });
+                        } else { //existed answer, increment the frequency of the answer by one, decrement the previous answer's frequency
+                            let prev_answers = arr_student_answer[student_id];
+                            for (let i = 0; i < arr_data.length; ++i) {
+                                if (arr_data[i].answers === student_answers) {
+                                    arr_data[i].value++;
+                                } else if (arr_data[i].answers === prev_answers) {
+                                    arr_data[i].value--;
+                                }
+                            }
+                        }
+
+                        for(let i = 0; i < arr_data.length; ++i) {
+                            c+= arr_data[i].value;
+                        }
+                        // update student answer
+                        arr_student_answer[student_id] = student_answers;
+                        $("#num_response").html(c);
+                        // console.log(arr_student_answer);
+                        // console.log(arr_dataset);
+                        // console.log(arr_data);
+                        //placeholder for d3
+                        //********************************************* */
+                        $("#chart").empty();
+                        demo(arr_data, Object.keys(arr_student_answer).length);
+
+                    } else if (msg.cmd == "close" || msg.cmd == "closing_connection") { //remove question contents
+                        websocket.close();
+                    } else if (msg.cmd == "pause") {
+                        action = "pause";
+                        init_progress = msg.remaining_time;
+                        console.log(`remaining time: ${msg.remaining_time}`)
+                        if (timer_type == "timeup") {
+                            $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+
+                        } else if (timer_type == "timedown") {
+                            $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        }
+                        if (msg.question_status == "pause_answerable") {
+                            // do nothing
+                            $('#status').html(`Status: Pause(Answerable)`);
+                        } else if (msg.question_status == "pause_disable") {
+                            $('#status').html(`Status: Pause(Disabled)`);
+                            $('.submit').prop('disabled', true);
+                            $('button[name=choice]').prop('disabled', true);
+                        }
+                    } else if (msg.cmd == "resume") {
+                        action = "resume";
+                        $('#status').html(`Status: Running`);
+                        $('.submit').prop('disabled', false);
+                        $('button[name=choice]').prop('disabled', false);
+                        init_progress = msg.remaining_time;
+                        if (timer_type == "timeup") {
+                            $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+
+                        } else if (timer_type == "timedown") {
+                            $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        }
+                    } else if (msg.cmd == "display_answer") {
+                        $('#status').html(`Status: Displaying Answer`);
+                        $('.submit').prop('disabled', true);
+                        $('button[name=choice]').prop('disabled', true);
+                        let answers = msg.answers;
+                        arr_answers = answers.split(",");
+                        for (i = 0; i < arr_answers.length; i++) {
+                            arr_answers[i] = arr_answers[i].replace("[", "").replace("]", "").replace('"', "").replace('\"', "")
+                        }
+
+                        i = 0;
+                        $(`button[name=choice]`).each(function() {
+                            let content = $(this).html();
+                            // console.log(arr_answers.includes(content))
+                            if ($(this).hasClass('active')) { //add trace for student's answer
+                                $(this).addClass('student_answers');
+                            }
+                            if ($(this).hasClass('active') && !arr_answers.includes(content)) {
+                                $(this).addClass('bg-danger');
+                                $(this).addClass('teacher_answers') // teacher's answer
+                            } else if (arr_answers.includes(content)) {
+                                $(this).addClass('bg-success');
+                                $(this).addClass('teacher_answers')
+                            }
+                        });
+                    } else if (msg.cmd == "hide_answer") {
+                        $('#status').html(`Status: Running`);
+                        $('.submit').prop('disabled', false);
+                        $('button[name=choice]').prop('disabled', false);
+                        $(`button[name=choice]`).each(function() {
+                            $(this).removeClass('bg-success').removeClass('bg-danger') //negate display_answer
+                        });
+                    } else if (msg.cmd == "update_remaining_time" && msg.remaining_time != null) {
+                        init_progress = msg.remaining_time;
+                        if (timer_type == "timeup") {
+                            $(`#progress_bar`).parent().prev().first().html(`Time: ${init_progress} seconds`);
+
+                        } else if (timer_type == "timedown") {
+                            $(`#progress_bar`).parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    function animate_time_down(init_progress, max_progress, $element) {
+        setTimeout(function() {
+            if (websocket.readyState === WebSocket.CLOSED) {
+                alert('server is not available at the moment');
+                return;
+            }
+            if (action == "start" || action == "resume") {
+                init_progress = init_progress - 1;
+                if (init_progress >= 0) {
+                    $element.attr('aria-valuenow', init_progress);
+                    let percentage = init_progress / max_progress;
+                    $element.css('width', percentage * 100 + "%");
+                    if (percentage <= 0.5) {
+                        $element.addClass('bg-warning');
+                    }
+                    if (percentage <= 0.2 || init_progress <= 5) { //remaining time is less than 5 seconds
+                        $element.removeClass('bg-warning');
+                        $element.addClass('bg-danger');
+                    }
+                    $element.parent().prev().first().html(`Remaining Time: ${init_progress} seconds`);
+                    animate_time_down(init_progress, max_progress, $element);
+                } else {
+                    $element.removeClass('bg-danger');
+                    return;
+                }
+            } else if (action == "close") {
+                $element.removeClass('bg-danger');
+                return;
+            } else if (action == "pause") {
+                return;
+            }
+        }, 1000);
+    };
+
+    function animate_time_up(init_progress, max_progress, $element) {
+        setTimeout(function() {
+            if (websocket.readyState === WebSocket.CLOSED) {
+                alert('server is not available at the moment');
+                return;
+            }
+            if (action == "start" || action == "resume") {
+                init_progress = init_progress + 1;
+                if (init_progress <= max_progress) {
+                    $element.attr('aria-valuenow', init_progress);
+                    let percentage = init_progress / max_progress;
+                    $element.css('width', percentage * 100 + "%");
+                    if (percentage >= 0.5) {
+                        $element.addClass('bg-warning');
+                    }
+                    if (percentage >= 0.9) {
+                        $element.removeClass('bg-warning');
+                        $element.addClass('bg-danger');
+                    }
+                }
+                //update timer
+                $element.parent().prev().first().html(`Time: ${init_progress} seconds`);
+                animate_time_up(init_progress, max_progress, $element);
+            } else if (action == "close") {
+                $element.removeClass('bg-danger');
+                return;
+            } else if (action == "pause") {
+                return;
+            }
+        }, 1000);
+    };
+    // https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/
+    function demo(sample, class_size) {
+        const svg = d3.select('#chart');
+        const svgContainer = d3.select('#container');
+
+        const margin = 80;
+        const width = 1000 - 2 * margin;
+        const height = 600 - 2 * margin;
+
+        const chart = svg.append('g')
+            .attr('transform', `translate(${margin}, ${margin})`);
+
+        const xScale = d3.scaleBand()
+            .range([0, width])
+            .domain(sample.map((s) => s.answers))
+            .padding(0.4)
+
+        const yScale = d3.scaleLinear()
+            .range([height, 0])
+            .domain([0, class_size]);
+
+        const makeYLines = () => d3.axisLeft()
+            .scale(yScale)
+
+        chart.append('g')
+            .attr('transform', `translate(0, ${height})`)
+            .call(d3.axisBottom(xScale));
+
+        chart.append('g')
+            .call(d3.axisLeft(yScale));
+
+        chart.append('g')
+            .attr('class', 'grid')
+            .call(makeYLines()
+                .tickSize(-width, 0, 0)
+                .tickFormat('')
+            )
+
+        const barGroups = chart.selectAll()
+            .data(sample)
+            .enter()
+            .append('g')
+
+        barGroups
+            .append('rect')
+            .attr('class', 'bar')
+            .attr('x', (g) => xScale(g.answers))
+            .attr('y', (g) => yScale(g.value))
+            .attr('height', (g) => height - yScale(g.value))
+            .attr('width', xScale.bandwidth())
+            .on('mouseenter', function(actual, i) {
+                d3.selectAll('.value')
+                    .attr('opacity', 0)
+
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr('opacity', 0.6)
+                    .attr('x', (a) => xScale(a.answers) - 5)
+                    .attr('width', xScale.bandwidth() + 10)
+
+                const y = yScale(actual.value)
+
+                line = chart.append('line')
+                    .attr('id', 'limit')
+                    .attr('x1', 0)
+                    .attr('y1', y)
+                    .attr('x2', width)
+                    .attr('y2', y)
+
+                barGroups.append('text')
+                    .attr('class', 'divergence')
+                    .attr('x', (a) => xScale(a.answers) + xScale.bandwidth() / 2)
+                    .attr('y', (a) => yScale(a.value) + 30)
+                    .attr('fill', 'white')
+                    .attr('text-anchor', 'middle')
+                    .text((a, idx) => {
+                        const divergence = (a.value - actual.value).toFixed(1)
+
+                        let text = ''
+                        if (divergence > 0) text += '+'
+                        text += `${divergence}%`
+
+                        return idx !== i ? text : '';
+                    })
+
+            })
+            .on('mouseleave', function() {
+                d3.selectAll('.value')
+                    .attr('opacity', 1)
+
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr('opacity', 1)
+                    .attr('x', (a) => xScale(a.answers))
+                    .attr('width', xScale.bandwidth())
+
+                chart.selectAll('#limit').remove()
+                chart.selectAll('.divergence').remove()
+            })
+
+        barGroups
+            .append('text')
+            .attr('class', 'value')
+            .attr('x', (a) => xScale(a.answers) + xScale.bandwidth() / 2)
+            .attr('y', (a) => yScale(a.value) + 30)
+            .attr('text-anchor', 'middle')
+            .text((a) => `${a.value/class_size * 100}%`)
+
+        svg
+            .append('text')
+            .attr('class', 'label')
+            .attr('x', -(height / 2) - margin)
+            .attr('y', margin / 2.4)
+            .attr('transform', 'rotate(-90)')
+            .attr('text-anchor', 'middle')
+            .text('Frequency(%)')
+
+        svg.append('text')
+            .attr('class', 'label')
+            .attr('x', width / 2 + margin)
+            .attr('y', height + margin * 1.7)
+            .attr('text-anchor', 'middle')
+            .text('Student Answers')
+    }
+    // https://stackoverflow.com/questions/16449295/how-to-sum-the-values-of-a-javascript-object
+    function sum(obj) {
+        return Object.keys(obj).reduce((sum, key) => sum + parseFloat(obj[key] || 0), 0);
+    }
 </script>

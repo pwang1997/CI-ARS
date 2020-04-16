@@ -5,9 +5,9 @@
 <?php endif; ?>
 <script src="../js/ddtf.js"></script>
 
-<h2>Question Base</h2>
+<h2>Question <span class="text-muted">Base</span></h2>
 <br>
-<table id="question_base_table" class="table table-bordered">
+<table id="question_base_table" class="table table-striped">
     <thead>
         <tr>
             <th>Index</th>
