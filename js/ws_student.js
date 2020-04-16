@@ -50,7 +50,7 @@ $(document).ready(() => {
                     $('.question_off').addClass("invisible").removeClass("visible");
 
                     $.ajax({
-                        url: `${base_url}/get_question_for_student`,
+                        url: `${root_url}/questions/get_question_for_student`,
                         type: "POST",
                         dataType: "JSON",
                         data: {
@@ -229,7 +229,7 @@ $(document).ready(() => {
             answers = answers.filter(Boolean);
             // console.log(answers)
             $.ajax({
-                url: `${base_url}/submit_student_response`,
+                url: `${root_url}/questions/submit_student_response`,
                 type: "POST",
                 dataType: "JSON",
                 data: {

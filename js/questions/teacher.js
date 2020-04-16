@@ -30,7 +30,7 @@ $(document).ready(() => {
 
     let arr_param = get_url_params(window.location.href)
     $('#new_question').click((e) => {
-        location.replace(`${base_url}/create/${arr_param[arr_param.length - 1]}`);
+        location.replace(`${root_url}/questions/create/${arr_param[arr_param.length - 1]}`);
     })
 
     $("button").click(function() {
@@ -50,7 +50,7 @@ $(document).ready(() => {
             choices = choices.filter(Boolean);
             console.log(arr_quill[this.id].root.innerHTML.trim());
             $.ajax({
-                url: `${base_url}/update_question`,
+                url: `${root_url}/questions/update_question`,
                 type: "POST",
                 dataType: "JSON",
                 data: {

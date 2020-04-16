@@ -56,7 +56,7 @@ $(document).ready(() => {
         choices = choices.filter(Boolean);
 
         $.ajax({
-            url: `${base_url}/create_question`,
+            url: `${root_url}/questions/create_question`,
             type: "POST",
             dataType: "JSON",
             data: {
