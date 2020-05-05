@@ -21,13 +21,13 @@ Deployment
 ************
 
 -  Download Apache LAMP Stack "sudo apt update & sudo apt install apache2"
--  Append apache2.config with 
-    > <Directory 'your deploy directory'> 
-        >> Options Indexes FollowSymLinks
-        >> AllowOverride All
-        >> Order allow,deny
-        >> Allow from all
-    > </Directory>
+-  Append apache2.config with  
+    ``<Directory 'your deploy directory'> 
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    </Directory>``
 
 -  Clone the repository ``git clone https://github.com/pwang1997/CI-ARS.git``
 -  Download Composer packages ``composer i``
