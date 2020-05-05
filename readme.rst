@@ -8,8 +8,8 @@ and maximize instructors' freedom in using educational software during quizzes a
 Server Requirements
 *******************
 
-PHP version 7.2 or newer.
-Composer version 1.3 or newer
+- PHP version 7.2 or newer.
+- Composer version 1.3 or newer
 
 ************
 Deployment
