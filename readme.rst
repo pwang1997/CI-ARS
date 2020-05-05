@@ -5,6 +5,11 @@ The system is a practice of WebSocket with audience response system(ARS). Its go
 and maximize instructors' freedom in using educational software during quizzes and lecturing. 
 
 *******************
+Living Demo
+*******************
+- ec2-54-183-88-168.us-west-1.compute.amazonaws.com
+
+*******************
 Server Requirements
 *******************
 
@@ -16,6 +21,13 @@ Deployment
 ************
 
 -  Download Apache LAMP Stack "sudo apt update & sudo apt install apache2"
+-  Append apache2.config with 
+"<Directory 'your deploy directory'>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+</Directory>"
 -  Clone the repository "git clone https://github.com/pwang1997/CI-ARS.git"
 -  Download Composer packages "composer i"
 -  Change Database Config under application/config/database.php to your database config
