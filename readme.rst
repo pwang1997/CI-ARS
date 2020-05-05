@@ -31,6 +31,6 @@ Deployment
 
 -  Clone the repository ``git clone https://github.com/pwang1997/CI-ARS.git``
 -  Download Composer packages ``composer i``
--  Change Database Config under application/config/database.php to your database config
--  Change Routing base url under application/config/config.php $config[base_url] to your deployment
--  Change JavaScript base url under js/global.js to your deployment
+-  Change Database Config under ``application/config/database.php`` to your database config
+-  Change Routing base url under ``application/config/config.php $config[base_url]`` to your deployment
+-  Change JavaScript base url under ``js/global.js`` to your deployment
